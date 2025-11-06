@@ -5,7 +5,7 @@
       "src": "medtutor-medicine-client/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "build"
+        "distDir": "medtutor-medicine-client/build"
       }
     }
   ],
