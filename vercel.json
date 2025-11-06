@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd medtutor-medicine-client && npm install && npm run build",
+  "outputDirectory": "medtutor-medicine-client/build",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+
