@@ -40,7 +40,7 @@
 
 // Vision UI Dashboard React layouts
 import Dashboard from "layouts/dashboard";
-import Placeholder from "layouts/placeholder";
+import Alimentacao from "layouts/alimentacao";
 import ExercicioFisico from "layouts/exercicio-fisico";
 import SuplementosFitoterapicos from "layouts/suplementos-fitoterapicos";
 import CheckinDiarios from "layouts/checkin-diarios";
@@ -81,7 +81,7 @@ const routes = [
         key: "alimentacao",
         route: "/lifestyle/alimentacao",
         icon: <IoRestaurant size="15px" color="inherit" />,
-        component: Placeholder,
+        component: Alimentacao,
         noCollapse: true,
       },
       {
