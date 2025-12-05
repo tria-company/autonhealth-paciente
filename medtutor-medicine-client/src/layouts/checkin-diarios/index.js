@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Grid from "@mui/material/Grid";
-import { Card, Slider } from "@mui/material";
+import { Card, Slider, CircularProgress } from "@mui/material";
 import VuiButton from "components/VuiButton";
 
 // Vision UI Dashboard React components
@@ -19,24 +19,55 @@ import colors from "assets/theme/base/colors";
 import linearGradient from "assets/theme/functions/linearGradient";
 
 // Icons
-import { IoMoon, IoFlower, IoFitness, IoRestaurant, IoPeople } from "react-icons/io5";
+import { IoMoon, IoFlower, IoFitness, IoRestaurant, IoPeople, IoCheckmarkCircle } from "react-icons/io5";
 import { GiBrainStem } from "react-icons/gi";
+
+// Hooks e funções
+import { usePaciente } from "hooks/usePaciente";
+import { verificarCheckinHoje, salvarCheckin } from "lib/checkins";
 
 const CheckinDiarios = () => {
   const { gradients, info } = colors;
   const { cardContent } = gradients;
   const [iniciado, setIniciado] = useState(false);
   const [stepAtual, setStepAtual] = useState(0);
+  const [salvando, setSalvando] = useState(false);
+  const [mensagem, setMensagem] = useState(null);
+  const [checkinJaFeito, setCheckinJaFeito] = useState(false);
+  const [carregando, setCarregando] = useState(true);
+
+  const { paciente, loading: loadingPaciente } = usePaciente();
 
   // Estados para os valores dos sliders
   const [valores, setValores] = useState({
-    sono: { qualidade: 2, tempo: 7 },
+    sono: { qualidade: 5, tempo: 7 },
     ambiente: { sol: 15, natureza: 30 },
     atividade: { tempo: 1, intensidade: 50 },
     sistemaNervoso: { estresse: 30, mindfulness: 15 },
-    alimentacao: { refeicoes: 4, agua: 2.1 },
+    alimentacao: { refeicoes: 3, agua: 2.0 },
     relacionamento: { qualidade: 60, tempo: 50 },
   });
+
+  // Verificar se o check-in de hoje já foi feito
+  useEffect(() => {
+    async function verificar() {
+      if (loadingPaciente) {
+        setCarregando(true);
+        return;
+      }
+
+      if (!paciente || !paciente.id) {
+        setCarregando(false);
+        return;
+      }
+
+      const jaFez = await verificarCheckinHoje(paciente.id);
+      setCheckinJaFeito(jaFez);
+      setCarregando(false);
+    }
+
+    verificar();
+  }, [paciente, loadingPaciente]);
 
   const categorias = [
     {
@@ -100,15 +131,92 @@ const CheckinDiarios = () => {
     }
   };
 
-  const handleFinalizar = () => {
-    // Aqui você pode salvar os dados
-    alert("Check-in diário concluído com sucesso!");
-    setIniciado(false);
-    setStepAtual(0);
+  const handleFinalizar = async () => {
+    if (!paciente || !paciente.id) {
+      setMensagem({ tipo: 'error', texto: 'Erro: Paciente não identificado.' });
+      return;
+    }
+
+    setSalvando(true);
+    setMensagem(null);
+
+    try {
+      const resultado = await salvarCheckin(paciente.id, valores);
+
+      if (resultado.success) {
+        setMensagem({ tipo: 'success', texto: 'Check-in concluído com sucesso! 🎉' });
+        setCheckinJaFeito(true);
+        // Aguardar 2 segundos antes de resetar
+        setTimeout(() => {
+          setIniciado(false);
+          setStepAtual(0);
+          setMensagem(null);
+        }, 2000);
+      } else {
+        setMensagem({ tipo: 'error', texto: resultado.error || 'Erro ao salvar check-in.' });
+      }
+    } catch (err) {
+      console.error('Erro ao finalizar check-in:', err);
+      setMensagem({ tipo: 'error', texto: 'Erro inesperado ao salvar check-in.' });
+    } finally {
+      setSalvando(false);
+    }
   };
 
   const categoriaAtual = categorias[stepAtual];
   const IconComponent = categoriaAtual?.icone;
+
+  // Estado de carregamento
+  if (carregando || loadingPaciente) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={3} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="70vh">
+          <CircularProgress sx={{ color: "#2E72AC" }} />
+        </VuiBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  // Check-in já realizado hoje
+  if (checkinJaFeito && !iniciado) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={3} pb={6}>
+          <VuiBox mb={3}>
+            <VuiTypography variant="h4" color="white" fontWeight="bold" mb={1}>
+              Check List Diários
+            </VuiTypography>
+          </VuiBox>
+
+          <Card
+            sx={{
+              borderRadius: "20px",
+              background: linearGradient(gradients.cardDark.main, gradients.cardDark.state, gradients.cardDark.deg),
+              textAlign: "center",
+              p: 6,
+            }}
+          >
+            <VuiBox display="flex" flexDirection="column" alignItems="center">
+              <IoCheckmarkCircle size={80} color="#01b574" style={{ marginBottom: 24 }} />
+              <VuiTypography variant="h4" color="white" fontWeight="bold" mb={2}>
+                Check-in Concluído!
+              </VuiTypography>
+              <VuiTypography variant="body1" color="text" fontWeight="regular" mb={1}>
+                Você já realizou o check-in de hoje.
+              </VuiTypography>
+              <VuiTypography variant="body2" color="text" fontWeight="regular">
+                Volte amanhã para o próximo check-in! 🌟
+              </VuiTypography>
+            </VuiBox>
+          </Card>
+        </VuiBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
 
   // Renderizar Checklist Geral
   if (!iniciado) {
@@ -259,13 +367,38 @@ const CheckinDiarios = () => {
           </VuiBox>
         </Card>
 
+        {/* Mensagens de Sucesso/Erro */}
+        {mensagem && (
+          <VuiBox mt={3}>
+            <Card
+              sx={{
+                borderRadius: "12px",
+                background: mensagem.tipo === 'success'
+                  ? "rgba(1, 181, 116, 0.15)"
+                  : "rgba(255, 56, 56, 0.15)",
+                border: `1px solid ${mensagem.tipo === 'success' ? '#01b574' : '#FF3838'}`,
+                p: 2,
+              }}
+            >
+              <VuiTypography
+                variant="body2"
+                color={mensagem.tipo === 'success' ? '#01b574' : '#FF3838'}
+                fontWeight="medium"
+                textAlign="center"
+              >
+                {mensagem.texto}
+              </VuiTypography>
+            </Card>
+          </VuiBox>
+        )}
+
         {/* Botões de Navegação */}
         <VuiBox display="flex" justifyContent="space-between" mt={4}>
           <VuiButton
             variant="outlined"
             size="medium"
             onClick={handleAnterior}
-            disabled={stepAtual === 0}
+            disabled={stepAtual === 0 || salvando}
             sx={{
               borderColor: "#2E72AC",
               color: "#2E72AC",
@@ -289,18 +422,27 @@ const CheckinDiarios = () => {
               color="white"
               size="medium"
               onClick={handleFinalizar}
+              disabled={salvando}
               sx={{
                 background: linearGradient(gradients.info.main, gradients.info.state, gradients.info.deg),
                 color: "#FFFFFF",
                 fontWeight: "bold",
                 px: 6,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
                 "&:hover": {
                   opacity: 0.9,
                   background: linearGradient(gradients.info.main, gradients.info.state, gradients.info.deg),
                 },
+                "&.Mui-disabled": {
+                  background: "rgba(46, 114, 172, 0.5)",
+                  color: "rgba(255, 255, 255, 0.5)",
+                },
               }}
             >
-              Finalizar
+              {salvando && <CircularProgress size={16} sx={{ color: "#FFFFFF" }} />}
+              {salvando ? "Salvando..." : "Finalizar"}
             </VuiButton>
           ) : (
             <VuiButton
@@ -308,6 +450,7 @@ const CheckinDiarios = () => {
               color="white"
               size="medium"
               onClick={handleProximo}
+              disabled={salvando}
               sx={{
                 background: linearGradient(gradients.info.main, gradients.info.state, gradients.info.deg),
                 color: "#FFFFFF",

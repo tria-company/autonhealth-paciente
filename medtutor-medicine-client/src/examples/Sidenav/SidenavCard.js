@@ -58,17 +58,14 @@ function SidenavCard({ color, ...rest }) {
             Precisa de ajuda?
           </VuiTypography>
           <VuiBox mb={1.825} mt={-1}>
-            <VuiTypography variant="caption" color="white" fontWeight="regular">
-              Consulte nossa documentação
-            </VuiTypography>
+            {/* Texto removido conforme solicitado */}
           </VuiBox>
           <VuiButton
             component={Link}
-            href="https://www.creative-tim.com/learning-lab/react/quick-start/vision-ui-dashboard/"
+            href="https://www.google.com"
             target="_blank"
             rel="noreferrer"
             size="small"
-            // sx={{ color: "white !important", background: "red" }}
             sx={({ palette: { gradients, white }, functions: { linearGradient } }) => ({
               color: `${white.main} !important`,
               background: linearGradient(
@@ -86,7 +83,7 @@ function SidenavCard({ color, ...rest }) {
             })}
             fullWidth
           >
-            DOCUMENTAÇÃO
+            ACESSAR
           </VuiButton>
         </VuiBox>
       </CardContent>

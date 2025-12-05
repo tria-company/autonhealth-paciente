@@ -19,7 +19,8 @@
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Icon from "@mui/material/Icon";
-import { Card, LinearProgress, Stack } from "@mui/material";
+import { Card, LinearProgress, Stack, MenuItem, Select, FormControl, CircularProgress } from "@mui/material";
+import { useState, useEffect } from "react";
 
 // Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
@@ -53,51 +54,219 @@ import { FaShoppingCart } from "react-icons/fa";
 // Data
 import LineChart from "examples/Charts/LineCharts/LineChart";
 import BarChart from "examples/Charts/BarCharts/BarChart";
-import { lineChartDataDashboard } from "layouts/dashboard/data/lineChartData";
 import { lineChartOptionsDashboard } from "layouts/dashboard/data/lineChartOptions";
 import EquilibrioGeralWidget from "layouts/dashboard/components/EquilibrioGeralWidget";
 import { barChartDataDashboard } from "layouts/dashboard/data/barChartData";
 import { barChartOptionsDashboard } from "layouts/dashboard/data/barChartOptions";
 
+// Hooks e funções
+import { usePaciente } from "hooks/usePaciente";
+import { buscarMetricasPaciente, buscarHistoricoCheckins, processarDadosGrafico } from "lib/checkins";
+
 function Dashboard() {
   const { gradients } = colors;
   const { cardContent } = gradients;
+  const { paciente, loading: loadingPaciente } = usePaciente();
+
+  const [metricas, setMetricas] = useState(null);
+  const [historico, setHistorico] = useState([]);
+  const [dadosGrafico, setDadosGrafico] = useState(null);
+  const [periodo, setPeriodo] = useState(7); // Período padrão: 7 dias
+  const [loading, setLoading] = useState(true);
+
+  // Carregar dados do paciente
+  useEffect(() => {
+    async function carregarDados() {
+      if (loadingPaciente) {
+        setLoading(true);
+        return;
+      }
+
+      if (!paciente || !paciente.id) {
+        setLoading(false);
+        return;
+      }
+
+      console.log('📊 Carregando dados do dashboard para paciente:', paciente.id);
+
+      try {
+        // Buscar métricas
+        const metricasData = await buscarMetricasPaciente(paciente.id);
+        setMetricas(metricasData);
+
+        // Buscar histórico de check-ins
+        const historicoData = await buscarHistoricoCheckins(paciente.id, periodo);
+        setHistorico(historicoData);
+
+        // Processar dados para o gráfico
+        if (historicoData.length > 0) {
+          const dadosProcessados = processarDadosGrafico(historicoData);
+          setDadosGrafico(dadosProcessados);
+        }
+      } catch (err) {
+        console.error('Erro ao carregar dados do dashboard:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarDados();
+  }, [paciente, loadingPaciente, periodo]);
+
+  // Estado de carregamento
+  if (loading || loadingPaciente) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={3} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="70vh">
+          <CircularProgress sx={{ color: "#2E72AC" }} />
+        </VuiBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  // Sem dados de check-in
+  if (!metricas) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={3} pb={6}>
+          <WelcomeMark />
+          <VuiBox mt={3}>
+            <Card
+              sx={{
+                borderRadius: "20px",
+                background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
+                textAlign: "center",
+                p: 6,
+              }}
+            >
+              <VuiTypography variant="h5" color="white" fontWeight="bold" mb={2}>
+                Nenhum Check-in Realizado
+              </VuiTypography>
+              <VuiTypography variant="body2" color="text" fontWeight="regular">
+                Complete seu primeiro check-in diário para visualizar suas métricas e acompanhar seu progresso.
+              </VuiTypography>
+            </Card>
+          </VuiBox>
+        </VuiBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  // Formatar valores para exibição
+  const equilibrioGeral = metricas.equilibrio_geral?.toFixed(1) || "0.0";
+  const equilibrioVariacao = metricas.equilibrio_geral_variacao 
+    ? (metricas.equilibrio_geral_variacao >= 0 ? `+${metricas.equilibrio_geral_variacao.toFixed(0)}%` : `${metricas.equilibrio_geral_variacao.toFixed(0)}%`)
+    : "+0%";
+  
+  const sonoHoras = metricas.qualidade_sono_horas || 0;
+  const sonoHorasFormatado = `${Math.floor(sonoHoras)}h:${Math.round((sonoHoras % 1) * 60)}min`;
+  const sonoVariacao = metricas.qualidade_sono_variacao_minutos 
+    ? (metricas.qualidade_sono_variacao_minutos >= 0 ? `+${metricas.qualidade_sono_variacao_minutos}min` : `${metricas.qualidade_sono_variacao_minutos}min`)
+    : "+0min";
+
+  const hidratacaoAtual = metricas.hidratacao_atual_litros?.toFixed(1) || "0.0";
+  const hidratacaoMeta = metricas.hidratacao_meta_litros?.toFixed(1) || "2.4";
+
+  const mentalEnergia = metricas.mental_energia?.toFixed(1) || "0.0";
+  const mentalVariacao = metricas.mental_energia_variacao 
+    ? (metricas.mental_energia_variacao >= 0 ? `+${metricas.mental_energia_variacao.toFixed(0)}%` : `${metricas.mental_energia_variacao.toFixed(0)}%`)
+    : "+0%";
+
+  // Debug: Ver valores brutos das métricas
+  console.log("📊 Métricas brutas do banco:", {
+    equilibrio_sono: metricas.equilibrio_sono,
+    equilibrio_ambiente: metricas.equilibrio_ambiente,
+    equilibrio_atividade_fisica: metricas.equilibrio_atividade_fisica,
+    equilibrio_sistema_nervoso: metricas.equilibrio_sistema_nervoso,
+    equilibrio_alimentacao: metricas.equilibrio_alimentacao,
+    equilibrio_relacionamento: metricas.equilibrio_relacionamento,
+  });
+
+  // Dimensões do equilíbrio integrativo
+  const dimensoes = [
+    { nome: "Sono", valor: metricas.equilibrio_sono?.toFixed(1) || "0.0" },
+    { nome: "Ambiente", valor: metricas.equilibrio_ambiente?.toFixed(1) || "0.0" },
+    { nome: "Atividade Física", valor: metricas.equilibrio_atividade_fisica?.toFixed(1) || "0.0" },
+    { nome: "Sistema Nervoso", valor: metricas.equilibrio_sistema_nervoso?.toFixed(1) || "0.0" },
+    { nome: "Alimentação", valor: metricas.equilibrio_alimentacao?.toFixed(1) || "0.0" },
+    { nome: "Relacionamento", valor: metricas.equilibrio_relacionamento?.toFixed(1) || "0.0" },
+  ];
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <VuiBox pt={3} pb={6}>
+        {/* Filtro de Período */}
+        <VuiBox mb={3} display="flex" justifyContent="flex-end">
+          <FormControl variant="standard" sx={{ minWidth: 120 }}>
+            <VuiTypography variant="caption" color="text" mb={1}>
+              Período:
+            </VuiTypography>
+            <Select
+              value={periodo}
+              onChange={(e) => setPeriodo(e.target.value)}
+              sx={{
+                color: "white",
+                "& .MuiSelect-icon": { color: "white" },
+                "&:before": { borderColor: "rgba(255, 255, 255, 0.3)" },
+                "&:after": { borderColor: "#2E72AC" },
+              }}
+            >
+              <MenuItem value={7}>Últimos 7 dias</MenuItem>
+              <MenuItem value={15}>Últimos 15 dias</MenuItem>
+              <MenuItem value={30}>Últimos 30 dias</MenuItem>
+              <MenuItem value={90}>Últimos 90 dias</MenuItem>
+            </Select>
+          </FormControl>
+        </VuiBox>
+
         <VuiBox mb={3}>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} xl={3}>
               <MiniStatisticsCard
                 title={{ text: "Equilíbrio Geral", fontWeight: "regular" }}
-                count="8.7/10"
-                percentage={{ color: "success", text: "+15%" }}
+                count={`${equilibrioGeral}/10`}
+                percentage={{ 
+                  color: metricas.equilibrio_geral_variacao >= 0 ? "success" : "error", 
+                  text: equilibrioVariacao 
+                }}
                 icon={{ color: "info", component: <IoChatbubbleEllipses size="22px" color="white" /> }}
               />
             </Grid>
             <Grid item xs={12} md={6} xl={3}>
               <MiniStatisticsCard
                 title={{ text: "Qualidade do sono" }}
-                count="7h:10min"
-                percentage={{ color: "success", text: "+20min" }}
+                count={sonoHorasFormatado}
+                percentage={{ 
+                  color: metricas.qualidade_sono_variacao_minutos >= 0 ? "success" : "error", 
+                  text: sonoVariacao 
+                }}
                 icon={{ color: "info", component: <IoMoon size="22px" color="white" /> }}
               />
             </Grid>
             <Grid item xs={12} md={6} xl={3}>
               <MiniStatisticsCard
                 title={{ text: "Hidratação" }}
-                count="1.8 L / 2.4 L"
-                percentage={{ color: "error", text: "" }}
+                count={`${hidratacaoAtual} L / ${hidratacaoMeta} L`}
+                percentage={{ 
+                  color: parseFloat(hidratacaoAtual) >= parseFloat(hidratacaoMeta) ? "success" : "error", 
+                  text: "" 
+                }}
                 icon={{ color: "info", component: <IoWater size="22px" color="white" /> }}
               />
             </Grid>
             <Grid item xs={12} md={6} xl={3}>
               <MiniStatisticsCard
                 title={{ text: "Mental & Energia" }}
-                count="9.3 / 10"
-                percentage={{ color: "success", text: "+8%" }}
+                count={`${mentalEnergia} / 10`}
+                percentage={{ 
+                  color: metricas.mental_energia_variacao >= 0 ? "success" : "error", 
+                  text: mentalVariacao 
+                }}
                 icon={{ color: "info", component: <IoHappy size="22px" color="white" /> }}
               />
             </Grid>
@@ -128,8 +297,8 @@ function Dashboard() {
               <Grid container spacing={3} alignItems="stretch">
                 <Grid item xs={12} xl={5}>
                   <Grid container spacing={3}>
-                    {[1,2,3,4,5,6].map((i) => (
-                      <Grid key={i} item xs={12} sm={6}>
+                    {dimensoes.map((dimensao, index) => (
+                      <Grid key={index} item xs={12} sm={6}>
                         <Card sx={{
                           height: 90,
                           borderRadius: '20px',
@@ -141,10 +310,10 @@ function Dashboard() {
                         }}>
                           <VuiBox p="14px" sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                             <VuiTypography color="text" variant="button" fontWeight="regular" mb="4px" sx={{ display: 'block' }}>
-                              Físico
+                              {dimensao.nome}
                             </VuiTypography>
                             <VuiTypography color="white" variant="lg" fontWeight="bold" sx={{ display: 'block' }}>
-                              8.6
+                              {dimensao.valor}
                             </VuiTypography>
                           </VuiBox>
                         </Card>
@@ -153,16 +322,24 @@ function Dashboard() {
                   </Grid>
                 </Grid>
                 <Grid item xs={12} xl={3}>
-                  <EquilibrioGeralWidget value={8.9} />
+                  <EquilibrioGeralWidget value={parseFloat(equilibrioGeral)} />
                 </Grid>
                 <Grid item xs={12} xl={4}>
                   <Card sx={{ height: 340 }}>
                     <VuiBox sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
                       <VuiBox sx={{ height: 300, width: '100%' }}>
-                        <LineChart
-                          lineChartData={lineChartDataDashboard}
-                          lineChartOptions={lineChartOptionsDashboard}
-                        />
+                        {dadosGrafico && dadosGrafico.labels.length > 0 ? (
+                          <LineChart
+                            lineChartData={dadosGrafico.datasets}
+                            lineChartOptions={lineChartOptionsDashboard}
+                          />
+                        ) : (
+                          <VuiBox display="flex" justifyContent="center" alignItems="center" height="100%">
+                            <VuiTypography variant="body2" color="text" textAlign="center">
+                              Realize mais check-ins para visualizar o gráfico de evolução
+                            </VuiTypography>
+                          </VuiBox>
+                        )}
                       </VuiBox>
                     </VuiBox>
                   </Card>

@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import Grid from "@mui/material/Grid";
-import { Card } from "@mui/material";
+import { Card, CircularProgress, Chip } from "@mui/material";
 
 // Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
@@ -15,14 +15,52 @@ import Footer from "examples/Footer";
 // Vision UI Dashboard React base styles
 import colors from "assets/theme/base/colors";
 import linearGradient from "assets/theme/functions/linearGradient";
-import { IoWarning, IoFlask, IoLeaf } from "react-icons/io5";
+import { IoWarning, IoFlask, IoLeaf, IoFlower } from "react-icons/io5";
 import { FaCapsules, FaPills } from "react-icons/fa";
+import { GiHerbsBundle } from "react-icons/gi";
+
+// Hooks e funções
+import { buscarSuplementacao } from "lib/suplementacao";
+import { usePaciente } from "hooks/usePaciente";
+
+// Função para obter ícone e cor baseado na categoria
+const getCategoriaInfo = (categoria) => {
+  const categorias = {
+    suplementos: { Icon: FaCapsules, color: "#2E72AC", label: "Suplemento" },
+    fitoterapicos: { Icon: IoLeaf, color: "#01b574", label: "Fitoterápico" },
+    homeopatia: { Icon: GiHerbsBundle, color: "#9f7aea", label: "Homeopatia" },
+    florais_bach: { Icon: IoFlower, color: "#f6ad55", label: "Floral de Bach" },
+  };
+  return categorias[categoria] || { Icon: IoFlask, color: "#4299e1", label: "Outro" };
+};
+
+// Função para formatar data
+const formatarData = (data) => {
+  if (!data || data === "Ongoing" || data === "ongoing") return "Em andamento";
+  try {
+    // Se já estiver formatada (DD/MM/YYYY), retornar como está
+    if (data.includes("/")) return data;
+    // Se for YYYY-MM-DD, converter para DD/MM/YYYY
+    if (data.includes("-")) {
+      const [year, month, day] = data.split("-");
+      return `${day}/${month}/${year}`;
+    }
+    return data;
+  } catch (e) {
+    return data;
+  }
+};
 
 const SuplementosFitoterapicos = () => {
   const { gradients } = colors;
   const { cardContent } = gradients;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [itens, setItens] = useState([]);
+  const { paciente, loading: loadingPaciente } = usePaciente();
 
-  const suplementos = [
+  // Dados mockados (fallback)
+  const suplementosMockados = [
     {
       id: 1,
       nome: "Vitamina D3 + K2",
@@ -103,6 +141,188 @@ const SuplementosFitoterapicos = () => {
     },
   ];
 
+  // Buscar dados de suplementação quando o componente carregar
+  useEffect(() => {
+    // Aguardar o carregamento do paciente antes de buscar os dados
+    if (loadingPaciente) {
+      console.log('⏳ Aguardando carregamento do paciente...');
+      return;
+    }
+
+    async function carregarDados() {
+      console.log('🔍 Carregando dados de Suplementação...');
+      console.log('👤 Paciente:', paciente);
+      
+      if (!paciente || !paciente.id) {
+        console.log('❌ Paciente não encontrado ou sem ID');
+        setLoading(false);
+        setError("Paciente não encontrado");
+        return;
+      }
+
+      console.log('✅ Paciente ID:', paciente.id);
+
+      try {
+        setLoading(true);
+        const dados = await buscarSuplementacao(paciente.id);
+        
+        console.log('📦 Dados retornados:', dados);
+
+        if (!dados) {
+          setError("Nenhum dado de suplementação encontrado para este paciente");
+          setLoading(false);
+          return;
+        }
+
+        // Combinar todas as categorias em um único array
+        const todosItens = [];
+        let idCounter = 1;
+
+        // Processar suplementos
+        if (dados.suplementos && dados.suplementos.length > 0) {
+          dados.suplementos.forEach((item) => {
+            const categoriaInfo = getCategoriaInfo('suplementos');
+            todosItens.push({
+              id: idCounter++,
+              categoria: 'suplementos',
+              nome: item.nome || '',
+              objetivo: item.objetivo || '',
+              dosagem: item.dosagem || '',
+              horario: item.horario || '',
+              inicio: formatarData(item.inicio || ''),
+              termino: formatarData(item.termino || ''),
+              criticidade: null,
+              observacaoCritica: null,
+              iconColor: categoriaInfo.color,
+              Icon: categoriaInfo.Icon,
+            });
+          });
+        }
+
+        // Processar fitoterápicos
+        if (dados.fitoterapicos && dados.fitoterapicos.length > 0) {
+          dados.fitoterapicos.forEach((item) => {
+            const categoriaInfo = getCategoriaInfo('fitoterapicos');
+            todosItens.push({
+              id: idCounter++,
+              categoria: 'fitoterapicos',
+              nome: item.nome || '',
+              objetivo: item.objetivo || '',
+              dosagem: item.dosagem || '',
+              horario: item.horario || '',
+              inicio: formatarData(item.inicio || ''),
+              termino: formatarData(item.termino || ''),
+              criticidade: null,
+              observacaoCritica: null,
+              iconColor: categoriaInfo.color,
+              Icon: categoriaInfo.Icon,
+            });
+          });
+        }
+
+        // Processar homeopatia
+        if (dados.homeopatia && dados.homeopatia.length > 0) {
+          dados.homeopatia.forEach((item) => {
+            const categoriaInfo = getCategoriaInfo('homeopatia');
+            todosItens.push({
+              id: idCounter++,
+              categoria: 'homeopatia',
+              nome: item.nome || '',
+              objetivo: item.objetivo || '',
+              dosagem: item.dosagem || '',
+              horario: item.horario || '',
+              inicio: formatarData(item.inicio || ''),
+              termino: formatarData(item.termino || ''),
+              criticidade: null,
+              observacaoCritica: null,
+              iconColor: categoriaInfo.color,
+              Icon: categoriaInfo.Icon,
+            });
+          });
+        }
+
+        // Processar florais de Bach
+        if (dados.florais_bach && dados.florais_bach.length > 0) {
+          dados.florais_bach.forEach((item) => {
+            const categoriaInfo = getCategoriaInfo('florais_bach');
+            todosItens.push({
+              id: idCounter++,
+              categoria: 'florais_bach',
+              nome: item.nome || '',
+              objetivo: item.objetivo || '',
+              dosagem: item.dosagem || '',
+              horario: item.horario || '',
+              inicio: formatarData(item.inicio || ''),
+              termino: formatarData(item.termino || ''),
+              criticidade: null,
+              observacaoCritica: null,
+              iconColor: categoriaInfo.color,
+              Icon: categoriaInfo.Icon,
+            });
+          });
+        }
+
+        console.log('📊 Total de itens processados:', todosItens.length);
+        setItens(todosItens);
+        setLoading(false);
+      } catch (err) {
+        console.error('Erro ao carregar Suplementação:', err);
+        setError("Erro ao carregar os dados de suplementação");
+        setLoading(false);
+      }
+    }
+
+    carregarDados();
+  }, [paciente, loadingPaciente]);
+
+  // Loading state
+  if (loadingPaciente || loading) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={3} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+          <VuiBox textAlign="center">
+            <CircularProgress sx={{ color: "#2E72AC", mb: 2 }} />
+            <VuiTypography variant="h6" color="white" fontWeight="medium">
+              {loadingPaciente ? "Carregando informações do paciente..." : "Carregando Suplementação..."}
+            </VuiTypography>
+          </VuiBox>
+        </VuiBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={3} pb={6}>
+          <Card
+            sx={{
+              borderRadius: "20px",
+              background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
+            }}
+          >
+            <VuiBox p={3} textAlign="center">
+              <VuiTypography variant="h5" color="white" fontWeight="bold" mb={2}>
+                {error}
+              </VuiTypography>
+              <VuiTypography variant="body2" color="text" fontWeight="regular">
+                Entre em contato com o suporte se o problema persistir.
+              </VuiTypography>
+            </VuiBox>
+          </Card>
+        </VuiBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  // Usar dados dinâmicos ou fallback
+  const itensParaExibir = itens.length > 0 ? itens : suplementosMockados;
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -114,8 +334,9 @@ const SuplementosFitoterapicos = () => {
         </VuiBox>
 
         <Grid container spacing={3}>
-          {suplementos.map((suplemento) => {
+          {itensParaExibir.map((suplemento) => {
             const IconComponent = suplemento.Icon;
+            const categoriaInfo = suplemento.categoria ? getCategoriaInfo(suplemento.categoria) : null;
             return (
               <Grid item xs={12} md={4} key={suplemento.id}>
                 <Card
@@ -148,10 +369,22 @@ const SuplementosFitoterapicos = () => {
                     </VuiBox>
 
                   {/* Nome do suplemento */}
-                  <VuiBox textAlign="center" mb={3}>
-                    <VuiTypography variant="h5" color="white" fontWeight="bold">
+                  <VuiBox textAlign="center" mb={2}>
+                    <VuiTypography variant="h5" color="white" fontWeight="bold" mb={1}>
                       {suplemento.nome}
                     </VuiTypography>
+                    {categoriaInfo && (
+                      <Chip
+                        label={categoriaInfo.label}
+                        size="small"
+                        sx={{
+                          backgroundColor: `${suplemento.iconColor}20`,
+                          color: suplemento.iconColor,
+                          fontWeight: "medium",
+                          border: `1px solid ${suplemento.iconColor}40`,
+                        }}
+                      />
+                    )}
                   </VuiBox>
 
                   {/* Grid de informações */}

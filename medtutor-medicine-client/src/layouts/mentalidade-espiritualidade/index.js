@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
-import { Card, Accordion, AccordionSummary, AccordionDetails, Chip } from "@mui/material";
+import { Card, Accordion, AccordionSummary, AccordionDetails, Chip, CircularProgress } from "@mui/material";
 import Icon from "@mui/material/Icon";
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
@@ -11,12 +11,20 @@ import colors from "assets/theme/base/colors";
 import linearGradient from "assets/theme/functions/linearGradient";
 import { GiSelfLove } from "react-icons/gi";
 import { IoArrowDown, IoArrowUp, IoMoon, IoTime, IoCalendar, IoCheckmarkCircle, IoCloseCircle, IoAlertCircle } from "react-icons/io5";
+import { buscarLivroDaVida } from "lib/livro-da-vida";
+import { usePaciente } from "hooks/usePaciente";
 
 const MentalidadeEspiritualidade = () => {
   const { gradients } = colors;
   const { cardContent } = gradients;
   const [expandedPadrao, setExpandedPadrao] = useState(null);
   const [expandedPasso, setExpandedPasso] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [resumoExecutivo, setResumoExecutivo] = useState(null);
+  const [padroes, setPadroes] = useState([]);
+  const [dadosSono, setDadosSono] = useState(null);
+  const { paciente, loading: loadingPaciente } = usePaciente();
 
   const handleChangePadrao = (padraoId) => (event, isExpanded) => {
     setExpandedPadrao(isExpanded ? padraoId : null);
@@ -29,19 +37,129 @@ const MentalidadeEspiritualidade = () => {
     });
   };
 
-  const resumoExecutivo = {
-    titulo: "Resumo Executivo",
-    conteudo: [
-      "Thiago, sua trajetória revela uma impressionante força de superação e resiliência, forjada desde a infância diante de adversidades marcantes.",
-      "Foram identificados 7 padrões mentais e emocionais centrais que hoje limitam não apenas sua performance sustentável, mas também sua qualidade de vida e bem-estar integral.",
-      "Os padrões raiz principais são: Crença Central de Inadequação, Hipercompensação (Overachiever), Autossacrifício e Perfeccionismo. Estes formam a fundação de uma rede de crenças e comportamentos que alimentam sintomas como negligência do autocuidado, privação crônica de sono, síndrome do impostor e autossabotagem física.",
-      "Compreender que estes padrões não surgiram do acaso, mas foram adaptações inteligentes para sobreviver e prosperar em contextos de escassez, é fundamental para iniciar a transformação.",
-      "Ao trabalhar estrategicamente as raízes — começando pela crença de inadequação e o ciclo de hipercompensação —, você abrirá espaço para um efeito dominó de mudanças positivas em seu corpo, mente e relações.",
-      "O caminho não exige perfeição, mas sim um compromisso genuíno com o autocuidado, a autocompaixão e a reescrita de sua narrativa interna. Com empenho consistente e aplicação das orientações detalhadas, é plenamente possível construir uma Nova Vida Extraordinária, onde alta performance e bem-estar caminham juntos, sem sacrificar sua essência.",
-    ],
-  };
+  // Buscar dados do Livro da Vida quando o componente carregar
+  useEffect(() => {
+    // Aguardar o carregamento do paciente antes de buscar os dados
+    if (loadingPaciente) {
+      console.log('⏳ Aguardando carregamento do paciente...');
+      return;
+    }
 
-  const padroes = [
+    async function carregarDados() {
+      console.log('🔍 Carregando dados do Livro da Vida...');
+      console.log('👤 Paciente:', paciente);
+      
+      if (!paciente || !paciente.id) {
+        console.log('❌ Paciente não encontrado ou sem ID');
+        setLoading(false);
+        setError("Paciente não encontrado");
+        return;
+      }
+
+      console.log('✅ Paciente ID:', paciente.id);
+
+      try {
+        setLoading(true);
+        const dados = await buscarLivroDaVida(paciente.id);
+        
+        console.log('📦 Dados retornados:', dados);
+
+        if (!dados) {
+          setError("Nenhum dado do Livro da Vida encontrado para este paciente");
+          setLoading(false);
+          return;
+        }
+
+        // Processar resumo executivo
+        if (dados.resumo_executivo) {
+          // Se for string, dividir em parágrafos
+          const conteudo = typeof dados.resumo_executivo === 'string' 
+            ? dados.resumo_executivo.split('\n').filter(p => p.trim())
+            : [dados.resumo_executivo];
+          
+          setResumoExecutivo({
+            titulo: "Resumo Executivo",
+            conteudo: conteudo.length > 0 ? conteudo : ["Nenhum resumo executivo disponível."],
+          });
+        } else {
+          setResumoExecutivo({
+            titulo: "Resumo Executivo",
+            conteudo: ["Nenhum resumo executivo disponível."],
+          });
+        }
+
+        // Processar padrões
+        if (dados.padroes && dados.padroes.length > 0) {
+          console.log('📋 Processando padrões:', dados.padroes);
+          const padroesProcessados = dados.padroes.map((padrao, index) => {
+            // Mapear estrutura do banco para estrutura do componente
+            const padraoProcessado = {
+              id: padrao.id || index + 1,
+              nome: padrao.padrao || padrao.nome || `Padrão ${index + 1}`,
+              subtitulo: padrao.subtitulo || (padrao.padrao ? `'${padrao.padrao}'` : ''),
+              prioridade: padrao.prioridade || index + 1,
+              categorias: Array.isArray(padrao.categorias) ? padrao.categorias : [],
+              areasImpacto: Array.isArray(padrao.areas_impacto) ? padrao.areas_impacto : [],
+              origem: {
+                periodo: padrao.origem_estimada?.periodo || padrao.origem?.periodo || "Não especificado",
+                contexto: padrao.origem_estimada?.contexto_provavel || padrao.origem?.contexto || "Não especificado",
+              },
+              manifestacoes: Array.isArray(padrao.manifestacoes_atuais) ? padrao.manifestacoes_atuais : (Array.isArray(padrao.manifestacoes) ? padrao.manifestacoes : []),
+              conexoes: {
+                raizDe: padrao.conexoes_padroes?.raiz_de || padrao.conexoes?.raizDe || [],
+                alimentadoPor: padrao.conexoes_padroes?.alimentado_por || padrao.conexoes?.alimentadoPor || [],
+                relacionadoCom: padrao.conexoes_padroes?.relacionado_com || padrao.conexoes?.relacionadoCom || [],
+              },
+              orientacoes: Array.isArray(padrao.orientacoes_transformacao) ? padrao.orientacoes_transformacao.map((orient, idx) => ({
+                numero: orient.passo || orient.numero || idx + 1,
+                titulo: orient.nome || orient.titulo || `Orientação ${idx + 1}`,
+                oQueFazer: orient.o_que_fazer || orient.oQueFazer || '',
+                comoFazer: orient.como_fazer || orient.comoFazer || '',
+                porQueFunciona: orient.porque_funciona || orient.porQueFunciona || '',
+              })) : [],
+            };
+            console.log(`✅ Padrão ${index + 1} processado:`, padraoProcessado.nome);
+            return padraoProcessado;
+          });
+          console.log('📊 Total de padrões processados:', padroesProcessados.length);
+          setPadroes(padroesProcessados);
+        } else {
+          console.log('⚠️ Nenhum padrão encontrado nos dados');
+          setPadroes([]);
+        }
+
+        // Processar higiene do sono
+        if (dados.higiene_sono) {
+          setDadosSono(dados.higiene_sono);
+        } else {
+          // Dados padrão se não houver no banco
+          setDadosSono({
+            horario_dormir_recomendado: "23:00",
+            horario_acordar_recomendado: "07:00",
+            duracao_alvo: "8h",
+            janela_sono_semana: "23:00-07:00",
+            janela_sono_fds: "23:00-07:00",
+            consistencia_horario: "Variação máxima ±30min entre semana e fins de semana",
+            rotina_pre_sono: [],
+            gatilhos_evitar: [],
+            progressao_ajuste: "",
+            observacoes_clinicas: "",
+          });
+        }
+
+        setLoading(false);
+      } catch (err) {
+        console.error('Erro ao carregar Livro da Vida:', err);
+        setError("Erro ao carregar os dados do Livro da Vida");
+        setLoading(false);
+      }
+    }
+
+    carregarDados();
+  }, [paciente, loadingPaciente]);
+
+  // Dados mockados (fallback caso não haja dados no banco)
+  const padroesMockados = [
     {
       id: 1,
       nome: "Crença Central de Inadequação",
@@ -492,6 +610,71 @@ const MentalidadeEspiritualidade = () => {
     return "#2E72AC";
   };
 
+  // Loading state - aguardar paciente ou dados
+  if (loadingPaciente || loading) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={3} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+          <VuiBox textAlign="center">
+            <CircularProgress sx={{ color: "#2E72AC", mb: 2 }} />
+            <VuiTypography variant="h6" color="white" fontWeight="medium">
+              {loadingPaciente ? "Carregando informações do paciente..." : "Carregando Livro da Vida..."}
+            </VuiTypography>
+          </VuiBox>
+        </VuiBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={3} pb={6}>
+          <Card
+            sx={{
+              borderRadius: "20px",
+              background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
+            }}
+          >
+            <VuiBox p={3} textAlign="center">
+              <VuiTypography variant="h5" color="white" fontWeight="bold" mb={2}>
+                {error}
+              </VuiTypography>
+              <VuiTypography variant="body2" color="text" fontWeight="regular">
+                Entre em contato com o suporte se o problema persistir.
+              </VuiTypography>
+            </VuiBox>
+          </Card>
+        </VuiBox>
+        <Footer />
+      </DashboardLayout>
+    );
+  }
+
+  // Usar dados dinâmicos ou fallback
+  const resumoParaExibir = resumoExecutivo || {
+    titulo: "Resumo Executivo",
+    conteudo: ["Nenhum resumo executivo disponível."],
+  };
+
+  const padroesParaExibir = padroes.length > 0 ? padroes : padroesMockados;
+  const dadosSonoParaExibir = dadosSono || {
+    horario_dormir_recomendado: "23:00",
+    horario_acordar_recomendado: "07:00",
+    duracao_alvo: "8h",
+    janela_sono_semana: "23:00-07:00",
+    janela_sono_fds: "23:00-07:00",
+    consistencia_horario: "Variação máxima ±30min entre semana e fins de semana",
+    rotina_pre_sono: [],
+    gatilhos_evitar: [],
+    progressao_ajuste: "",
+    observacoes_clinicas: "",
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
@@ -508,17 +691,17 @@ const MentalidadeEspiritualidade = () => {
             <VuiBox display="flex" alignItems="center" mb={2}>
               <GiSelfLove size={32} color="#2E72AC" style={{ marginRight: 12 }} />
               <VuiTypography variant="h4" color="white" fontWeight="bold">
-                {resumoExecutivo.titulo}
+                {resumoParaExibir.titulo}
               </VuiTypography>
             </VuiBox>
             <VuiBox>
-              {resumoExecutivo.conteudo.map((paragrafo, index) => (
+              {resumoParaExibir.conteudo.map((paragrafo, index) => (
                 <VuiTypography
                   key={index}
                   variant="body2"
                   color="text"
                   fontWeight="regular"
-                  mb={index < resumoExecutivo.conteudo.length - 1 ? 2 : 0}
+                  mb={index < resumoParaExibir.conteudo.length - 1 ? 2 : 0}
                   sx={{ lineHeight: 1.8 }}
                 >
                   {paragrafo}
@@ -540,31 +723,6 @@ const MentalidadeEspiritualidade = () => {
 
         {/* Dados do Sono */}
         {(() => {
-          const dadosSono = {
-            horario_dormir_recomendado: "23:00",
-            horario_acordar_recomendado: "07:00",
-            duracao_alvo: "8h",
-            janela_sono_semana: "23:00-07:00",
-            janela_sono_fds: "23:00-07:00",
-            consistencia_horario: "Variação máxima ±30min entre semana e fins de semana",
-            rotina_pre_sono: [
-              "22:00 - Desligar telas e luz branca",
-              "22:20 - Banho morno ou técnica respiratória/mindfulness",
-              "22:40 - Leitura leve com luz tênue",
-              "23:00 - Deitar no horário combinado",
-            ],
-            gatilhos_evitar: [
-              "Cafeína após 16h",
-              "Exercício intenso noturno (após 20h)",
-              "Telas ou reuniões após 21h",
-              "Refeições pesadas após 20h",
-            ],
-            progressao_ajuste:
-              "Reduzir horário de dormir 15 minutos a cada 3 dias até atingir 23:00 sem perda do despertar fixo às 07:00.",
-            observacoes_clinicas:
-              "Sono cronicamente curto e superficial, mente ativa e jet-lag social moderado (>1h2min). Prioridade máxima para saúde neurocognitiva e metabólica. Impacto de olheiras, fadiga e desempenho oscilante exige ajuste imediato na rotina.",
-          };
-
           return (
             <>
               {/* Card de Resumo - Horários Recomendados */}
@@ -596,7 +754,7 @@ const MentalidadeEspiritualidade = () => {
                           Dormir
                         </VuiTypography>
                         <VuiTypography variant="h4" color="white" fontWeight="bold">
-                          {dadosSono.horario_dormir_recomendado}
+                          {dadosSonoParaExibir.horario_dormir_recomendado}
                         </VuiTypography>
                       </Card>
                     </Grid>
@@ -613,7 +771,7 @@ const MentalidadeEspiritualidade = () => {
                           Acordar
                         </VuiTypography>
                         <VuiTypography variant="h4" color="white" fontWeight="bold">
-                          {dadosSono.horario_acordar_recomendado}
+                          {dadosSonoParaExibir.horario_acordar_recomendado}
                         </VuiTypography>
                       </Card>
                     </Grid>
@@ -630,16 +788,18 @@ const MentalidadeEspiritualidade = () => {
                           Duração Alvo
                         </VuiTypography>
                         <VuiTypography variant="h4" color="white" fontWeight="bold">
-                          {dadosSono.duracao_alvo}
+                          {dadosSonoParaExibir.duracao_alvo}
                         </VuiTypography>
                       </Card>
                     </Grid>
                   </Grid>
-                  <VuiBox mt={3} p={2} sx={{ background: "rgba(255, 255, 255, 0.05)", borderRadius: "12px" }}>
-                    <VuiTypography variant="body2" color="text" fontWeight="regular" sx={{ lineHeight: 1.7 }}>
-                      <strong>Consistência:</strong> {dadosSono.consistencia_horario}
-                    </VuiTypography>
-                  </VuiBox>
+                  {dadosSonoParaExibir.consistencia_horario && (
+                    <VuiBox mt={3} p={2} sx={{ background: "rgba(255, 255, 255, 0.05)", borderRadius: "12px" }}>
+                      <VuiTypography variant="body2" color="text" fontWeight="regular" sx={{ lineHeight: 1.7 }}>
+                        <strong>Consistência:</strong> {dadosSonoParaExibir.consistencia_horario}
+                      </VuiTypography>
+                    </VuiBox>
+                  )}
                 </VuiBox>
               </Card>
 
@@ -669,7 +829,7 @@ const MentalidadeEspiritualidade = () => {
                         }}
                       >
                         <VuiTypography variant="h4" color="white" fontWeight="bold">
-                          {dadosSono.janela_sono_semana}
+                          {dadosSonoParaExibir.janela_sono_semana}
                         </VuiTypography>
                       </VuiBox>
                     </VuiBox>
@@ -699,7 +859,7 @@ const MentalidadeEspiritualidade = () => {
                         }}
                       >
                         <VuiTypography variant="h4" color="white" fontWeight="bold">
-                          {dadosSono.janela_sono_fds}
+                          {dadosSonoParaExibir.janela_sono_fds}
                         </VuiTypography>
                       </VuiBox>
                     </VuiBox>
@@ -708,24 +868,27 @@ const MentalidadeEspiritualidade = () => {
               </Grid>
 
               {/* Rotina Pré-Sono */}
-              <Card
-                sx={{
-                  borderRadius: "20px",
-                  background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
-                  mb: 3,
-                }}
-              >
-                <VuiBox p={3}>
-                  <VuiBox display="flex" alignItems="center" mb={3}>
-                    <IoCheckmarkCircle size={28} color="#2E72AC" style={{ marginRight: 12 }} />
-                    <VuiTypography variant="h5" color="white" fontWeight="bold">
-                      Rotina Pré-Sono
-                    </VuiTypography>
-                  </VuiBox>
-                  <VuiBox position="relative">
-                    {dadosSono.rotina_pre_sono.map((item, index) => {
-                      const [horario, atividade] = item.split(" - ");
-                      const isLast = index === dadosSono.rotina_pre_sono.length - 1;
+              {dadosSonoParaExibir.rotina_pre_sono && dadosSonoParaExibir.rotina_pre_sono.length > 0 && (
+                <Card
+                  sx={{
+                    borderRadius: "20px",
+                    background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
+                    mb: 3,
+                  }}
+                >
+                  <VuiBox p={3}>
+                    <VuiBox display="flex" alignItems="center" mb={3}>
+                      <IoCheckmarkCircle size={28} color="#2E72AC" style={{ marginRight: 12 }} />
+                      <VuiTypography variant="h5" color="white" fontWeight="bold">
+                        Rotina Pré-Sono
+                      </VuiTypography>
+                    </VuiBox>
+                    <VuiBox position="relative">
+                      {dadosSonoParaExibir.rotina_pre_sono.map((item, index) => {
+                        // Se for string, tentar dividir por " - "
+                        const itemStr = typeof item === 'string' ? item : JSON.stringify(item);
+                        const [horario, atividade] = itemStr.includes(' - ') ? itemStr.split(' - ') : [itemStr, ''];
+                        const isLast = index === dadosSonoParaExibir.rotina_pre_sono.length - 1;
                       return (
                         <VuiBox key={index} position="relative" mb={isLast ? 0 : 3}>
                           <VuiBox display="flex" alignItems="flex-start">
@@ -816,24 +979,26 @@ const MentalidadeEspiritualidade = () => {
                   </VuiBox>
                 </VuiBox>
               </Card>
+              )}
 
               {/* Gatilhos a Evitar */}
-              <Card
-                sx={{
-                  borderRadius: "20px",
-                  background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
-                  mb: 3,
-                }}
-              >
-                <VuiBox p={3}>
-                  <VuiBox display="flex" alignItems="center" mb={3}>
-                    <IoCloseCircle size={28} color="#FF3838" style={{ marginRight: 12 }} />
-                    <VuiTypography variant="h5" color="white" fontWeight="bold">
-                      Gatilhos a Evitar
-                    </VuiTypography>
-                  </VuiBox>
-                  <Grid container spacing={2}>
-                    {dadosSono.gatilhos_evitar.map((gatilho, index) => (
+              {dadosSonoParaExibir.gatilhos_evitar && dadosSonoParaExibir.gatilhos_evitar.length > 0 && (
+                <Card
+                  sx={{
+                    borderRadius: "20px",
+                    background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
+                    mb: 3,
+                  }}
+                >
+                  <VuiBox p={3}>
+                    <VuiBox display="flex" alignItems="center" mb={3}>
+                      <IoCloseCircle size={28} color="#FF3838" style={{ marginRight: 12 }} />
+                      <VuiTypography variant="h5" color="white" fontWeight="bold">
+                        Gatilhos a Evitar
+                      </VuiTypography>
+                    </VuiBox>
+                    <Grid container spacing={2}>
+                      {dadosSonoParaExibir.gatilhos_evitar.map((gatilho, index) => (
                       <Grid item xs={12} sm={6} key={index}>
                         <Card
                           sx={{
@@ -864,70 +1029,75 @@ const MentalidadeEspiritualidade = () => {
                           </VuiBox>
                         </Card>
                       </Grid>
-                    ))}
-                  </Grid>
-                </VuiBox>
-              </Card>
+                      ))}
+                    </Grid>
+                  </VuiBox>
+                </Card>
+              )}
 
               {/* Progressão de Ajuste */}
-              <Card
-                sx={{
-                  borderRadius: "20px",
-                  background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
-                  mb: 3,
-                }}
-              >
-                <VuiBox p={3}>
-                  <VuiBox display="flex" alignItems="center" mb={2}>
-                    <IoCheckmarkCircle size={28} color="#F9CF05" style={{ marginRight: 12 }} />
-                    <VuiTypography variant="h5" color="white" fontWeight="bold">
-                      Progressão de Ajuste
-                    </VuiTypography>
+              {dadosSonoParaExibir.progressao_ajuste && (
+                <Card
+                  sx={{
+                    borderRadius: "20px",
+                    background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
+                    mb: 3,
+                  }}
+                >
+                  <VuiBox p={3}>
+                    <VuiBox display="flex" alignItems="center" mb={2}>
+                      <IoCheckmarkCircle size={28} color="#F9CF05" style={{ marginRight: 12 }} />
+                      <VuiTypography variant="h5" color="white" fontWeight="bold">
+                        Progressão de Ajuste
+                      </VuiTypography>
+                    </VuiBox>
+                    <Card
+                      sx={{
+                        borderRadius: "15px",
+                        background: "rgba(249, 207, 5, 0.1)",
+                        border: "1px solid rgba(249, 207, 5, 0.2)",
+                        p: 2.5,
+                      }}
+                    >
+                      <VuiTypography variant="body2" color="text" fontWeight="regular" sx={{ lineHeight: 1.8 }}>
+                        {dadosSonoParaExibir.progressao_ajuste}
+                      </VuiTypography>
+                    </Card>
                   </VuiBox>
-                  <Card
-                    sx={{
-                      borderRadius: "15px",
-                      background: "rgba(249, 207, 5, 0.1)",
-                      border: "1px solid rgba(249, 207, 5, 0.2)",
-                      p: 2.5,
-                    }}
-                  >
-                    <VuiTypography variant="body2" color="text" fontWeight="regular" sx={{ lineHeight: 1.8 }}>
-                      {dadosSono.progressao_ajuste}
-                    </VuiTypography>
-                  </Card>
-                </VuiBox>
-              </Card>
+                </Card>
+              )}
 
               {/* Observações Clínicas */}
-              <Card
-                sx={{
-                  borderRadius: "20px",
-                  background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
-                  mb: 3,
-                }}
-              >
-                <VuiBox p={3}>
-                  <VuiBox display="flex" alignItems="center" mb={2}>
-                    <IoAlertCircle size={28} color="#F9CF05" style={{ marginRight: 12 }} />
-                    <VuiTypography variant="h5" color="white" fontWeight="bold">
-                      Observações Clínicas
-                    </VuiTypography>
+              {dadosSonoParaExibir.observacoes_clinicas && (
+                <Card
+                  sx={{
+                    borderRadius: "20px",
+                    background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
+                    mb: 3,
+                  }}
+                >
+                  <VuiBox p={3}>
+                    <VuiBox display="flex" alignItems="center" mb={2}>
+                      <IoAlertCircle size={28} color="#F9CF05" style={{ marginRight: 12 }} />
+                      <VuiTypography variant="h5" color="white" fontWeight="bold">
+                        Observações Clínicas
+                      </VuiTypography>
+                    </VuiBox>
+                    <Card
+                      sx={{
+                        borderRadius: "15px",
+                        background: "rgba(249, 207, 5, 0.1)",
+                        border: "1px solid rgba(249, 207, 5, 0.3)",
+                        p: 2.5,
+                      }}
+                    >
+                      <VuiTypography variant="body2" color="text" fontWeight="regular" sx={{ lineHeight: 1.8 }}>
+                        {dadosSonoParaExibir.observacoes_clinicas}
+                      </VuiTypography>
+                    </Card>
                   </VuiBox>
-                  <Card
-                    sx={{
-                      borderRadius: "15px",
-                      background: "rgba(249, 207, 5, 0.1)",
-                      border: "1px solid rgba(249, 207, 5, 0.3)",
-                      p: 2.5,
-                    }}
-                  >
-                    <VuiTypography variant="body2" color="text" fontWeight="regular" sx={{ lineHeight: 1.8 }}>
-                      {dadosSono.observacoes_clinicas}
-                    </VuiTypography>
-                  </Card>
-                </VuiBox>
-              </Card>
+                </Card>
+              )}
             </>
           );
         })()}
@@ -944,7 +1114,7 @@ const MentalidadeEspiritualidade = () => {
 
         {/* Lista de Padrões */}
         <Grid container spacing={3}>
-          {padroes.map((padrao) => (
+          {padroesParaExibir.map((padrao) => (
             <Grid item xs={12} key={padrao.id}>
               <Accordion
                 expanded={expandedPadrao === padrao.id}

@@ -1,14 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@mui/material';
 import Icon from '@mui/material/Icon';
 import VuiBox from 'components/VuiBox';
 import VuiTypography from 'components/VuiTypography';
 import colors from 'assets/theme/base/colors';
 import linearGradient from 'assets/theme/functions/linearGradient';
+import { usePaciente } from 'hooks/usePaciente';
+import { buscarMetricasPaciente } from 'lib/checkins';
 
 function ReferralTracking() {
 	const { info, gradients } = colors;
 	const { cardContent } = gradients;
+	const { paciente } = usePaciente();
+	const [aderencia, setAderencia] = useState(0);
+
+	useEffect(() => {
+		async function carregarAderencia() {
+			if (paciente?.id) {
+				const metricas = await buscarMetricasPaciente(paciente.id);
+				if (metricas && metricas.aderencia_protocolo !== null) {
+					setAderencia(metricas.aderencia_protocolo);
+				}
+			}
+		}
+		carregarAderencia();
+	}, [paciente]);
+
+	// Normalizar aderência para 0-1
+	const progress = (aderencia / 100) || 0;
+	const aderenciaFormatada = Math.round(aderencia);
+
+	// Ícone baseado na aderência
+	const getIcone = () => {
+		if (aderencia >= 80) return "sentiment_satisfied_alt";
+		if (aderencia >= 50) return "sentiment_neutral";
+		return "sentiment_dissatisfied";
+	};
 
 	return (
 		<Card
@@ -35,12 +62,11 @@ function ReferralTracking() {
                             const size = 260;
                             const radius = 110;
                             const cx = size / 2;
-                            const cy = size / 2 + 10; // abaixa um pouco o centro para o arco ficar mais alto
+                            const cy = size / 2 + 10;
                             const circumference = Math.PI * radius;
-                            const progress = 0.82; // 82%
                             const dashArray = circumference;
                             const dashOffset = circumference * (1 - progress);
-                            const pathD = `M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`; // arco superior (invertido)
+                            const pathD = `M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`;
                             return (
                                 <svg width={size} height={size} style={{ position: 'absolute', top: -20, left: 0 }}>
                                     <path d={pathD} stroke="#2F3765" strokeWidth={22} fill="none" strokeLinecap="round" />
@@ -63,7 +89,7 @@ function ReferralTracking() {
                                 alignItems: 'center'
                             }}
                         >
-                            <Icon sx={{ color: '#fff', fontSize: 26 }}>sentiment_satisfied_alt</Icon>
+                            <Icon sx={{ color: '#fff', fontSize: 26 }}>{getIcone()}</Icon>
                         </VuiBox>
                     </VuiBox>
                 </VuiBox>
@@ -84,10 +110,10 @@ function ReferralTracking() {
                         <VuiTypography color='text' variant='caption'>0%</VuiTypography>
                         <VuiBox flexDirection='column' display='flex' justifyContent='center' alignItems='center' sx={{ minWidth: '100px' }}>
                             <VuiTypography color='white' variant='h4'>
-                                82%
+                                {aderenciaFormatada}%
                             </VuiTypography>
                             <VuiTypography color='text' variant='caption' fontWeight='regular'>
-                                das metas diárias concluídas
+                                de check-ins realizados
                             </VuiTypography>
                         </VuiBox>
                         <VuiTypography color='text' variant='caption'>100%</VuiTypography>

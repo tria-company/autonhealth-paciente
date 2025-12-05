@@ -5,12 +5,21 @@ import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
 import colors from "assets/theme/base/colors";
 import linearGradient from "assets/theme/functions/linearGradient";
+import { usePaciente } from "hooks/usePaciente";
 
 // imagem vinda da pasta public
 
 const WelcomeMark = () => {
   const { gradients } = colors;
   const { cardDark } = gradients;
+  const { paciente } = usePaciente();
+
+  // Extrair apenas nome e sobrenome
+  const nomeCompleto = paciente?.name || "Usuário";
+  const partesNome = nomeCompleto.trim().split(' ');
+  const nomeExibicao = partesNome.length >= 2 
+    ? `${partesNome[0]} ${partesNome[1]}`
+    : partesNome[0];
 
   return (
     <Card sx={() => ({
@@ -27,7 +36,7 @@ const WelcomeMark = () => {
             Bem vindo de volta,
           </VuiTypography>
           <VuiTypography color="white" variant="h3" fontWeight="bold" mb="18px">
-            Felipe Porto
+            {nomeExibicao}
           </VuiTypography>
           <VuiTypography color="text" variant="h6" fontWeight="regular" mb="auto">
             Que bom ver você de novo!

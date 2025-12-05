@@ -47,9 +47,10 @@ import CheckinDiarios from "layouts/checkin-diarios";
 import Educacional from "layouts/educacional";
 import MentalidadeEspiritualidade from "layouts/mentalidade-espiritualidade";
 import Marketplace from "layouts/marketplace";
+import Perfil from "layouts/perfil";
 
 // Vision UI Dashboard React icons
-import { IoHome, IoBook, IoCart, IoHeart, IoRestaurant, IoFitness, IoLeaf, IoMoon } from "react-icons/io5";
+import { IoHome, IoBook, IoCart, IoHeart, IoRestaurant, IoFitness, IoLeaf, IoMoon, IoPerson } from "react-icons/io5";
 import { GiSelfLove } from "react-icons/gi";
 
 const routes = [
@@ -111,24 +112,31 @@ const routes = [
     component: CheckinDiarios,
     noCollapse: true,
   },
+  // Rota oculta - não aparece no menu, mas é acessível via URL
   {
-    type: "collapse",
-    name: "Educacional",
-    key: "educacional",
-    route: "/educacional",
-    icon: <IoBook size="15px" color="inherit" />,
-    component: Educacional,
+    key: "perfil",
+    route: "/perfil",
+    component: Perfil,
     noCollapse: true,
   },
-  {
-    type: "collapse",
-    name: "Marketplace",
-    key: "marketplace",
-    route: "/marketplace",
-    icon: <IoCart size="15px" color="inherit" />,
-    component: Marketplace,
-    noCollapse: true,
-  },
+  // {
+  //   type: "collapse",
+  //   name: "Educacional",
+  //   key: "educacional",
+  //   route: "/educacional",
+  //   icon: <IoBook size="15px" color="inherit" />,
+  //   component: Educacional,
+  //   noCollapse: true,
+  // },
+  // {
+  //   type: "collapse",
+  //   name: "Marketplace",
+  //   key: "marketplace",
+  //   route: "/marketplace",
+  //   icon: <IoCart size="15px" color="inherit" />,
+  //   component: Marketplace,
+  //   noCollapse: true,
+  // },
 ];
 
 export default routes;

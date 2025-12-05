@@ -19,7 +19,7 @@
 import { useState, useEffect } from "react";
 
 // react-router components
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useHistory } from "react-router-dom";
 
 // prop-types is a library for typechecking of props.
 import PropTypes from "prop-types";
@@ -34,11 +34,9 @@ import Icon from "@mui/material/Icon";
 // Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
-import VuiInput from "components/VuiInput";
 
 // Vision UI Dashboard React example components
 import Breadcrumbs from "examples/Breadcrumbs";
-import NotificationItem from "examples/Items/NotificationItem";
 
 // Custom styles for DashboardNavbar
 import {
@@ -57,9 +55,9 @@ import {
   setOpenConfigurator,
 } from "context";
 
-// Images
-import team2 from "assets/images/team-2.jpg";
-import logoSpotify from "assets/images/small-logos/logo-spotify.svg";
+// Supabase
+import { supabase } from "lib/supabase-client";
+import { usePaciente } from "hooks/usePaciente";
 
 function DashboardNavbar({ absolute, light, isMini }) {
   const [navbarType, setNavbarType] = useState();
@@ -67,6 +65,19 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const { miniSidenav, transparentNavbar, fixedNavbar, openConfigurator } = controller;
   const [openMenu, setOpenMenu] = useState(false);
   const route = useLocation().pathname.split("/").slice(1);
+  const history = useHistory();
+  const { paciente } = usePaciente();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      localStorage.removeItem('paciente');
+      localStorage.removeItem('user_auth_id');
+      history.push('/authentication/sign-in');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
 
   useEffect(() => {
     // Setting the navbar type
@@ -99,42 +110,105 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleOpenMenu = (event) => setOpenMenu(event.currentTarget);
   const handleCloseMenu = () => setOpenMenu(false);
 
-  // Render the notifications menu
+  // Render the profile menu
   const renderMenu = () => (
     <Menu
       anchorEl={openMenu}
       anchorReference={null}
       anchorOrigin={{
         vertical: "bottom",
-        horizontal: "left",
+        horizontal: "right",
+      }}
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
       }}
       open={Boolean(openMenu)}
       onClose={handleCloseMenu}
-      sx={{ mt: 2 }}
-    >
-      <NotificationItem
-        image={<img src={team2} alt="person" />}
-        title={["New message", "from Laur"]}
-        date="13 minutes ago"
-        onClick={handleCloseMenu}
-      />
-      <NotificationItem
-        image={<img src={logoSpotify} alt="person" />}
-        title={["New album", "by Travis Scott"]}
-        date="1 day"
-        onClick={handleCloseMenu}
-      />
-      <NotificationItem
-        color="text"
-        image={
-          <Icon fontSize="small" sx={{ color: ({ palette: { white } }) => white.main }}>
-            payment
-          </Icon>
+      sx={{ 
+        mt: 2,
+        "& .MuiPaper-root": {
+          backgroundColor: "#0F1535",
+          border: "1px solid rgba(226, 232, 240, 0.1)",
+          minWidth: "280px",
+          borderRadius: "12px",
         }
-        title={["", "Payment successfully completed"]}
-        date="2 days"
-        onClick={handleCloseMenu}
-      />
+      }}
+    >
+      <VuiBox px={2.5} py={2.5}>
+        {/* Header do Perfil */}
+        <VuiBox display="flex" alignItems="center" mb={2.5}>
+          <Icon sx={{ fontSize: "48px", color: "#0075FF" }}>account_circle</Icon>
+          <VuiBox ml={2}>
+            <VuiTypography variant="h6" color="white" fontWeight="bold" sx={{ mb: 0.3 }}>
+              {paciente?.name}
+            </VuiTypography>
+            <VuiTypography variant="caption" color="text" fontWeight="regular">
+              Paciente
+            </VuiTypography>
+          </VuiBox>
+        </VuiBox>
+
+        {/* Divisor */}
+        <VuiBox 
+          sx={{ 
+            height: "1px", 
+            backgroundColor: "rgba(226, 232, 240, 0.15)",
+            mb: 2 
+          }} 
+        />
+
+        {/* Botão Acessar Perfil */}
+        <VuiBox mb={1}>
+          <IconButton 
+            component={Link}
+            to="/perfil"
+            sx={{
+              width: "100%",
+              justifyContent: "flex-start",
+              padding: "12px 16px",
+              borderRadius: "10px",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                backgroundColor: "rgba(0, 117, 255, 0.15)",
+                transform: "translateX(4px)",
+              }
+            }}
+            onClick={handleCloseMenu}
+          >
+            <Icon sx={{ color: "#0075FF", mr: 1.5, fontSize: "20px" }}>person</Icon>
+            <VuiTypography variant="button" color="white" fontWeight="medium">
+              Acessar Perfil
+            </VuiTypography>
+          </IconButton>
+        </VuiBox>
+
+        {/* Botão de Logout */}
+        <VuiBox>
+          <IconButton 
+            sx={{
+              width: "100%",
+              justifyContent: "flex-start",
+              padding: "12px 16px",
+              borderRadius: "10px",
+              transition: "all 0.2s ease",
+              "&:hover": {
+                backgroundColor: "rgba(255, 56, 56, 0.15)",
+                transform: "translateX(4px)",
+              }
+            }}
+            onClick={() => {
+              handleCloseMenu();
+              handleLogout();
+            }}
+          >
+            <Icon sx={{ color: "#FF3838", mr: 1.5, fontSize: "20px" }}>logout</Icon>
+            <VuiTypography variant="button" color="error" fontWeight="medium">
+              Sair da Conta
+            </VuiTypography>
+          </IconButton>
+        </VuiBox>
+      </VuiBox>
     </Menu>
   );
 
@@ -150,24 +224,16 @@ function DashboardNavbar({ absolute, light, isMini }) {
         </VuiBox>
         {isMini ? null : (
           <VuiBox sx={(theme) => navbarRow(theme, { isMini })}>
-            <VuiBox pr={1}>
-              <VuiInput
-                placeholder="Type here..."
-                icon={{ component: "search", direction: "left" }}
-                sx={({ breakpoints }) => ({
-                  [breakpoints.down("sm")]: {
-                    maxWidth: "80px",
-                  },
-                  [breakpoints.only("sm")]: {
-                    maxWidth: "80px",
-                  },
-                  backgroundColor: "info.main !important",
-                })}
-              />
-            </VuiBox>
-            <VuiBox color={light ? "white" : "inherit"}>
-              <Link to="/authentication/sign-in">
-                <IconButton sx={navbarIconButton} size="small">
+            <VuiBox color={light ? "white" : "inherit"} display="flex" alignItems="center" gap={2}>
+              {/* Perfil do Paciente */}
+              {paciente && (
+                <IconButton 
+                  sx={navbarIconButton} 
+                  size="small" 
+                  onClick={handleOpenMenu}
+                  aria-controls="profile-menu"
+                  aria-haspopup="true"
+                >
                   <Icon
                     sx={({ palette: { dark, white } }) => ({
                       color: light ? white.main : dark.main,
@@ -179,11 +245,14 @@ function DashboardNavbar({ absolute, light, isMini }) {
                     variant="button"
                     fontWeight="medium"
                     color={light ? "white" : "dark"}
+                    ml={1}
                   >
-                    Sign in
+                    Perfil
                   </VuiTypography>
                 </IconButton>
-              </Link>
+              )}
+              
+              {/* Botão de Menu Mobile */}
               <IconButton
                 size="small"
                 color="inherit"
@@ -192,25 +261,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               >
                 <Icon className={"text-white"}>{miniSidenav ? "menu_open" : "menu"}</Icon>
               </IconButton>
-              <IconButton
-                size="small"
-                color="inherit"
-                sx={navbarIconButton}
-                onClick={handleConfiguratorOpen}
-              >
-                <Icon>settings</Icon>
-              </IconButton>
-              <IconButton
-                size="small"
-                color="inherit"
-                sx={navbarIconButton}
-                aria-controls="notification-menu"
-                aria-haspopup="true"
-                variant="contained"
-                onClick={handleOpenMenu}
-              >
-                <Icon className={light ? "text-white" : "text-dark"}>notifications</Icon>
-              </IconButton>
+              
               {renderMenu()}
             </VuiBox>
           </VuiBox>

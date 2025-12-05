@@ -24,14 +24,9 @@ import { Route, Switch, Redirect, useLocation } from "react-router-dom";
 // @mui material components
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import Icon from "@mui/material/Icon";
-
-// Vision UI Dashboard React components
-import VuiBox from "components/VuiBox";
 
 // Vision UI Dashboard React example components
 import Sidenav from "examples/Sidenav";
-import Configurator from "examples/Configurator";
 
 // Vision UI Dashboard React themes
 import theme from "assets/theme";
@@ -46,14 +41,14 @@ import createCache from "@emotion/cache";
 import routes from "routes";
 import EducacionalModulo from "layouts/educacional/modulo";
 import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
+import ProtectedRoute from "components/ProtectedRoute";
 
 // Vision UI Dashboard React contexts
-import { useVisionUIController, setMiniSidenav, setOpenConfigurator } from "context";
+import { useVisionUIController, setMiniSidenav } from "context";
 
 export default function App() {
   const [controller, dispatch] = useVisionUIController();
-  const { miniSidenav, direction, layout, openConfigurator, sidenavColor } = controller;
+  const { miniSidenav, direction, layout, sidenavColor } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
@@ -84,9 +79,6 @@ export default function App() {
     }
   };
 
-  // Change the openConfigurator state
-  const handleConfiguratorOpen = () => setOpenConfigurator(dispatch, !openConfigurator);
-
   // Setting the dir attribute for the body element
   useEffect(() => {
     document.body.setAttribute("dir", direction);
@@ -105,35 +97,18 @@ export default function App() {
       }
 
       if (route.route) {
-        return <Route exact path={route.route} component={route.component} key={route.key} />;
+        return (
+          <ProtectedRoute
+            exact
+            path={route.route}
+            component={route.component}
+            key={route.key}
+          />
+        );
       }
 
       return null;
     });
-
-  const configsButton = (
-    <VuiBox
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      width="3.5rem"
-      height="3.5rem"
-      bgColor="info"
-      shadow="sm"
-      borderRadius="50%"
-      position="fixed"
-      right="2rem"
-      bottom="2rem"
-      zIndex={99}
-      color="white"
-      sx={{ cursor: "pointer" }}
-      onClick={handleConfiguratorOpen}
-    >
-      <Icon fontSize="default" color="inherit">
-        settings
-      </Icon>
-    </VuiBox>
-  );
 
   return direction === "rtl" ? (
     <CacheProvider value={rtlCache}>
@@ -149,15 +124,11 @@ export default function App() {
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
             />
-            <Configurator />
-            {configsButton}
           </>
         )}
-        {layout === "vr" && <Configurator />}
         <Switch>
           <Route exact path="/authentication/sign-in" component={SignIn} />
-          <Route exact path="/authentication/sign-up" component={SignUp} />
-          <Route exact path="/educacional/modulo/:moduloId" component={EducacionalModulo} />
+          <ProtectedRoute exact path="/educacional/modulo/:moduloId" component={EducacionalModulo} />
           {getRoutes(routes)}
           <Redirect from="/" to="/authentication/sign-in" />
           <Redirect from="*" to="/authentication/sign-in" />
@@ -177,15 +148,11 @@ export default function App() {
             onMouseEnter={handleOnMouseEnter}
             onMouseLeave={handleOnMouseLeave}
           />
-          <Configurator />
-          {configsButton}
         </>
       )}
-      {layout === "vr" && <Configurator />}
       <Switch>
         <Route exact path="/authentication/sign-in" component={SignIn} />
-        <Route exact path="/authentication/sign-up" component={SignUp} />
-        <Route exact path="/educacional/modulo/:moduloId" component={EducacionalModulo} />
+        <ProtectedRoute exact path="/educacional/modulo/:moduloId" component={EducacionalModulo} />
         {getRoutes(routes)}
         <Redirect from="/" to="/authentication/sign-in" />
         <Redirect from="*" to="/authentication/sign-in" />

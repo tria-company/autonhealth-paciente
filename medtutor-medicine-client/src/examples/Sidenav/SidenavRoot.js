@@ -88,6 +88,16 @@ export default styled(Drawer)(({ theme, ownerState }) => {
           ),
     backdropFilter: transparentSidenav ? "unset" : "blur(120px)",
       ...(miniSidenav ? drawerCloseStyles() : drawerOpenStyles()),
+      
+      // Forçar background sólido no mobile
+      [breakpoints.down("xl")]: {
+        background: `${linearGradient(
+          gradients.sidenav.main,
+          gradients.sidenav.state,
+          gradients.sidenav.deg
+        )} !important`,
+        backdropFilter: "blur(120px) !important",
+      },
     },
   };
 });
