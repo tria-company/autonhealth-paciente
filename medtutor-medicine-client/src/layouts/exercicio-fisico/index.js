@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import Grid from "@mui/material/Grid";
 import { Card, Dialog, DialogContent } from "@mui/material";
 import Icon from "@mui/material/Icon";
+import CircularProgress from "@mui/material/CircularProgress";
 import VuiButton from "components/VuiButton";
 
 // Vision UI Dashboard React components
@@ -18,104 +19,134 @@ import Footer from "examples/Footer";
 import colors from "assets/theme/base/colors";
 import linearGradient from "assets/theme/functions/linearGradient";
 
+// Hooks e funções
+import { usePaciente } from "hooks/usePaciente";
+import { buscarExerciciosPaciente } from "lib/exercicios";
+
 const ExercicioFisico = () => {
   const { gradients } = colors;
   const { cardContent, info } = gradients;
+  const { paciente, loading: loadingPaciente } = usePaciente();
+  
+  const [exercicios, setExercicios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState(null);
   const [openVideo, setOpenVideo] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
 
-  const exercicios = [
-    {
-      id: 1,
-      nome: "Agachamento goblet",
-      series: "3",
-      repeticoes: "12-15",
-      descanso: "60s",
-      observacoes: "Manter o peito aberto e coluna reta, agachar até amplitude confortável.",
-      completo: true,
-      videoUrl: "https://www.youtube.com/embed/2gT1Q_RAlxo",
-    },
-    {
-      id: 2,
-      nome: "Flexão de braço",
-      series: "3",
-      repeticoes: "max",
-      descanso: "60s",
-      observacoes: "Realizar até a falha técnica, apoiando os joelhos se necessário para manter boa forma.",
-      completo: true,
-      videoUrl: "https://www.youtube.com/embed/rDwbR2r6iHA",
-    },
-    {
-      id: 3,
-      nome: "Remada curvada com halteres",
-      series: "3",
-      repeticoes: "12-15",
-      descanso: "60s",
-      observacoes: "Manter o abdômen estabilizado e costas retas; movimento lento e controlado.",
-      completo: true,
-      videoUrl: "https://www.youtube.com/embed/RipgpZsvFyg",
-    },
-    {
-      id: 4,
-      nome: "Desenvolvimento militar com halteres",
-      series: "3",
-      repeticoes: "12-15",
-      descanso: "60s",
-      observacoes: "Segurar halteres na linha dos ombros, evitar extensão excessiva do tronco; executar em pé ou sentado.",
-      completo: true,
-      videoUrl: "https://www.youtube.com/embed/qEwKCR5JCog",
-    },
-    {
-      id: 5,
-      nome: "Prancha frontal",
-      series: "3",
-      repeticoes: "45-60",
-      descanso: "45s",
-      observacoes: "Manter o corpo alinhado, abdômen contraído, evitar elevação do quadril.",
-      completo: true,
-      videoUrl: "https://www.youtube.com/embed/ASdvN_XEl_c",
-    },
-    {
-      id: 6,
-      nome: "Burpees",
-      series: "3",
-      repeticoes: "10",
-      descanso: "90s",
-      observacoes: "Executar com controle, adaptando remoção do salto caso necessário para minimizar impacto.",
-      completo: true,
-      videoUrl: "https://www.youtube.com/embed/qLG9mUj9mXM",
-    },
-    {
-      id: 7,
-      nome: "CARDIO: Bike ou caminhada",
-      series: "1",
-      repeticoes: "15-20",
-      descanso: "0s",
-      observacoes: "15-20 minutos após a musculação, intensidade moderada, objetivo de aumentar queima calórica semanal.",
-      completo: true,
-      videoUrl: "https://www.youtube.com/embed/6CS2xznZ6kw",
-    },
-    {
-      id: 8,
-      nome: "Agachamento goblet",
-      series: "3",
-      repeticoes: "12-15",
-      descanso: "60s",
-      observacoes: "Manter o peito aberto e coluna reta, agachar até amplitude confortável.",
-      completo: true,
-      videoUrl: "https://www.youtube.com/embed/2gT1Q_RAlxo",
-    },
-  ];
+  // Carregar exercícios
+  useEffect(() => {
+    async function carregarDados() {
+      if (loadingPaciente) {
+        setLoading(true);
+        return;
+      }
+
+      if (!paciente || !paciente.id) {
+        setLoading(false);
+        setErro('Paciente não encontrado');
+        return;
+      }
+
+      console.log('🏋️ Carregando exercícios para paciente:', paciente.id);
+
+      try {
+        setLoading(true);
+        const exerciciosData = await buscarExerciciosPaciente(paciente.id);
+        
+        // Formatar dados para o formato esperado pelo componente
+        const exerciciosFormatados = exerciciosData.map((ex) => ({
+          id: ex.id,
+          nome: ex.nome_exercicio || 'Sem nome',
+          series: ex.series || '-',
+          repeticoes: ex.repeticoes || '-',
+          descanso: ex.descanso || '-',
+          observacoes: ex.observacoes || 'Sem observações',
+          completo: true,
+          videoUrl: null, // Sem vídeo por enquanto
+          tipoTreino: ex.tipo_treino,
+          grupoMuscular: ex.grupo_muscular,
+        }));
+
+        setExercicios(exerciciosFormatados);
+        setErro(null);
+      } catch (error) {
+        console.error('❌ Erro ao carregar exercícios:', error);
+        setErro('Erro ao carregar exercícios');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    carregarDados();
+  }, [paciente, loadingPaciente]);
 
   const handleOpenVideo = (exercicio) => {
-    setSelectedVideo(exercicio);
-    setOpenVideo(true);
+    if (exercicio.videoUrl) {
+      setSelectedVideo(exercicio);
+      setOpenVideo(true);
+    }
   };
 
   const handleCloseVideo = () => {
     setOpenVideo(false);
     setSelectedVideo(null);
   };
+
+  // Estado de loading
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={6} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+          <VuiBox textAlign="center">
+            <CircularProgress size={60} sx={{ color: '#0075FF' }} />
+            <VuiTypography variant="h6" color="white" mt={3}>
+              Carregando exercícios...
+            </VuiTypography>
+          </VuiBox>
+        </VuiBox>
+      </DashboardLayout>
+    );
+  }
+
+  // Estado de erro
+  if (erro) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={6} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+          <VuiBox textAlign="center">
+            <VuiTypography variant="h4" color="white" mb={2}>
+              ⚠️ {erro}
+            </VuiTypography>
+            <VuiTypography variant="body2" color="text">
+              Não foi possível carregar os exercícios.
+            </VuiTypography>
+          </VuiBox>
+        </VuiBox>
+      </DashboardLayout>
+    );
+  }
+
+  // Estado sem dados
+  if (!exercicios || exercicios.length === 0) {
+    return (
+      <DashboardLayout>
+        <DashboardNavbar />
+        <VuiBox pt={6} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+          <VuiBox textAlign="center">
+            <VuiTypography variant="h4" color="white" mb={2}>
+              🏋️ Nenhum exercício cadastrado
+            </VuiTypography>
+            <VuiTypography variant="body2" color="text">
+              Entre em contato com seu profissional para receber seu plano de treino.
+            </VuiTypography>
+          </VuiBox>
+        </VuiBox>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -125,11 +156,9 @@ const ExercicioFisico = () => {
           <VuiTypography variant="h4" color="white" fontWeight="bold" mb={1}>
             Exercício Físico
           </VuiTypography>
-          <VuiBox display="flex" justifyContent="center" mb={4}>
-            <VuiTypography variant="h5" color="text" fontWeight="regular">
-              Treino de Força
-            </VuiTypography>
-          </VuiBox>
+          <VuiTypography variant="body2" color="text" mb={2}>
+            {exercicios.length} {exercicios.length === 1 ? 'exercício cadastrado' : 'exercícios cadastrados'}
+          </VuiTypography>
         </VuiBox>
 
         <Grid container spacing={3}>
@@ -215,26 +244,28 @@ const ExercicioFisico = () => {
                     </VuiTypography>
                   </VuiBox>
 
-                  <VuiBox mt="auto" pt={3} display="flex" justifyContent="center">
-                    <VuiButton
-                      variant="contained"
-                      size="small"
-                      onClick={() => handleOpenVideo(exercicio)}
-                      sx={{
-                        background: linearGradient(info.main, info.state, info.deg || "0"),
-                        color: "#FFFFFF",
-                        fontWeight: "bold",
-                        px: 3,
-                        py: 1,
-                        "&:hover": {
-                          opacity: 0.9,
+                  {exercicio.videoUrl && (
+                    <VuiBox mt="auto" pt={3} display="flex" justifyContent="center">
+                      <VuiButton
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleOpenVideo(exercicio)}
+                        sx={{
                           background: linearGradient(info.main, info.state, info.deg || "0"),
-                        },
-                      }}
-                    >
-                      Ver Vídeo Tutorial
-                    </VuiButton>
-                  </VuiBox>
+                          color: "#FFFFFF",
+                          fontWeight: "bold",
+                          px: 3,
+                          py: 1,
+                          "&:hover": {
+                            opacity: 0.9,
+                            background: linearGradient(info.main, info.state, info.deg || "0"),
+                          },
+                        }}
+                      >
+                        Ver Vídeo Tutorial
+                      </VuiButton>
+                    </VuiBox>
+                  )}
                 </VuiBox>
               </Card>
             </Grid>
