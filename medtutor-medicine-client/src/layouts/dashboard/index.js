@@ -21,6 +21,7 @@ import Grid from "@mui/material/Grid";
 import Icon from "@mui/material/Icon";
 import { Card, LinearProgress, Stack, MenuItem, Select, FormControl, CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 // Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
@@ -67,12 +68,21 @@ function Dashboard() {
   const { gradients } = colors;
   const { cardContent } = gradients;
   const { paciente, loading: loadingPaciente } = usePaciente();
+  const location = useLocation();
 
   const [metricas, setMetricas] = useState(null);
   const [historico, setHistorico] = useState([]);
   const [dadosGrafico, setDadosGrafico] = useState(null);
   const [periodo, setPeriodo] = useState(7); // Período padrão: 7 dias
   const [loading, setLoading] = useState(true);
+
+  // Resetar estado quando a rota mudar
+  useEffect(() => {
+    setMetricas(null);
+    setHistorico([]);
+    setDadosGrafico(null);
+    setLoading(true);
+  }, [location.pathname]);
 
   // Carregar dados do paciente
   useEffect(() => {
@@ -111,7 +121,7 @@ function Dashboard() {
     }
 
     carregarDados();
-  }, [paciente, loadingPaciente, periodo]);
+  }, [paciente, loadingPaciente, periodo, location.pathname]);
 
   // Estado de carregamento
   if (loading || loadingPaciente) {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 import Grid from "@mui/material/Grid";
 import { Card, Dialog, DialogContent } from "@mui/material";
@@ -27,12 +28,20 @@ const ExercicioFisico = () => {
   const { gradients } = colors;
   const { cardContent, info } = gradients;
   const { paciente, loading: loadingPaciente } = usePaciente();
+  const location = useLocation();
   
   const [exercicios, setExercicios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const [openVideo, setOpenVideo] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
+
+  // Resetar estado quando a rota mudar
+  useEffect(() => {
+    setExercicios([]);
+    setLoading(true);
+    setErro(null);
+  }, [location.pathname]);
 
   // Carregar exercícios
   useEffect(() => {
@@ -79,7 +88,7 @@ const ExercicioFisico = () => {
     }
 
     carregarDados();
-  }, [paciente, loadingPaciente]);
+  }, [paciente, loadingPaciente, location.pathname]);
 
   const handleOpenVideo = (exercicio) => {
     if (exercicio.videoUrl) {

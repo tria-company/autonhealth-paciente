@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 import Grid from "@mui/material/Grid";
 import { Card, Slider, CircularProgress } from "@mui/material";
@@ -29,6 +30,7 @@ import { verificarCheckinHoje, salvarCheckin } from "lib/checkins";
 const CheckinDiarios = () => {
   const { gradients, info } = colors;
   const { cardContent } = gradients;
+  const location = useLocation();
   const [iniciado, setIniciado] = useState(false);
   const [stepAtual, setStepAtual] = useState(0);
   const [salvando, setSalvando] = useState(false);
@@ -47,6 +49,24 @@ const CheckinDiarios = () => {
     alimentacao: { refeicoes: 3, agua: 2.0 },
     relacionamento: { qualidade: 60, tempo: 50 },
   });
+
+  // Resetar estado quando a rota mudar
+  useEffect(() => {
+    setIniciado(false);
+    setStepAtual(0);
+    setSalvando(false);
+    setMensagem(null);
+    setCheckinJaFeito(false);
+    setCarregando(true);
+    setValores({
+      sono: { qualidade: 5, tempo: 7 },
+      ambiente: { sol: 15, natureza: 30 },
+      atividade: { tempo: 1, intensidade: 50 },
+      sistemaNervoso: { estresse: 30, mindfulness: 15 },
+      alimentacao: { refeicoes: 3, agua: 2.0 },
+      relacionamento: { qualidade: 60, tempo: 50 },
+    });
+  }, [location.pathname]);
 
   // Verificar se o check-in de hoje já foi feito
   useEffect(() => {
@@ -67,7 +87,7 @@ const CheckinDiarios = () => {
     }
 
     verificar();
-  }, [paciente, loadingPaciente]);
+  }, [paciente, loadingPaciente, location.pathname]);
 
   const categorias = [
     {

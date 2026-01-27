@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Card } from '@mui/material';
 import Icon from '@mui/material/Icon';
 import VuiBox from 'components/VuiBox';
@@ -12,7 +13,13 @@ function ReferralTracking() {
 	const { info, gradients } = colors;
 	const { cardContent } = gradients;
 	const { paciente } = usePaciente();
+	const location = useLocation();
 	const [aderencia, setAderencia] = useState(0);
+
+	// Resetar estado quando a rota mudar
+	useEffect(() => {
+		setAderencia(0);
+	}, [location.pathname]);
 
 	useEffect(() => {
 		async function carregarAderencia() {
@@ -24,7 +31,7 @@ function ReferralTracking() {
 			}
 		}
 		carregarAderencia();
-	}, [paciente]);
+	}, [paciente, location.pathname]);
 
 	// Normalizar aderência para 0-1
 	const progress = (aderencia / 100) || 0;

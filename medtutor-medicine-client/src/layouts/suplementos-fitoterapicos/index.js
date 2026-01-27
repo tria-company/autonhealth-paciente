@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 import Grid from "@mui/material/Grid";
 import { Card, CircularProgress, Chip } from "@mui/material";
@@ -54,10 +55,18 @@ const formatarData = (data) => {
 const SuplementosFitoterapicos = () => {
   const { gradients } = colors;
   const { cardContent } = gradients;
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [itens, setItens] = useState([]);
   const { paciente, loading: loadingPaciente } = usePaciente();
+
+  // Resetar estado quando a rota mudar
+  useEffect(() => {
+    setItens([]);
+    setLoading(true);
+    setError(null);
+  }, [location.pathname]);
 
   // Dados mockados (fallback)
   const suplementosMockados = [
@@ -273,7 +282,7 @@ const SuplementosFitoterapicos = () => {
     }
 
     carregarDados();
-  }, [paciente, loadingPaciente]);
+  }, [paciente, loadingPaciente, location.pathname]);
 
   // Loading state
   if (loadingPaciente || loading) {

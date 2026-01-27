@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
@@ -27,11 +28,19 @@ import { buscarAlimentacaoPaciente, processarDadosAlimentacao } from "lib/alimen
 
 const Alimentacao = () => {
   const { paciente, loading: loadingPaciente } = usePaciente();
+  const location = useLocation();
   const [dadosAlimentacao, setDadosAlimentacao] = useState(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const { gradients } = colors;
   const { cardContent, info, success } = gradients;
+
+  // Resetar estado quando a rota mudar
+  useEffect(() => {
+    setDadosAlimentacao(null);
+    setLoading(true);
+    setErro(null);
+  }, [location.pathname]);
 
   // Carregar dados de alimentação
   useEffect(() => {
@@ -64,7 +73,7 @@ const Alimentacao = () => {
     }
 
     carregarDados();
-  }, [paciente, loadingPaciente]);
+  }, [paciente, loadingPaciente, location.pathname]);
 
   // Estado de loading
   if (loading) {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Card, Grid, Icon, CircularProgress } from "@mui/material";
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
@@ -14,6 +15,7 @@ import linearGradient from "assets/theme/functions/linearGradient";
 
 function Perfil() {
   const { paciente, loading: loadingPaciente } = usePaciente();
+  const location = useLocation();
   const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
@@ -36,6 +38,16 @@ function Perfil() {
   const { gradients } = colors;
   const { cardContent } = gradients;
 
+  // Resetar estado quando a rota mudar
+  useEffect(() => {
+    setModoEdicao(false);
+    setMensagem({ tipo: "", texto: "" });
+    setMensagemPerfil({ tipo: "", texto: "" });
+    setSenhaAtual("");
+    setNovaSenha("");
+    setConfirmarSenha("");
+  }, [location.pathname]);
+
   // Atualizar dados editáveis quando paciente carregar
   useEffect(() => {
     if (paciente) {
@@ -45,7 +57,7 @@ function Perfil() {
         birth_date: paciente.birth_date || "",
       });
     }
-  }, [paciente]);
+  }, [paciente, location.pathname]);
 
   useEffect(() => {
     if (mensagem.texto) {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import { Card, Accordion, AccordionSummary, AccordionDetails, Chip, CircularProgress } from "@mui/material";
 import Icon from "@mui/material/Icon";
@@ -17,6 +18,7 @@ import { usePaciente } from "hooks/usePaciente";
 const MentalidadeEspiritualidade = () => {
   const { gradients } = colors;
   const { cardContent } = gradients;
+  const location = useLocation();
   const [expandedPadrao, setExpandedPadrao] = useState(null);
   const [expandedPasso, setExpandedPasso] = useState({});
   const [loading, setLoading] = useState(true);
@@ -25,6 +27,17 @@ const MentalidadeEspiritualidade = () => {
   const [padroes, setPadroes] = useState([]);
   const [dadosSono, setDadosSono] = useState(null);
   const { paciente, loading: loadingPaciente } = usePaciente();
+
+  // Resetar estado quando a rota mudar
+  useEffect(() => {
+    setResumoExecutivo(null);
+    setPadroes([]);
+    setDadosSono(null);
+    setLoading(true);
+    setError(null);
+    setExpandedPadrao(null);
+    setExpandedPasso({});
+  }, [location.pathname]);
 
   const handleChangePadrao = (padraoId) => (event, isExpanded) => {
     setExpandedPadrao(isExpanded ? padraoId : null);
@@ -156,7 +169,7 @@ const MentalidadeEspiritualidade = () => {
     }
 
     carregarDados();
-  }, [paciente, loadingPaciente]);
+  }, [paciente, loadingPaciente, location.pathname]);
 
   // Dados mockados (fallback caso não haja dados no banco)
   const padroesMockados = [

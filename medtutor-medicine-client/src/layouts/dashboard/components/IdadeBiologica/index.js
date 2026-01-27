@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 import { Card } from '@mui/material';
 import VuiBox from 'components/VuiBox';
@@ -15,6 +16,7 @@ const IdadeBiologica = () => {
 	const { gradients } = colors;
 	const { cardContent } = gradients;
 	const { paciente } = usePaciente();
+	const location = useLocation();
 	const [idadeBiologica, setIdadeBiologica] = useState(null);
 	const [idadeReal, setIdadeReal] = useState(null);
 
@@ -31,6 +33,12 @@ const IdadeBiologica = () => {
 		return idade;
 	};
 
+	// Resetar estado quando a rota mudar
+	useEffect(() => {
+		setIdadeBiologica(null);
+		setIdadeReal(null);
+	}, [location.pathname]);
+
 	useEffect(() => {
 		async function carregarIdade() {
 			if (paciente?.id) {
@@ -46,7 +54,7 @@ const IdadeBiologica = () => {
 			}
 		}
 		carregarIdade();
-	}, [paciente]);
+	}, [paciente, location.pathname]);
 
 	const idadeExibir = idadeBiologica || idadeReal;
 	const legendaIdade = idadeBiologica 
