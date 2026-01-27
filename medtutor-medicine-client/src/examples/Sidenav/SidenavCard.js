@@ -41,7 +41,7 @@ function SidenavCard({ color, ...rest }) {
     <Card sx={(theme) => card(theme, { miniSidenav })}>
       <CardContent sx={(theme) => cardContent(theme, { sidenavColor })}>
         <VuiBox
-          bgColor="white"
+          bgColor="light"
           width="2rem"
           height="2rem"
           borderRadius="md"
@@ -54,7 +54,7 @@ function SidenavCard({ color, ...rest }) {
           </Icon>
         </VuiBox>
         <VuiBox lineHeight={1}>
-          <VuiTypography variant="h6" color="white">
+          <VuiTypography variant="h6" color="dark">
             Precisa de ajuda?
           </VuiTypography>
           <VuiBox mb={1.825} mt={-1}>
@@ -66,19 +66,11 @@ function SidenavCard({ color, ...rest }) {
             target="_blank"
             rel="noreferrer"
             size="small"
-            sx={({ palette: { gradients, white }, functions: { linearGradient } }) => ({
+            sx={({ palette: { primary, white } }) => ({
               color: `${white.main} !important`,
-              background: linearGradient(
-                gradients.cardDark.main,
-                gradients.cardDark.state,
-                gradients.cardDark.deg
-              ),
+              background: primary.main,
               "&:hover": {
-                background: linearGradient(
-                  gradients.cardDark.main,
-                  gradients.cardDark.state,
-                  gradients.cardDark.deg
-                ),
+                background: primary.focus,
               },
             })}
             fullWidth

@@ -84,44 +84,84 @@ function Dashboard() {
     setLoading(true);
   }, [location.pathname]);
 
-  // Carregar dados do paciente
-  useEffect(() => {
-    async function carregarDados() {
-      if (loadingPaciente) {
-        setLoading(true);
-        return;
-      }
-
-      if (!paciente || !paciente.id) {
-        setLoading(false);
-        return;
-      }
-
-      console.log('📊 Carregando dados do dashboard para paciente:', paciente.id);
-
-      try {
-        // Buscar métricas
-        const metricasData = await buscarMetricasPaciente(paciente.id);
-        setMetricas(metricasData);
-
-        // Buscar histórico de check-ins
-        const historicoData = await buscarHistoricoCheckins(paciente.id, periodo);
-        setHistorico(historicoData);
-
-        // Processar dados para o gráfico
-        if (historicoData.length > 0) {
-          const dadosProcessados = processarDadosGrafico(historicoData);
-          setDadosGrafico(dadosProcessados);
-        }
-      } catch (err) {
-        console.error('Erro ao carregar dados do dashboard:', err);
-      } finally {
-        setLoading(false);
-      }
+  // Função para carregar dados
+  const carregarDados = async () => {
+    // Aguardar o paciente carregar
+    if (loadingPaciente) {
+      setLoading(true);
+      return;
     }
 
-    carregarDados();
-  }, [paciente, loadingPaciente, periodo, location.pathname]);
+    // Verificar se tem paciente
+    if (!paciente || !paciente.id) {
+      setLoading(false);
+      return;
+    }
+
+    console.log('📊 Carregando dados do dashboard para paciente:', paciente.id);
+
+    try {
+      setLoading(true);
+      
+      // Timeout de segurança: 10 segundos
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Timeout ao carregar dados')), 10000);
+      });
+
+      // Buscar métricas e histórico em paralelo com timeout
+      const dataPromise = Promise.all([
+        buscarMetricasPaciente(paciente.id),
+        buscarHistoricoCheckins(paciente.id, periodo)
+      ]);
+
+      const [metricasData, historicoData] = await Promise.race([
+        dataPromise,
+        timeoutPromise
+      ]);
+
+      setMetricas(metricasData);
+      setHistorico(historicoData);
+
+      // Processar dados para o gráfico
+      if (historicoData && historicoData.length > 0) {
+        const dadosProcessados = processarDadosGrafico(historicoData);
+        setDadosGrafico(dadosProcessados);
+      } else {
+        setDadosGrafico(null);
+      }
+      
+      console.log('✅ Dados do dashboard carregados com sucesso');
+    } catch (err) {
+      console.error('❌ Erro ao carregar dados do dashboard:', err);
+      
+      // Se for timeout, mostrar mensagem específica
+      if (err.message.includes('Timeout')) {
+        console.error('⏱️ Timeout ao carregar dados do dashboard');
+      }
+      
+      // Mesmo com erro, não deixar em loading infinito
+      // Apenas manter os dados anteriores se houver
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Carregar dados quando paciente estiver disponível
+  useEffect(() => {
+    let mounted = true;
+
+    if (!loadingPaciente && paciente?.id && mounted) {
+      carregarDados();
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [paciente?.id, loadingPaciente, periodo, location.pathname]);
+
+  // Sistema de refresh automático removido para evitar loops
+  // Os dados são carregados normalmente quando o componente monta ou quando as dependências mudam
 
   // Estado de carregamento
   if (loading || loadingPaciente) {
@@ -189,21 +229,15 @@ function Dashboard() {
   // Debug: Ver valores brutos das métricas
   console.log("📊 Métricas brutas do banco:", {
     equilibrio_sono: metricas.equilibrio_sono,
-    equilibrio_ambiente: metricas.equilibrio_ambiente,
     equilibrio_atividade_fisica: metricas.equilibrio_atividade_fisica,
-    equilibrio_sistema_nervoso: metricas.equilibrio_sistema_nervoso,
     equilibrio_alimentacao: metricas.equilibrio_alimentacao,
-    equilibrio_relacionamento: metricas.equilibrio_relacionamento,
   });
 
   // Dimensões do equilíbrio integrativo
   const dimensoes = [
     { nome: "Sono", valor: metricas.equilibrio_sono?.toFixed(1) || "0.0" },
-    { nome: "Ambiente", valor: metricas.equilibrio_ambiente?.toFixed(1) || "0.0" },
     { nome: "Atividade Física", valor: metricas.equilibrio_atividade_fisica?.toFixed(1) || "0.0" },
-    { nome: "Sistema Nervoso", valor: metricas.equilibrio_sistema_nervoso?.toFixed(1) || "0.0" },
     { nome: "Alimentação", valor: metricas.equilibrio_alimentacao?.toFixed(1) || "0.0" },
-    { nome: "Relacionamento", valor: metricas.equilibrio_relacionamento?.toFixed(1) || "0.0" },
   ];
 
   return (

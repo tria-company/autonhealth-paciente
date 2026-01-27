@@ -20,16 +20,16 @@ function collapseItem(theme, ownerState) {
   const { palette, transitions, breakpoints, boxShadows, borders, functions } = theme;
   const { active, transparentSidenav, isChild } = ownerState;
 
-  const { transparent, white, sidenav } = palette;
+  const { transparent, text } = palette;
   const { xxl } = boxShadows;
   const { borderRadius } = borders;
   const { pxToRem } = functions;
 
   return {
     background: isChild 
-      ? (active ? "rgba(46, 114, 172, 0.15)" : "rgba(255, 255, 255, 0.03)")
-      : (active ? sidenav.button : transparent.main),
-    color: white.main,
+      ? (active ? "rgba(45, 98, 147, 0.12)" : transparent.main)
+      : (active ? "rgba(45, 98, 147, 0.12)" : transparent.main),
+    color: text.main,
     display: "flex",
     alignItems: "center",
     width: "100%",
@@ -41,7 +41,7 @@ function collapseItem(theme, ownerState) {
     whiteSpace: "normal",
     overflow: "visible",
     boxShadow: active && transparentSidenav && !isChild ? xxl : "none",
-    borderLeft: isChild ? "2px solid rgba(46, 114, 172, 0.3)" : "none",
+    borderLeft: isChild ? "2px solid rgba(45, 98, 147, 0.4)" : "none",
     [breakpoints.up("xl")]: {
       boxShadow: () => {
         if (active && !isChild) {
@@ -62,7 +62,7 @@ function collapseIconBox(theme, ownerState) {
   const { palette, transitions, breakpoints, boxShadows, borders, functions } = theme;
   const { active, color } = ownerState;
 
-  const { white, info, gradients, transparent, sidenav } = palette;
+  const { white, info, gradients, transparent, primary } = palette;
   const { md } = boxShadows;
   const { borderRadius } = borders;
   const { pxToRem } = functions;
@@ -70,9 +70,9 @@ function collapseIconBox(theme, ownerState) {
   return {
     background: (active) => {
       if (active) {
-        return color === "default" ? white.button : sidenav.button;
+        return color === "default" ? primary.main : primary.main;
       }
-      return sidenav.button;
+      return "rgba(27, 66, 102, 0.08)";
     },
     minWidth: pxToRem(32),
     minHeight: pxToRem(32),
@@ -90,9 +90,9 @@ function collapseIconBox(theme, ownerState) {
         let background;
 
         if (!active) {
-          background = sidenav.button;
+          background = "rgba(27, 66, 102, 0.08)";
         } else if (color === "default") {
-          background = info.main;
+          background = primary.main;
         } else if (color === "warning") {
           background = gradients.warning.main;
         } else {
@@ -105,13 +105,13 @@ function collapseIconBox(theme, ownerState) {
 
     backgroundColor: active ? palette[color].main : transparent.main,
     "& svg, svg g": {
-      fill: active ? white.main : palette[color].main,
+      fill: active ? white.main : primary.main,
     },
   };
 }
 
-const collapseIcon = ({ palette: { white, gradients } }, { active }) => ({
-  color: active ? white.main : gradients.dark.state,
+const collapseIcon = ({ palette: { white, text, primary } }, { active }) => ({
+  color: active ? white.main : (text.main || primary.main),
 });
 
 function collapseText(theme, ownerState) {
@@ -138,6 +138,7 @@ function collapseText(theme, ownerState) {
       fontWeight: active ? fontWeightMedium : fontWeightRegular,
       fontSize: size.sm,
       lineHeight: 1.4,
+      color: active ? "#1B4266" : "#1B4266",
     },
   };
 }

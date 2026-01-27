@@ -48,7 +48,6 @@ function navbar(theme, ownerState) {
       } else {
         color = dark.main;
       }
-      color = white.main;
       return color;
     },
     top: absolute ? 0 : pxToRem(12),
@@ -101,7 +100,7 @@ const navbarContainer = ({ breakpoints }) => ({
   },
 });
 
-const navbarRow = ({ breakpoints, palette: { white } }, { isMini }) => ({
+const navbarRow = ({ breakpoints, palette: { text } }, { isMini }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
@@ -113,22 +112,22 @@ const navbarRow = ({ breakpoints, palette: { white } }, { isMini }) => ({
           "&.MuiBreadcrumbs-li": {
             "& a": {
               "& span": {
-                color: white.main,
+                color: text.main,
               },
             },
           },
           "&.MuiBreadcrumbs-li span.MuiTypography-button": {
-            color: white.main,
+            color: text.main,
           },
           "&.MuiBreadcrumbs-separator": {
-            color: white.main,
+            color: text.main,
           },
         },
       },
     },
   },
   "& h6": {
-    color: "rgb(255,255,255)",
+    color: text.main,
   },
 
   [breakpoints.up("md")]: {
@@ -142,17 +141,17 @@ const navbarRow = ({ breakpoints, palette: { white } }, { isMini }) => ({
   },
 });
 
-const navbarIconButton = ({ typography: { size }, breakpoints, palette: { grey, white } }) => ({
+const navbarIconButton = ({ typography: { size }, breakpoints, palette: { text } }) => ({
   px: 0.75,
 
   "& .material-icons, .material-icons-round": {
     fontSize: `${size.md} !important`,
-    color: white.main,
+    color: text.main,
   },
 
   "& .MuiTypography-root": {
     display: "none",
-    color: white.main,
+    color: text.main,
 
     [breakpoints.up("sm")]: {
       display: "inline-block",
@@ -162,10 +161,23 @@ const navbarIconButton = ({ typography: { size }, breakpoints, palette: { grey, 
   },
 });
 
-const navbarMobileMenu = ({ breakpoints, palette: { white } }) => ({
+const navbarMobileMenu = ({ breakpoints, palette: { text, primary } }) => ({
   display: "inline-block",
   lineHeight: 0,
-  color: white.main,
+  color: text.main,
+  padding: "12px",
+  marginRight: "16px",
+  backgroundColor: "rgba(27, 66, 102, 0.08)",
+  borderRadius: "12px",
+  transition: "all 0.2s ease",
+  "&:hover": {
+    backgroundColor: "rgba(27, 66, 102, 0.15)",
+    transform: "scale(1.05)",
+  },
+  "& .MuiSvgIcon-root, & .material-icons": {
+    fontSize: "32px !important",
+    color: primary.main,
+  },
 
   [breakpoints.up("xl")]: {
     display: "none",

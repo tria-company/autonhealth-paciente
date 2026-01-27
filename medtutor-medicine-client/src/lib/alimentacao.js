@@ -1,34 +1,53 @@
 import { supabase } from './supabase-client';
 
 /**
- * Busca os dados de alimentação do paciente
+ * Busca os dados de alimentação do paciente com timeout
  * @param {string} pacienteId - ID do paciente (UUID)
+ * @param {number} tentativas - Número de tentativas (padrão: 1)
  * @returns {Promise<Array>} Array com os alimentos do plano
  */
-export async function buscarAlimentacaoPaciente(pacienteId) {
+export async function buscarAlimentacaoPaciente(pacienteId, tentativas = 1) {
   console.log('🍽️ Buscando alimentação para paciente:', pacienteId);
 
   try {
-    // Buscar TODOS os alimentos do paciente (removido filtro no_plano)
-    const { data, error } = await supabase
+    // Criar uma promise com timeout de 8 segundos
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Timeout ao buscar alimentação')), 8000);
+    });
+
+    const queryPromise = supabase
       .from('s_gramaturas_alimentares')
       .select('*')
       .eq('paciente_id', pacienteId)
       .order('id', { ascending: true });
 
+    const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+
     if (error) {
       console.error('❌ Erro ao buscar alimentação:', error);
+      
+      // Tentar novamente se for erro de rede e ainda tiver tentativas
+      if (tentativas > 0 && (error.message?.includes('network') || error.message?.includes('timeout'))) {
+        console.log('🔄 Tentando novamente buscar alimentação...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return buscarAlimentacaoPaciente(pacienteId, tentativas - 1);
+      }
+      
       throw error;
     }
 
     console.log('✅ Alimentação encontrada:', data?.length || 0, 'alimentos');
-    if (data && data.length > 0) {
-      console.log('📋 Primeiro registro:', data[0]);
-    }
-    
     return data || [];
   } catch (error) {
     console.error('❌ Erro na busca de alimentação:', error);
+    
+    // Tentar novamente se for timeout e ainda tiver tentativas
+    if (tentativas > 0 && error.message?.includes('Timeout')) {
+      console.log('🔄 Timeout - tentando novamente buscar alimentação...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return buscarAlimentacaoPaciente(pacienteId, tentativas - 1);
+    }
+    
     return [];
   }
 }

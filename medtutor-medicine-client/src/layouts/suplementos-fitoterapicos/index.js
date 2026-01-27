@@ -150,139 +150,144 @@ const SuplementosFitoterapicos = () => {
     },
   ];
 
-  // Buscar dados de suplementação quando o componente carregar
-  useEffect(() => {
+  // Função para carregar dados
+  const carregarDados = async () => {
     // Aguardar o carregamento do paciente antes de buscar os dados
     if (loadingPaciente) {
       console.log('⏳ Aguardando carregamento do paciente...');
       return;
     }
 
-    async function carregarDados() {
-      console.log('🔍 Carregando dados de Suplementação...');
-      console.log('👤 Paciente:', paciente);
+    console.log('🔍 Carregando dados de Suplementação...');
+    console.log('👤 Paciente:', paciente);
+    
+    if (!paciente || !paciente.id) {
+      console.log('❌ Paciente não encontrado ou sem ID');
+      setLoading(false);
+      setError("Paciente não encontrado");
+      return;
+    }
+
+    console.log('✅ Paciente ID:', paciente.id);
+
+    try {
+      setLoading(true);
+      const dados = await buscarSuplementacao(paciente.id);
       
-      if (!paciente || !paciente.id) {
-        console.log('❌ Paciente não encontrado ou sem ID');
+      console.log('📦 Dados retornados:', dados);
+
+      if (!dados) {
+        setError("Nenhum dado de suplementação encontrado para este paciente");
         setLoading(false);
-        setError("Paciente não encontrado");
         return;
       }
 
-      console.log('✅ Paciente ID:', paciente.id);
+      // Combinar todas as categorias em um único array
+      const todosItens = [];
+      let idCounter = 1;
 
-      try {
-        setLoading(true);
-        const dados = await buscarSuplementacao(paciente.id);
-        
-        console.log('📦 Dados retornados:', dados);
-
-        if (!dados) {
-          setError("Nenhum dado de suplementação encontrado para este paciente");
-          setLoading(false);
-          return;
-        }
-
-        // Combinar todas as categorias em um único array
-        const todosItens = [];
-        let idCounter = 1;
-
-        // Processar suplementos
-        if (dados.suplementos && dados.suplementos.length > 0) {
-          dados.suplementos.forEach((item) => {
-            const categoriaInfo = getCategoriaInfo('suplementos');
-            todosItens.push({
-              id: idCounter++,
-              categoria: 'suplementos',
-              nome: item.nome || '',
-              objetivo: item.objetivo || '',
-              dosagem: item.dosagem || '',
-              horario: item.horario || '',
-              inicio: formatarData(item.inicio || ''),
-              termino: formatarData(item.termino || ''),
-              criticidade: null,
-              observacaoCritica: null,
-              iconColor: categoriaInfo.color,
-              Icon: categoriaInfo.Icon,
-            });
+      // Processar suplementos
+      if (dados.suplementos && dados.suplementos.length > 0) {
+        dados.suplementos.forEach((item) => {
+          const categoriaInfo = getCategoriaInfo('suplementos');
+          todosItens.push({
+            id: idCounter++,
+            categoria: 'suplementos',
+            nome: item.nome || '',
+            objetivo: item.objetivo || '',
+            dosagem: item.dosagem || '',
+            horario: item.horario || '',
+            inicio: formatarData(item.inicio || ''),
+            termino: formatarData(item.termino || ''),
+            criticidade: null,
+            observacaoCritica: null,
+            iconColor: categoriaInfo.color,
+            Icon: categoriaInfo.Icon,
           });
-        }
-
-        // Processar fitoterápicos
-        if (dados.fitoterapicos && dados.fitoterapicos.length > 0) {
-          dados.fitoterapicos.forEach((item) => {
-            const categoriaInfo = getCategoriaInfo('fitoterapicos');
-            todosItens.push({
-              id: idCounter++,
-              categoria: 'fitoterapicos',
-              nome: item.nome || '',
-              objetivo: item.objetivo || '',
-              dosagem: item.dosagem || '',
-              horario: item.horario || '',
-              inicio: formatarData(item.inicio || ''),
-              termino: formatarData(item.termino || ''),
-              criticidade: null,
-              observacaoCritica: null,
-              iconColor: categoriaInfo.color,
-              Icon: categoriaInfo.Icon,
-            });
-          });
-        }
-
-        // Processar homeopatia
-        if (dados.homeopatia && dados.homeopatia.length > 0) {
-          dados.homeopatia.forEach((item) => {
-            const categoriaInfo = getCategoriaInfo('homeopatia');
-            todosItens.push({
-              id: idCounter++,
-              categoria: 'homeopatia',
-              nome: item.nome || '',
-              objetivo: item.objetivo || '',
-              dosagem: item.dosagem || '',
-              horario: item.horario || '',
-              inicio: formatarData(item.inicio || ''),
-              termino: formatarData(item.termino || ''),
-              criticidade: null,
-              observacaoCritica: null,
-              iconColor: categoriaInfo.color,
-              Icon: categoriaInfo.Icon,
-            });
-          });
-        }
-
-        // Processar florais de Bach
-        if (dados.florais_bach && dados.florais_bach.length > 0) {
-          dados.florais_bach.forEach((item) => {
-            const categoriaInfo = getCategoriaInfo('florais_bach');
-            todosItens.push({
-              id: idCounter++,
-              categoria: 'florais_bach',
-              nome: item.nome || '',
-              objetivo: item.objetivo || '',
-              dosagem: item.dosagem || '',
-              horario: item.horario || '',
-              inicio: formatarData(item.inicio || ''),
-              termino: formatarData(item.termino || ''),
-              criticidade: null,
-              observacaoCritica: null,
-              iconColor: categoriaInfo.color,
-              Icon: categoriaInfo.Icon,
-            });
-          });
-        }
-
-        console.log('📊 Total de itens processados:', todosItens.length);
-        setItens(todosItens);
-        setLoading(false);
-      } catch (err) {
-        console.error('Erro ao carregar Suplementação:', err);
-        setError("Erro ao carregar os dados de suplementação");
-        setLoading(false);
+        });
       }
-    }
 
-    carregarDados();
-  }, [paciente, loadingPaciente, location.pathname]);
+      // Processar fitoterápicos
+      if (dados.fitoterapicos && dados.fitoterapicos.length > 0) {
+        dados.fitoterapicos.forEach((item) => {
+          const categoriaInfo = getCategoriaInfo('fitoterapicos');
+          todosItens.push({
+            id: idCounter++,
+            categoria: 'fitoterapicos',
+            nome: item.nome || '',
+            objetivo: item.objetivo || '',
+            dosagem: item.dosagem || '',
+            horario: item.horario || '',
+            inicio: formatarData(item.inicio || ''),
+            termino: formatarData(item.termino || ''),
+            criticidade: null,
+            observacaoCritica: null,
+            iconColor: categoriaInfo.color,
+            Icon: categoriaInfo.Icon,
+          });
+        });
+      }
+
+      // Processar homeopatia
+      if (dados.homeopatia && dados.homeopatia.length > 0) {
+        dados.homeopatia.forEach((item) => {
+          const categoriaInfo = getCategoriaInfo('homeopatia');
+          todosItens.push({
+            id: idCounter++,
+            categoria: 'homeopatia',
+            nome: item.nome || '',
+            objetivo: item.objetivo || '',
+            dosagem: item.dosagem || '',
+            horario: item.horario || '',
+            inicio: formatarData(item.inicio || ''),
+            termino: formatarData(item.termino || ''),
+            criticidade: null,
+            observacaoCritica: null,
+            iconColor: categoriaInfo.color,
+            Icon: categoriaInfo.Icon,
+          });
+        });
+      }
+
+      // Processar florais de Bach
+      if (dados.florais_bach && dados.florais_bach.length > 0) {
+        dados.florais_bach.forEach((item) => {
+          const categoriaInfo = getCategoriaInfo('florais_bach');
+          todosItens.push({
+            id: idCounter++,
+            categoria: 'florais_bach',
+            nome: item.nome || '',
+            objetivo: item.objetivo || '',
+            dosagem: item.dosagem || '',
+            horario: item.horario || '',
+            inicio: formatarData(item.inicio || ''),
+            termino: formatarData(item.termino || ''),
+            criticidade: null,
+            observacaoCritica: null,
+            iconColor: categoriaInfo.color,
+            Icon: categoriaInfo.Icon,
+          });
+        });
+      }
+
+      console.log('📊 Total de itens processados:', todosItens.length);
+      setItens(todosItens);
+      setLoading(false);
+    } catch (err) {
+      console.error('Erro ao carregar Suplementação:', err);
+      setError("Erro ao carregar os dados de suplementação");
+      setLoading(false);
+    }
+  };
+
+  // Buscar dados quando paciente estiver disponível
+  useEffect(() => {
+    if (!loadingPaciente && paciente?.id) {
+      carregarDados();
+    }
+  }, [paciente?.id, loadingPaciente, location.pathname]);
+
+  // Sistema de refresh automático removido para evitar loops
 
   // Loading state
   if (loadingPaciente || loading) {

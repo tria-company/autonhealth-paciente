@@ -2,19 +2,20 @@
 import backgroundImage from "assets/images/sidenav/sidenav-card-background.png";
 
 function card(theme, ownerState) {
-  const { borders, functions, transitions, breakpoints } = theme;
+  const { borders, functions, transitions, breakpoints, palette } = theme;
   const { miniSidenav } = ownerState;
 
   const { borderRadius } = borders;
   const { pxToRem } = functions;
+  const { white, borderCol } = palette;
 
   return {
     minWidth: "auto",
-    backgroundImage: `url(${backgroundImage})`,
-    backgroundPosition: "50%",
-    backgroundSize: "cover",
+    backgroundImage: "none",
+    backgroundColor: white.main,
     borderRadius: borderRadius.xl,
     boxShadow: "none",
+    border: `1px solid ${borderCol.main}`,
 
     [breakpoints.up("xl")]: {
       maxHeight: miniSidenav ? pxToRem(64) : pxToRem(192),
@@ -30,11 +31,11 @@ function card(theme, ownerState) {
 function cardContent(theme) {
   const { palette, borders } = theme;
 
-  const { white, dark } = palette;
+  const { dark, text } = palette;
   const { borderRadius } = borders;
 
   return {
-    color: white,
+    color: text.main,
     position: "relative",
     zIndex: 2,
     width: "100%",
@@ -50,7 +51,7 @@ function cardContent(theme) {
       position: "absolute",
       top: 0,
       left: 0,
-      opacity: 0.65,
+      opacity: 0,
       zIndex: -1,
     },
 

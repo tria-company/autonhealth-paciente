@@ -42,38 +42,43 @@ const Alimentacao = () => {
     setErro(null);
   }, [location.pathname]);
 
-  // Carregar dados de alimentação
-  useEffect(() => {
-    async function carregarDados() {
-      if (loadingPaciente) {
-        setLoading(true);
-        return;
-      }
-
-      if (!paciente || !paciente.id) {
-        setLoading(false);
-        setErro('Paciente não encontrado');
-        return;
-      }
-
-      console.log('🍽️ Carregando dados de alimentação para paciente:', paciente.id);
-
-      try {
-        setLoading(true);
-        const alimentos = await buscarAlimentacaoPaciente(paciente.id);
-        const dadosProcessados = processarDadosAlimentacao(alimentos);
-        setDadosAlimentacao(dadosProcessados);
-        setErro(null);
-      } catch (error) {
-        console.error('❌ Erro ao carregar alimentação:', error);
-        setErro('Erro ao carregar dados de alimentação');
-      } finally {
-        setLoading(false);
-      }
+  // Função para carregar dados
+  const carregarDados = async () => {
+    if (loadingPaciente) {
+      setLoading(true);
+      return;
     }
 
-    carregarDados();
-  }, [paciente, loadingPaciente, location.pathname]);
+    if (!paciente || !paciente.id) {
+      setLoading(false);
+      setErro('Paciente não encontrado');
+      return;
+    }
+
+    console.log('🍽️ Carregando dados de alimentação para paciente:', paciente.id);
+
+    try {
+      setLoading(true);
+      const alimentos = await buscarAlimentacaoPaciente(paciente.id);
+      const dadosProcessados = processarDadosAlimentacao(alimentos);
+      setDadosAlimentacao(dadosProcessados);
+      setErro(null);
+    } catch (error) {
+      console.error('❌ Erro ao carregar alimentação:', error);
+      setErro('Erro ao carregar dados de alimentação');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Carregar dados quando paciente estiver disponível
+  useEffect(() => {
+    if (!loadingPaciente && paciente?.id) {
+      carregarDados();
+    }
+  }, [paciente?.id, loadingPaciente, location.pathname]);
+
+  // Sistema de refresh automático removido para evitar loops
 
   // Estado de loading
   if (loading) {

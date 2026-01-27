@@ -111,106 +111,116 @@ function DashboardNavbar({ absolute, light, isMini }) {
   const handleCloseMenu = () => setOpenMenu(false);
 
   // Render the profile menu
-  const renderMenu = () => (
-    <Menu
-      anchorEl={openMenu}
-      anchorReference={null}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "right",
-      }}
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={Boolean(openMenu)}
-      onClose={handleCloseMenu}
-      sx={{ 
-        mt: 2,
-        "& .MuiPaper-root": {
-          backgroundColor: "#0F1535",
-          border: "1px solid rgba(226, 232, 240, 0.1)",
-          minWidth: "280px",
-          borderRadius: "12px",
-        }
-      }}
-    >
-      <VuiBox px={2.5} py={2.5}>
-        {/* Header do Perfil */}
-        <VuiBox display="flex" alignItems="center" mb={2.5}>
-          <Icon sx={{ fontSize: "48px", color: "#0075FF" }}>account_circle</Icon>
-          <VuiBox ml={2}>
-            <VuiTypography variant="h6" color="white" fontWeight="bold" sx={{ mb: 0.3 }}>
-              {paciente?.name}
-            </VuiTypography>
-            <VuiTypography variant="caption" color="text" fontWeight="regular">
-              Paciente
-            </VuiTypography>
+  const renderMenu = () => {
+    if (!paciente) {
+      return null;
+    }
+
+    return (
+      <Menu
+        anchorEl={openMenu}
+        anchorReference={null}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+        open={Boolean(openMenu)}
+        onClose={handleCloseMenu}
+        sx={{
+          mt: 2,
+          "& .MuiPaper-root": {
+            backgroundColor: "#FFFFFF",
+            border: "1px solid rgba(27, 66, 102, 0.12)",
+            minWidth: "280px",
+            borderRadius: "12px",
+          }
+        }}
+      >
+        <VuiBox px={2.5} py={2.5}>
+          {/* Header do Perfil */}
+          <VuiBox display="flex" alignItems="center" mb={2.5}>
+            <Icon sx={{ fontSize: "48px", color: "#2D6293" }}>account_circle</Icon>
+            <VuiBox ml={2}>
+              <VuiTypography variant="h6" color="dark" fontWeight="bold" sx={{ mb: 0.3 }}>
+                {paciente?.name || "Paciente"}
+              </VuiTypography>
+              <VuiTypography variant="caption" color="text" fontWeight="regular">
+                Paciente
+              </VuiTypography>
+            </VuiBox>
+          </VuiBox>
+
+          {/* Divisor */}
+          <VuiBox 
+            sx={{ 
+              height: "1px", 
+              backgroundColor: "rgba(226, 232, 240, 0.15)",
+              mb: 2 
+            }} 
+          />
+
+          {/* Botão Acessar Perfil */}
+          <VuiBox mb={1}>
+            <IconButton 
+              component={Link}
+              to="/perfil"
+              sx={{
+                width: "100%",
+                justifyContent: "flex-start",
+                padding: "12px 16px",
+                borderRadius: "10px",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  backgroundColor: "rgba(0, 117, 255, 0.15)",
+                  transform: "translateX(4px)",
+                }
+              }}
+              onClick={handleCloseMenu}
+            >
+              <>
+                <Icon sx={{ color: "#2D6293", mr: 1.5, fontSize: "20px" }}>person</Icon>
+                <VuiTypography variant="button" color="dark" fontWeight="medium">
+                  Acessar Perfil
+                </VuiTypography>
+              </>
+            </IconButton>
+          </VuiBox>
+
+          {/* Botão de Logout */}
+          <VuiBox>
+            <IconButton 
+              sx={{
+                width: "100%",
+                justifyContent: "flex-start",
+                padding: "12px 16px",
+                borderRadius: "10px",
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  backgroundColor: "rgba(255, 56, 56, 0.15)",
+                  transform: "translateX(4px)",
+                }
+              }}
+              onClick={() => {
+                handleCloseMenu();
+                handleLogout();
+              }}
+            >
+              <>
+                <Icon sx={{ color: "#FF3838", mr: 1.5, fontSize: "20px" }}>logout</Icon>
+                <VuiTypography variant="button" color="error" fontWeight="medium">
+                  Sair da Conta
+                </VuiTypography>
+              </>
+            </IconButton>
           </VuiBox>
         </VuiBox>
-
-        {/* Divisor */}
-        <VuiBox 
-          sx={{ 
-            height: "1px", 
-            backgroundColor: "rgba(226, 232, 240, 0.15)",
-            mb: 2 
-          }} 
-        />
-
-        {/* Botão Acessar Perfil */}
-        <VuiBox mb={1}>
-          <IconButton 
-            component={Link}
-            to="/perfil"
-            sx={{
-              width: "100%",
-              justifyContent: "flex-start",
-              padding: "12px 16px",
-              borderRadius: "10px",
-              transition: "all 0.2s ease",
-              "&:hover": {
-                backgroundColor: "rgba(0, 117, 255, 0.15)",
-                transform: "translateX(4px)",
-              }
-            }}
-            onClick={handleCloseMenu}
-          >
-            <Icon sx={{ color: "#0075FF", mr: 1.5, fontSize: "20px" }}>person</Icon>
-            <VuiTypography variant="button" color="white" fontWeight="medium">
-              Acessar Perfil
-            </VuiTypography>
-          </IconButton>
-        </VuiBox>
-
-        {/* Botão de Logout */}
-        <VuiBox>
-          <IconButton 
-            sx={{
-              width: "100%",
-              justifyContent: "flex-start",
-              padding: "12px 16px",
-              borderRadius: "10px",
-              transition: "all 0.2s ease",
-              "&:hover": {
-                backgroundColor: "rgba(255, 56, 56, 0.15)",
-                transform: "translateX(4px)",
-              }
-            }}
-            onClick={() => {
-              handleCloseMenu();
-              handleLogout();
-            }}
-          >
-            <Icon sx={{ color: "#FF3838", mr: 1.5, fontSize: "20px" }}>logout</Icon>
-            <VuiTypography variant="button" color="error" fontWeight="medium">
-              Sair da Conta
-            </VuiTypography>
-          </IconButton>
-        </VuiBox>
-      </VuiBox>
-    </Menu>
-  );
+      </Menu>
+    );
+  };
 
   return (
     <AppBar
@@ -219,8 +229,65 @@ function DashboardNavbar({ absolute, light, isMini }) {
       sx={(theme) => navbar(theme, { transparentNavbar, absolute, light })}
     >
       <Toolbar sx={(theme) => navbarContainer(theme)}>
-        <VuiBox color="inherit" mb={{ xs: 1, md: 0 }} sx={(theme) => navbarRow(theme, { isMini })}>
-          <Breadcrumbs icon="home" title={(route && route.length ? route[route.length - 1] : "")} route={route || []} light={light} />
+        <VuiBox 
+          color="inherit" 
+          mb={{ xs: 1, md: 0 }} 
+          sx={{ 
+            display: "flex",
+            alignItems: "center",
+            width: "100%",
+            gap: 2
+          }}
+        >
+          {/* Botão de Menu Mobile - Lado Esquerdo */}
+          <VuiBox 
+            sx={{ 
+              display: { xs: "flex", xl: "none" },
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              flexShrink: 0,
+              width: "70px",
+              position: "relative"
+            }}
+            onClick={handleMiniSidenav}
+          >
+            <IconButton
+              size="large"
+              color="inherit"
+              sx={{
+                ...navbarMobileMenu,
+                margin: "0 auto",
+                padding: "12px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+              aria-label="Abrir menu"
+            >
+              <Icon sx={{ fontSize: "32px" }}>{miniSidenav ? "menu_open" : "menu"}</Icon>
+            </IconButton>
+            <VuiTypography 
+              variant="caption" 
+              color="dark" 
+              fontWeight="medium"
+              sx={{ 
+                fontSize: "9px",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+                textAlign: "center",
+                display: { xs: "block", xl: "none" },
+                width: "100%",
+                marginTop: "4px",
+                lineHeight: 1.2
+              }}
+            >
+              Menu
+            </VuiTypography>
+          </VuiBox>
+          
+          <Breadcrumbs icon="home" title={(route && route.length ? route[route.length - 1] : "")} route={route || []} light={false} />
         </VuiBox>
         {isMini ? null : (
           <VuiBox sx={(theme) => navbarRow(theme, { isMini })}>
@@ -235,8 +302,8 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   aria-haspopup="true"
                 >
                   <Icon
-                    sx={({ palette: { dark, white } }) => ({
-                      color: light ? white.main : dark.main,
+                    sx={({ palette: { dark } }) => ({
+                      color: dark.main,
                     })}
                   >
                     account_circle
@@ -244,23 +311,13 @@ function DashboardNavbar({ absolute, light, isMini }) {
                   <VuiTypography
                     variant="button"
                     fontWeight="medium"
-                    color={light ? "white" : "dark"}
+                    color="dark"
                     ml={1}
                   >
                     Perfil
                   </VuiTypography>
                 </IconButton>
               )}
-              
-              {/* Botão de Menu Mobile */}
-              <IconButton
-                size="small"
-                color="inherit"
-                sx={navbarMobileMenu}
-                onClick={handleMiniSidenav}
-              >
-                <Icon className={"text-white"}>{miniSidenav ? "menu_open" : "menu"}</Icon>
-              </IconButton>
               
               {renderMenu()}
             </VuiBox>

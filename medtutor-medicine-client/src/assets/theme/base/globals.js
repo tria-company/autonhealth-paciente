@@ -26,7 +26,7 @@ export default {
     background: dark.body,
   },
   body: {
-    background: "#0f2647",
+    background: dark.body,
     backgroundSize: "cover",
   },
   "*, *::before, *::after": {

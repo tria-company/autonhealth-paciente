@@ -24,5 +24,71 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase URL e ANON KEY devem estar configurados nas variáveis de ambiente. Verifique o arquivo .env.local e reinicie o servidor.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    storage: window.localStorage,
+    flowType: 'pkce',
+  },
+  global: {
+    headers: {
+      'x-client-info': 'medtutor-client',
+    },
+    fetch: (url, options = {}) => {
+      // Timeout de 10 segundos para todas as requisições
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+      
+      return fetch(url, {
+        ...options,
+        signal: controller.signal,
+      }).finally(() => {
+        clearTimeout(timeoutId);
+      });
+    },
+  },
+});
 
+/**
+ * Verifica e renova a sessão se necessário
+ * @returns {Promise<{session: Object|null, error: Error|null}>}
+ */
+export async function verificarERenovarSessao() {
+  try {
+    const { data, error } = await supabase.auth.getSession();
+    
+    if (error) {
+      console.error('Erro ao verificar sessão:', error);
+      return { session: null, error };
+    }
+    
+    if (!data.session) {
+      return { session: null, error: null };
+    }
+    
+    // Verificar se o token está perto de expirar (menos de 5 minutos)
+    const expiresAt = data.session.expires_at;
+    const now = Math.floor(Date.now() / 1000);
+    const tempoRestante = expiresAt - now;
+    
+    // Se restar menos de 5 minutos, renovar
+    if (tempoRestante < 300) {
+      console.log('🔄 Token próximo de expirar, renovando...');
+      const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+      
+      if (refreshError) {
+        console.error('Erro ao renovar sessão:', refreshError);
+        return { session: null, error: refreshError };
+      }
+      
+      return { session: refreshData.session, error: null };
+    }
+    
+    return { session: data.session, error: null };
+  } catch (err) {
+    console.error('Erro ao verificar e renovar sessão:', err);
+    return { session: null, error: err };
+  }
+}

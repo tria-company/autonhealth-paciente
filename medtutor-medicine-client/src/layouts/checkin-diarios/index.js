@@ -20,8 +20,7 @@ import colors from "assets/theme/base/colors";
 import linearGradient from "assets/theme/functions/linearGradient";
 
 // Icons
-import { IoMoon, IoFlower, IoFitness, IoRestaurant, IoPeople, IoCheckmarkCircle } from "react-icons/io5";
-import { GiBrainStem } from "react-icons/gi";
+import { IoMoon, IoFitness, IoRestaurant, IoCheckmarkCircle } from "react-icons/io5";
 
 // Hooks e funções
 import { usePaciente } from "hooks/usePaciente";
@@ -43,11 +42,8 @@ const CheckinDiarios = () => {
   // Estados para os valores dos sliders
   const [valores, setValores] = useState({
     sono: { qualidade: 5, tempo: 7 },
-    ambiente: { sol: 15, natureza: 30 },
     atividade: { tempo: 1, intensidade: 50 },
-    sistemaNervoso: { estresse: 30, mindfulness: 15 },
     alimentacao: { refeicoes: 3, agua: 2.0 },
-    relacionamento: { qualidade: 60, tempo: 50 },
   });
 
   // Resetar estado quando a rota mudar
@@ -60,34 +56,36 @@ const CheckinDiarios = () => {
     setCarregando(true);
     setValores({
       sono: { qualidade: 5, tempo: 7 },
-      ambiente: { sol: 15, natureza: 30 },
       atividade: { tempo: 1, intensidade: 50 },
-      sistemaNervoso: { estresse: 30, mindfulness: 15 },
       alimentacao: { refeicoes: 3, agua: 2.0 },
-      relacionamento: { qualidade: 60, tempo: 50 },
     });
   }, [location.pathname]);
 
-  // Verificar se o check-in de hoje já foi feito
-  useEffect(() => {
-    async function verificar() {
-      if (loadingPaciente) {
-        setCarregando(true);
-        return;
-      }
-
-      if (!paciente || !paciente.id) {
-        setCarregando(false);
-        return;
-      }
-
-      const jaFez = await verificarCheckinHoje(paciente.id);
-      setCheckinJaFeito(jaFez);
-      setCarregando(false);
+  // Função para verificar check-in
+  const verificarCheckin = async () => {
+    if (loadingPaciente) {
+      setCarregando(true);
+      return;
     }
 
-    verificar();
-  }, [paciente, loadingPaciente, location.pathname]);
+    if (!paciente || !paciente.id) {
+      setCarregando(false);
+      return;
+    }
+
+    const jaFez = await verificarCheckinHoje(paciente.id);
+    setCheckinJaFeito(jaFez);
+    setCarregando(false);
+  };
+
+  // Verificar check-in quando paciente estiver disponível
+  useEffect(() => {
+    if (!loadingPaciente && paciente?.id) {
+      verificarCheckin();
+    }
+  }, [paciente?.id, loadingPaciente, location.pathname]);
+
+  // Sistema de refresh automático removido para evitar loops
 
   const categorias = [
     {
@@ -99,38 +97,17 @@ const CheckinDiarios = () => {
     },
     {
       id: 2,
-      nome: "Ambiente",
-      descricao: "Natureza e Exposição Solar",
-      icone: IoFlower,
-      corIcone: "#01b574",
-    },
-    {
-      id: 3,
       nome: "Atividade Física",
       descricao: "Movimento e Exercício",
       icone: IoFitness,
       corIcone: "#2E72AC",
     },
     {
-      id: 4,
-      nome: "Sistema Nervoso",
-      descricao: "Mindfulness e Controle do Estresse",
-      icone: GiBrainStem,
-      corIcone: "#f6ad55",
-    },
-    {
-      id: 5,
+      id: 3,
       nome: "Alimentação",
       descricao: "Nutrição e Hidratação",
       icone: IoRestaurant,
       corIcone: "#4299e1",
-    },
-    {
-      id: 6,
-      nome: "Relacionamento",
-      descricao: "Conexões e Comunicação",
-      icone: IoPeople,
-      corIcone: "#9f7aea",
     },
   ];
 
@@ -603,85 +580,6 @@ function renderStepContent(categoria, valores, setValores) {
         </VuiBox>
       );
 
-    case "Ambiente":
-      return (
-        <VuiBox>
-          <VuiTypography variant="body1" color="text" mb={4}>
-            A exposição solar e contato com a natureza são fundamentais para sua saúde.
-          </VuiTypography>
-          <VuiBox mb={4}>
-            <VuiTypography variant="body2" color="white" fontWeight="medium" mb={2}>
-              Tempo de exposição ao sol (minutos)
-            </VuiTypography>
-            <Slider
-              value={valores.ambiente.sol}
-              onChange={(e, novoValor) => handleChange("ambiente", "sol", novoValor)}
-              min={0}
-              max={120}
-              step={5}
-              sx={{
-                color: "#F9CF05",
-                "& .MuiSlider-thumb": {
-                  width: 20,
-                  height: 20,
-                  backgroundColor: "#F9CF05",
-                  border: "2px solid #FFFFFF",
-                },
-                "& .MuiSlider-track": {
-                  backgroundColor: "#F9CF05",
-                },
-                "& .MuiSlider-rail": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            />
-            <VuiBox display="flex" justifyContent="space-between" mt={1}>
-              <VuiTypography variant="caption" color="text">
-                {valores.ambiente.sol}min
-              </VuiTypography>
-              <VuiTypography variant="caption" color="white">
-                Bom
-              </VuiTypography>
-            </VuiBox>
-          </VuiBox>
-          <VuiBox>
-            <VuiTypography variant="body2" color="white" fontWeight="medium" mb={2}>
-              Tempo em ambientes naturais (minutos)
-            </VuiTypography>
-            <Slider
-              value={valores.ambiente.natureza}
-              onChange={(e, novoValor) => handleChange("ambiente", "natureza", novoValor)}
-              min={0}
-              max={120}
-              step={5}
-              sx={{
-                color: "#01b574",
-                "& .MuiSlider-thumb": {
-                  width: 20,
-                  height: 20,
-                  backgroundColor: "#01b574",
-                  border: "2px solid #FFFFFF",
-                },
-                "& .MuiSlider-track": {
-                  backgroundColor: "#01b574",
-                },
-                "& .MuiSlider-rail": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            />
-            <VuiBox display="flex" justifyContent="space-between" mt={1}>
-              <VuiTypography variant="caption" color="text">
-                {valores.ambiente.natureza}min
-              </VuiTypography>
-              <VuiTypography variant="caption" color="white">
-                Excelente
-              </VuiTypography>
-            </VuiBox>
-          </VuiBox>
-        </VuiBox>
-      );
-
     case "Atividade Física":
       return (
         <VuiBox>
@@ -755,85 +653,6 @@ function renderStepContent(categoria, valores, setValores) {
               </VuiTypography>
               <VuiTypography variant="caption" color="white">
                 {getLabel(valores.atividade.intensidade, "percentual")}
-              </VuiTypography>
-            </VuiBox>
-          </VuiBox>
-        </VuiBox>
-      );
-
-    case "Sistema Nervoso":
-      return (
-        <VuiBox>
-          <VuiTypography variant="body1" color="text" mb={4}>
-            O equilíbrio do sistema nervoso impacta diretamente sua qualidade de vida.
-          </VuiTypography>
-          <VuiBox mb={4}>
-            <VuiTypography variant="body2" color="white" fontWeight="medium" mb={2}>
-              Nível de Estresse (%)
-            </VuiTypography>
-            <Slider
-              value={valores.sistemaNervoso.estresse}
-              onChange={(e, novoValor) => handleChange("sistemaNervoso", "estresse", novoValor)}
-              min={0}
-              max={100}
-              step={5}
-              sx={{
-                color: "#01b574",
-                "& .MuiSlider-thumb": {
-                  width: 20,
-                  height: 20,
-                  backgroundColor: "#01b574",
-                  border: "2px solid #FFFFFF",
-                },
-                "& .MuiSlider-track": {
-                  backgroundColor: "#01b574",
-                },
-                "& .MuiSlider-rail": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            />
-            <VuiBox display="flex" justifyContent="space-between" mt={1}>
-              <VuiTypography variant="caption" color="text">
-                {valores.sistemaNervoso.estresse}%
-              </VuiTypography>
-              <VuiTypography variant="caption" color="white">
-                {valores.sistemaNervoso.estresse < 40 ? "Excelente" : valores.sistemaNervoso.estresse < 70 ? "Moderado" : "Alto"}
-              </VuiTypography>
-            </VuiBox>
-          </VuiBox>
-          <VuiBox>
-            <VuiTypography variant="body2" color="white" fontWeight="medium" mb={2}>
-              Tempo de Mindfulness/Meditação (minutos)
-            </VuiTypography>
-            <Slider
-              value={valores.sistemaNervoso.mindfulness}
-              onChange={(e, novoValor) => handleChange("sistemaNervoso", "mindfulness", novoValor)}
-              min={0}
-              max={60}
-              step={5}
-              sx={{
-                color: "#2E72AC",
-                "& .MuiSlider-thumb": {
-                  width: 20,
-                  height: 20,
-                  backgroundColor: "#2E72AC",
-                  border: "2px solid #FFFFFF",
-                },
-                "& .MuiSlider-track": {
-                  backgroundColor: "#2E72AC",
-                },
-                "& .MuiSlider-rail": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            />
-            <VuiBox display="flex" justifyContent="space-between" mt={1}>
-              <VuiTypography variant="caption" color="text">
-                {valores.sistemaNervoso.mindfulness}min
-              </VuiTypography>
-              <VuiTypography variant="caption" color="white">
-                {valores.sistemaNervoso.mindfulness > 20 ? "Excelente" : valores.sistemaNervoso.mindfulness > 10 ? "Bom" : "Básico"}
               </VuiTypography>
             </VuiBox>
           </VuiBox>
@@ -919,84 +738,6 @@ function renderStepContent(categoria, valores, setValores) {
         </VuiBox>
       );
 
-    case "Relacionamento":
-      return (
-        <VuiBox>
-          <VuiTypography variant="body1" color="text" mb={4}>
-            Conexões saudáveis enriquecem sua vida e bem-estar.
-          </VuiTypography>
-          <VuiBox mb={4}>
-            <VuiTypography variant="body2" color="white" fontWeight="medium" mb={2}>
-              Qualidade das Interações Sociais (%)
-            </VuiTypography>
-            <Slider
-              value={valores.relacionamento.qualidade}
-              onChange={(e, novoValor) => handleChange("relacionamento", "qualidade", novoValor)}
-              min={0}
-              max={100}
-              step={5}
-              sx={{
-                color: "#9f7aea",
-                "& .MuiSlider-thumb": {
-                  width: 20,
-                  height: 20,
-                  backgroundColor: "#9f7aea",
-                  border: "2px solid #FFFFFF",
-                },
-                "& .MuiSlider-track": {
-                  backgroundColor: "#9f7aea",
-                },
-                "& .MuiSlider-rail": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            />
-            <VuiBox display="flex" justifyContent="space-between" mt={1}>
-              <VuiTypography variant="caption" color="text">
-                {valores.relacionamento.qualidade}%
-              </VuiTypography>
-              <VuiTypography variant="caption" color="white">
-                {getLabel(valores.relacionamento.qualidade, "percentual")}
-              </VuiTypography>
-            </VuiBox>
-          </VuiBox>
-          <VuiBox>
-            <VuiTypography variant="body2" color="white" fontWeight="medium" mb={2}>
-              Satisfação com Relacionamentos (%)
-            </VuiTypography>
-            <Slider
-              value={valores.relacionamento.tempo}
-              onChange={(e, novoValor) => handleChange("relacionamento", "tempo", novoValor)}
-              min={0}
-              max={100}
-              step={5}
-              sx={{
-                color: "#9f7aea",
-                "& .MuiSlider-thumb": {
-                  width: 20,
-                  height: 20,
-                  backgroundColor: "#9f7aea",
-                  border: "2px solid #FFFFFF",
-                },
-                "& .MuiSlider-track": {
-                  backgroundColor: "#9f7aea",
-                },
-                "& .MuiSlider-rail": {
-                  backgroundColor: "rgba(255, 255, 255, 0.1)",
-                },
-              }}
-            />
-            <VuiBox display="flex" justifyContent="space-between" mt={1}>
-              <VuiTypography variant="caption" color="text">
-                {valores.relacionamento.tempo}%
-              </VuiTypography>
-              <VuiTypography variant="caption" color="white">
-                {getLabel(valores.relacionamento.tempo, "percentual")}
-              </VuiTypography>
-            </VuiBox>
-          </VuiBox>
-        </VuiBox>
-      );
 
     default:
       return null;

@@ -46,12 +46,18 @@ import ProtectedRoute from "components/ProtectedRoute";
 // Vision UI Dashboard React contexts
 import { useVisionUIController, setMiniSidenav } from "context";
 
+// Hook para detectar foco da página
+import { usePageFocus } from "hooks/usePageFocus";
+
 export default function App() {
   const [controller, dispatch] = useVisionUIController();
   const { miniSidenav, direction, layout, sidenavColor } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
+  
+  // Inicializar detecção de foco da página
+  usePageFocus();
 
   // Cache for the rtl
   useMemo(() => {

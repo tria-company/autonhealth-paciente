@@ -43,52 +43,57 @@ const ExercicioFisico = () => {
     setErro(null);
   }, [location.pathname]);
 
-  // Carregar exercícios
-  useEffect(() => {
-    async function carregarDados() {
-      if (loadingPaciente) {
-        setLoading(true);
-        return;
-      }
-
-      if (!paciente || !paciente.id) {
-        setLoading(false);
-        setErro('Paciente não encontrado');
-        return;
-      }
-
-      console.log('🏋️ Carregando exercícios para paciente:', paciente.id);
-
-      try {
-        setLoading(true);
-        const exerciciosData = await buscarExerciciosPaciente(paciente.id);
-        
-        // Formatar dados para o formato esperado pelo componente
-        const exerciciosFormatados = exerciciosData.map((ex) => ({
-          id: ex.id,
-          nome: ex.nome_exercicio || 'Sem nome',
-          series: ex.series || '-',
-          repeticoes: ex.repeticoes || '-',
-          descanso: ex.descanso || '-',
-          observacoes: ex.observacoes || 'Sem observações',
-          completo: true,
-          videoUrl: null, // Sem vídeo por enquanto
-          tipoTreino: ex.tipo_treino,
-          grupoMuscular: ex.grupo_muscular,
-        }));
-
-        setExercicios(exerciciosFormatados);
-        setErro(null);
-      } catch (error) {
-        console.error('❌ Erro ao carregar exercícios:', error);
-        setErro('Erro ao carregar exercícios');
-      } finally {
-        setLoading(false);
-      }
+  // Função para carregar dados
+  const carregarDados = async () => {
+    if (loadingPaciente) {
+      setLoading(true);
+      return;
     }
 
-    carregarDados();
-  }, [paciente, loadingPaciente, location.pathname]);
+    if (!paciente || !paciente.id) {
+      setLoading(false);
+      setErro('Paciente não encontrado');
+      return;
+    }
+
+    console.log('🏋️ Carregando exercícios para paciente:', paciente.id);
+
+    try {
+      setLoading(true);
+      const exerciciosData = await buscarExerciciosPaciente(paciente.id);
+      
+      // Formatar dados para o formato esperado pelo componente
+      const exerciciosFormatados = exerciciosData.map((ex) => ({
+        id: ex.id,
+        nome: ex.nome_exercicio || 'Sem nome',
+        series: ex.series || '-',
+        repeticoes: ex.repeticoes || '-',
+        descanso: ex.descanso || '-',
+        observacoes: ex.observacoes || 'Sem observações',
+        completo: true,
+        videoUrl: null, // Sem vídeo por enquanto
+        tipoTreino: ex.tipo_treino,
+        grupoMuscular: ex.grupo_muscular,
+      }));
+
+      setExercicios(exerciciosFormatados);
+      setErro(null);
+    } catch (error) {
+      console.error('❌ Erro ao carregar exercícios:', error);
+      setErro('Erro ao carregar exercícios');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Carregar exercícios quando paciente estiver disponível
+  useEffect(() => {
+    if (!loadingPaciente && paciente?.id) {
+      carregarDados();
+    }
+  }, [paciente?.id, loadingPaciente, location.pathname]);
+
+  // Sistema de refresh automático removido para evitar loops
 
   const handleOpenVideo = (exercicio) => {
     if (exercicio.videoUrl) {

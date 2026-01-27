@@ -50,126 +50,131 @@ const MentalidadeEspiritualidade = () => {
     });
   };
 
-  // Buscar dados do Livro da Vida quando o componente carregar
-  useEffect(() => {
+  // Função para carregar dados
+  const carregarDados = async () => {
     // Aguardar o carregamento do paciente antes de buscar os dados
     if (loadingPaciente) {
       console.log('⏳ Aguardando carregamento do paciente...');
       return;
     }
 
-    async function carregarDados() {
-      console.log('🔍 Carregando dados do Livro da Vida...');
-      console.log('👤 Paciente:', paciente);
+    console.log('🔍 Carregando dados do Livro da Vida...');
+    console.log('👤 Paciente:', paciente);
+    
+    if (!paciente || !paciente.id) {
+      console.log('❌ Paciente não encontrado ou sem ID');
+      setLoading(false);
+      setError("Paciente não encontrado");
+      return;
+    }
+
+    console.log('✅ Paciente ID:', paciente.id);
+
+    try {
+      setLoading(true);
+      const dados = await buscarLivroDaVida(paciente.id);
       
-      if (!paciente || !paciente.id) {
-        console.log('❌ Paciente não encontrado ou sem ID');
+      console.log('📦 Dados retornados:', dados);
+
+      if (!dados) {
+        setError("Nenhum dado do Livro da Vida encontrado para este paciente");
         setLoading(false);
-        setError("Paciente não encontrado");
         return;
       }
 
-      console.log('✅ Paciente ID:', paciente.id);
-
-      try {
-        setLoading(true);
-        const dados = await buscarLivroDaVida(paciente.id);
+      // Processar resumo executivo
+      if (dados.resumo_executivo) {
+        // Se for string, dividir em parágrafos
+        const conteudo = typeof dados.resumo_executivo === 'string' 
+          ? dados.resumo_executivo.split('\n').filter(p => p.trim())
+          : [dados.resumo_executivo];
         
-        console.log('📦 Dados retornados:', dados);
-
-        if (!dados) {
-          setError("Nenhum dado do Livro da Vida encontrado para este paciente");
-          setLoading(false);
-          return;
-        }
-
-        // Processar resumo executivo
-        if (dados.resumo_executivo) {
-          // Se for string, dividir em parágrafos
-          const conteudo = typeof dados.resumo_executivo === 'string' 
-            ? dados.resumo_executivo.split('\n').filter(p => p.trim())
-            : [dados.resumo_executivo];
-          
-          setResumoExecutivo({
-            titulo: "Resumo Executivo",
-            conteudo: conteudo.length > 0 ? conteudo : ["Nenhum resumo executivo disponível."],
-          });
-        } else {
-          setResumoExecutivo({
-            titulo: "Resumo Executivo",
-            conteudo: ["Nenhum resumo executivo disponível."],
-          });
-        }
-
-        // Processar padrões
-        if (dados.padroes && dados.padroes.length > 0) {
-          console.log('📋 Processando padrões:', dados.padroes);
-          const padroesProcessados = dados.padroes.map((padrao, index) => {
-            // Mapear estrutura do banco para estrutura do componente
-            const padraoProcessado = {
-              id: padrao.id || index + 1,
-              nome: padrao.padrao || padrao.nome || `Padrão ${index + 1}`,
-              subtitulo: padrao.subtitulo || (padrao.padrao ? `'${padrao.padrao}'` : ''),
-              prioridade: padrao.prioridade || index + 1,
-              categorias: Array.isArray(padrao.categorias) ? padrao.categorias : [],
-              areasImpacto: Array.isArray(padrao.areas_impacto) ? padrao.areas_impacto : [],
-              origem: {
-                periodo: padrao.origem_estimada?.periodo || padrao.origem?.periodo || "Não especificado",
-                contexto: padrao.origem_estimada?.contexto_provavel || padrao.origem?.contexto || "Não especificado",
-              },
-              manifestacoes: Array.isArray(padrao.manifestacoes_atuais) ? padrao.manifestacoes_atuais : (Array.isArray(padrao.manifestacoes) ? padrao.manifestacoes : []),
-              conexoes: {
-                raizDe: padrao.conexoes_padroes?.raiz_de || padrao.conexoes?.raizDe || [],
-                alimentadoPor: padrao.conexoes_padroes?.alimentado_por || padrao.conexoes?.alimentadoPor || [],
-                relacionadoCom: padrao.conexoes_padroes?.relacionado_com || padrao.conexoes?.relacionadoCom || [],
-              },
-              orientacoes: Array.isArray(padrao.orientacoes_transformacao) ? padrao.orientacoes_transformacao.map((orient, idx) => ({
-                numero: orient.passo || orient.numero || idx + 1,
-                titulo: orient.nome || orient.titulo || `Orientação ${idx + 1}`,
-                oQueFazer: orient.o_que_fazer || orient.oQueFazer || '',
-                comoFazer: orient.como_fazer || orient.comoFazer || '',
-                porQueFunciona: orient.porque_funciona || orient.porQueFunciona || '',
-              })) : [],
-            };
-            console.log(`✅ Padrão ${index + 1} processado:`, padraoProcessado.nome);
-            return padraoProcessado;
-          });
-          console.log('📊 Total de padrões processados:', padroesProcessados.length);
-          setPadroes(padroesProcessados);
-        } else {
-          console.log('⚠️ Nenhum padrão encontrado nos dados');
-          setPadroes([]);
-        }
-
-        // Processar higiene do sono
-        if (dados.higiene_sono) {
-          setDadosSono(dados.higiene_sono);
-        } else {
-          // Dados padrão se não houver no banco
-          setDadosSono({
-            horario_dormir_recomendado: "23:00",
-            horario_acordar_recomendado: "07:00",
-            duracao_alvo: "8h",
-            janela_sono_semana: "23:00-07:00",
-            janela_sono_fds: "23:00-07:00",
-            consistencia_horario: "Variação máxima ±30min entre semana e fins de semana",
-            rotina_pre_sono: [],
-            gatilhos_evitar: [],
-            progressao_ajuste: "",
-            observacoes_clinicas: "",
-          });
-        }
-
-        setLoading(false);
-      } catch (err) {
-        console.error('Erro ao carregar Livro da Vida:', err);
-        setError("Erro ao carregar os dados do Livro da Vida");
-        setLoading(false);
+        setResumoExecutivo({
+          titulo: "Resumo Executivo",
+          conteudo: conteudo.length > 0 ? conteudo : ["Nenhum resumo executivo disponível."],
+        });
+      } else {
+        setResumoExecutivo({
+          titulo: "Resumo Executivo",
+          conteudo: ["Nenhum resumo executivo disponível."],
+        });
       }
-    }
 
-    carregarDados();
-  }, [paciente, loadingPaciente, location.pathname]);
+      // Processar padrões
+      if (dados.padroes && dados.padroes.length > 0) {
+        console.log('📋 Processando padrões:', dados.padroes);
+        const padroesProcessados = dados.padroes.map((padrao, index) => {
+          // Mapear estrutura do banco para estrutura do componente
+          const padraoProcessado = {
+            id: padrao.id || index + 1,
+            nome: padrao.padrao || padrao.nome || `Padrão ${index + 1}`,
+            subtitulo: padrao.subtitulo || (padrao.padrao ? `'${padrao.padrao}'` : ''),
+            prioridade: padrao.prioridade || index + 1,
+            categorias: Array.isArray(padrao.categorias) ? padrao.categorias : [],
+            areasImpacto: Array.isArray(padrao.areas_impacto) ? padrao.areas_impacto : [],
+            origem: {
+              periodo: padrao.origem_estimada?.periodo || padrao.origem?.periodo || "Não especificado",
+              contexto: padrao.origem_estimada?.contexto_provavel || padrao.origem?.contexto || "Não especificado",
+            },
+            manifestacoes: Array.isArray(padrao.manifestacoes_atuais) ? padrao.manifestacoes_atuais : (Array.isArray(padrao.manifestacoes) ? padrao.manifestacoes : []),
+            conexoes: {
+              raizDe: padrao.conexoes_padroes?.raiz_de || padrao.conexoes?.raizDe || [],
+              alimentadoPor: padrao.conexoes_padroes?.alimentado_por || padrao.conexoes?.alimentadoPor || [],
+              relacionadoCom: padrao.conexoes_padroes?.relacionado_com || padrao.conexoes?.relacionadoCom || [],
+            },
+            orientacoes: Array.isArray(padrao.orientacoes_transformacao) ? padrao.orientacoes_transformacao.map((orient, idx) => ({
+              numero: orient.passo || orient.numero || idx + 1,
+              titulo: orient.nome || orient.titulo || `Orientação ${idx + 1}`,
+              oQueFazer: orient.o_que_fazer || orient.oQueFazer || '',
+              comoFazer: orient.como_fazer || orient.comoFazer || '',
+              porQueFunciona: orient.porque_funciona || orient.porQueFunciona || '',
+            })) : [],
+          };
+          console.log(`✅ Padrão ${index + 1} processado:`, padraoProcessado.nome);
+          return padraoProcessado;
+        });
+        console.log('📊 Total de padrões processados:', padroesProcessados.length);
+        setPadroes(padroesProcessados);
+      } else {
+        console.log('⚠️ Nenhum padrão encontrado nos dados');
+        setPadroes([]);
+      }
+
+      // Processar higiene do sono
+      if (dados.higiene_sono) {
+        setDadosSono(dados.higiene_sono);
+      } else {
+        // Dados padrão se não houver no banco
+        setDadosSono({
+          horario_dormir_recomendado: "23:00",
+          horario_acordar_recomendado: "07:00",
+          duracao_alvo: "8h",
+          janela_sono_semana: "23:00-07:00",
+          janela_sono_fds: "23:00-07:00",
+          consistencia_horario: "Variação máxima ±30min entre semana e fins de semana",
+          rotina_pre_sono: [],
+          gatilhos_evitar: [],
+          progressao_ajuste: "",
+          observacoes_clinicas: "",
+        });
+      }
+
+      setLoading(false);
+    } catch (err) {
+      console.error('Erro ao carregar Livro da Vida:', err);
+      setError("Erro ao carregar os dados do Livro da Vida");
+      setLoading(false);
+    }
+  };
+
+  // Buscar dados quando paciente estiver disponível
+  useEffect(() => {
+    if (!loadingPaciente && paciente?.id) {
+      carregarDados();
+    }
+  }, [paciente?.id, loadingPaciente, location.pathname]);
+
+  // Sistema de refresh automático removido para evitar loops
 
   // Dados mockados (fallback caso não haja dados no banco)
   const padroesMockados = [

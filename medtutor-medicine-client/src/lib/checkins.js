@@ -57,16 +57,10 @@ export async function salvarCheckin(pacienteId, dados) {
       data_checkin: hoje,
       sono_qualidade: dados.sono?.qualidade || 0,
       sono_tempo_horas: dados.sono?.tempo || 0,
-      ambiente_sol_minutos: dados.ambiente?.sol || 0,
-      ambiente_natureza_minutos: dados.ambiente?.natureza || 0,
       atividade_tempo_horas: dados.atividade?.tempo || 0,
       atividade_intensidade: dados.atividade?.intensidade || 0,
-      sistema_nervoso_estresse: dados.sistemaNervoso?.estresse || 0,
-      sistema_nervoso_mindfulness_minutos: dados.sistemaNervoso?.mindfulness || 0,
       alimentacao_refeicoes: dados.alimentacao?.refeicoes || 0,
       alimentacao_agua_litros: dados.alimentacao?.agua || 0,
-      relacionamento_qualidade: dados.relacionamento?.qualidade || 0,
-      relacionamento_satisfacao: dados.relacionamento?.tempo || 0, // Nota: era "tempo" no código original
     };
 
     // Inserir check-in
@@ -101,23 +95,39 @@ export async function salvarCheckin(pacienteId, dados) {
 }
 
 /**
- * Busca as métricas do paciente
+ * Busca as métricas do paciente com timeout e retry
  * @param {string} pacienteId - ID do paciente
+ * @param {number} tentativas - Número de tentativas (padrão: 1)
  * @returns {Promise<Object|null>} Métricas do paciente ou null
  */
-export async function buscarMetricasPaciente(pacienteId) {
+export async function buscarMetricasPaciente(pacienteId, tentativas = 1) {
   try {
     console.log('🔍 Buscando métricas do paciente:', pacienteId);
     const pacienteIdStr = String(pacienteId);
 
-    const { data, error } = await supabase
+    // Criar uma promise com timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Timeout ao buscar métricas')), 8000);
+    });
+
+    const queryPromise = supabase
       .from('patient_metrics')
       .select('*')
       .eq('paciente_id', pacienteIdStr)
       .maybeSingle();
 
+    const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+
     if (error) {
-      console.error('Erro ao buscar métricas:', error);
+      console.error('❌ Erro ao buscar métricas:', error);
+      
+      // Tentar novamente se for erro de rede e ainda tiver tentativas
+      if (tentativas > 0 && (error.message?.includes('network') || error.message?.includes('timeout'))) {
+        console.log('🔄 Tentando novamente buscar métricas...');
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Esperar 1 segundo
+        return buscarMetricasPaciente(pacienteId, tentativas - 1);
+      }
+      
       return null;
     }
 
@@ -126,21 +136,30 @@ export async function buscarMetricasPaciente(pacienteId) {
       return null;
     }
 
-    console.log('✅ Métricas encontradas:', data);
+    console.log('✅ Métricas encontradas');
     return data;
   } catch (err) {
-    console.error('Erro ao buscar métricas:', err);
+    console.error('❌ Erro ao buscar métricas:', err);
+    
+    // Tentar novamente se for timeout e ainda tiver tentativas
+    if (tentativas > 0 && err.message?.includes('Timeout')) {
+      console.log('🔄 Timeout - tentando novamente buscar métricas...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return buscarMetricasPaciente(pacienteId, tentativas - 1);
+    }
+    
     return null;
   }
 }
 
 /**
- * Busca histórico de check-ins para gráficos
+ * Busca histórico de check-ins para gráficos com timeout e retry
  * @param {string} pacienteId - ID do paciente
  * @param {number} dias - Número de dias para buscar (padrão: 7)
+ * @param {number} tentativas - Número de tentativas (padrão: 1)
  * @returns {Promise<Array>} Array de check-ins
  */
-export async function buscarHistoricoCheckins(pacienteId, dias = 7) {
+export async function buscarHistoricoCheckins(pacienteId, dias = 7, tentativas = 1) {
   try {
     console.log(`🔍 Buscando histórico de check-ins (últimos ${dias} dias):`, pacienteId);
     const pacienteIdStr = String(pacienteId);
@@ -149,22 +168,45 @@ export async function buscarHistoricoCheckins(pacienteId, dias = 7) {
     dataInicio.setDate(dataInicio.getDate() - dias);
     const dataInicioStr = dataInicio.toISOString().split('T')[0];
 
-    const { data, error } = await supabase
+    // Criar uma promise com timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Timeout ao buscar histórico')), 8000);
+    });
+
+    const queryPromise = supabase
       .from('daily_checkins')
       .select('*')
       .eq('paciente_id', pacienteIdStr)
       .gte('data_checkin', dataInicioStr)
       .order('data_checkin', { ascending: true });
 
+    const { data, error } = await Promise.race([queryPromise, timeoutPromise]);
+
     if (error) {
-      console.error('Erro ao buscar histórico:', error);
+      console.error('❌ Erro ao buscar histórico:', error);
+      
+      // Tentar novamente se for erro de rede e ainda tiver tentativas
+      if (tentativas > 0 && (error.message?.includes('network') || error.message?.includes('timeout'))) {
+        console.log('🔄 Tentando novamente buscar histórico...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return buscarHistoricoCheckins(pacienteId, dias, tentativas - 1);
+      }
+      
       return [];
     }
 
-    console.log(`✅ ${data.length} check-ins encontrados`);
+    console.log(`✅ ${data?.length || 0} check-ins encontrados`);
     return data || [];
   } catch (err) {
-    console.error('Erro ao buscar histórico:', err);
+    console.error('❌ Erro ao buscar histórico:', err);
+    
+    // Tentar novamente se for timeout e ainda tiver tentativas
+    if (tentativas > 0 && err.message?.includes('Timeout')) {
+      console.log('🔄 Timeout - tentando novamente buscar histórico...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      return buscarHistoricoCheckins(pacienteId, dias, tentativas - 1);
+    }
+    
     return [];
   }
 }
@@ -178,23 +220,14 @@ export function calcularEquilibrioGeral(checkin) {
   // Sono: média ponderada de qualidade (70%) e tempo normalizado (30%)
   const sono = checkin.sono_qualidade * 0.7 + (checkin.sono_tempo_horas / 8 * 10) * 0.3;
 
-  // Ambiente: média de exposição solar e natureza (normalizados)
-  const ambiente = (checkin.ambiente_sol_minutos / 30.0 * 10 * 0.5) + (checkin.ambiente_natureza_minutos / 60.0 * 10 * 0.5);
-
   // Atividade Física: tempo e intensidade
   const atividade = (checkin.atividade_tempo_horas / 1.5 * 10 * 0.5) + (checkin.atividade_intensidade / 10.0 * 0.5);
-
-  // Sistema Nervoso: estresse invertido (menos é melhor) + mindfulness
-  const nervoso = ((100 - checkin.sistema_nervoso_estresse) / 10.0 * 0.6) + (checkin.sistema_nervoso_mindfulness_minutos / 20.0 * 10 * 0.4);
 
   // Alimentação: refeições + hidratação
   const alimentacao = (checkin.alimentacao_refeicoes / 4.0 * 10 * 0.5) + (checkin.alimentacao_agua_litros / 2.5 * 10 * 0.5);
 
-  // Relacionamento: qualidade e satisfação
-  const relacionamento = (checkin.relacionamento_qualidade / 10.0 * 0.5) + (checkin.relacionamento_satisfacao / 10.0 * 0.5);
-
-  // Média das 6 dimensões
-  const equilibrioGeral = (sono + ambiente + atividade + nervoso + alimentacao + relacionamento) / 6.0;
+  // Média das 3 dimensões
+  const equilibrioGeral = (sono + atividade + alimentacao) / 3.0;
 
   return Math.min(Math.max(equilibrioGeral, 0), 10); // Garantir entre 0-10
 }

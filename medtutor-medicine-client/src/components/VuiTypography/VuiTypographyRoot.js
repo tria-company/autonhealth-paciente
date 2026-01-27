@@ -27,6 +27,9 @@ export default styled(Typography)(({ theme, ownerState }) => {
   const { gradients, transparent } = palette;
   const { fontWeightLight, fontWeightRegular, fontWeightMedium, fontWeightBold } = typography;
   const { linearGradient } = functions;
+  const isLightBackground =
+    palette?.background?.default &&
+    palette.background.default.toLowerCase() === "#ebf3f6";
 
   // fontWeight styles
   const fontWeights = {
@@ -54,7 +57,12 @@ export default styled(Typography)(({ theme, ownerState }) => {
     textTransform,
     verticalAlign,
     textDecoration: "none",
-    color: color === "inherit" || !palette[color] ? "inherit" : palette[color].main,
+    color:
+      color === "inherit" || !palette[color]
+        ? "inherit"
+        : color === "white" && isLightBackground
+        ? palette.text.main
+        : palette[color].main,
     fontWeight: fontWeights[fontWeight] && fontWeights[fontWeight],
     ...(textGradient && gradientStyles()),
   };
