@@ -306,29 +306,50 @@ const Alimentacao = () => {
                         </VuiTypography>
                       </VuiBox>
                       <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.08)" }} />
-                      {refeicao.itens.map((item, index) => (
-                        <VuiBox
-                          key={`${item.alimento}-${index}`}
-                          display="grid"
-                          gridTemplateColumns="1.2fr 0.8fr 0.5fr"
-                          px={3}
-                          py={1.25}
-                          sx={{
-                            backgroundColor:
-                              index % 2 === 0 ? "rgba(255, 255, 255, 0.02)" : "rgba(255, 255, 255, 0.06)",
-                          }}
-                        >
-                          <VuiTypography variant="body2" color="white" fontWeight="medium">
-                            {item.alimento}
-                          </VuiTypography>
-                          <VuiTypography variant="body2" color="text">
-                            {item.quantidade}
-                          </VuiTypography>
-                          <VuiTypography variant="body2" color="white" textAlign="right" fontWeight="bold">
-                            {Math.round(item.kcal)}
-                          </VuiTypography>
-                        </VuiBox>
-                      ))}
+                      <VuiBox
+                        sx={{
+                          maxHeight: "320px",
+                          overflowY: "auto",
+                          "&::-webkit-scrollbar": {
+                            width: "6px",
+                          },
+                          "&::-webkit-scrollbar-track": {
+                            background: "rgba(255, 255, 255, 0.05)",
+                            borderRadius: "10px",
+                          },
+                          "&::-webkit-scrollbar-thumb": {
+                            background: "rgba(255, 255, 255, 0.2)",
+                            borderRadius: "10px",
+                            "&:hover": {
+                              background: "rgba(255, 255, 255, 0.3)",
+                            },
+                          },
+                        }}
+                      >
+                        {refeicao.itens.map((item, index) => (
+                          <VuiBox
+                            key={`${item.alimento}-${index}`}
+                            display="grid"
+                            gridTemplateColumns="1.2fr 0.8fr 0.5fr"
+                            px={3}
+                            py={1.25}
+                            sx={{
+                              backgroundColor:
+                                index % 2 === 0 ? "rgba(255, 255, 255, 0.02)" : "rgba(255, 255, 255, 0.06)",
+                            }}
+                          >
+                            <VuiTypography variant="body2" color="white" fontWeight="medium">
+                              {item.alimento}
+                            </VuiTypography>
+                            <VuiTypography variant="body2" color="text">
+                              {item.quantidade}
+                            </VuiTypography>
+                            <VuiTypography variant="body2" color="white" textAlign="right" fontWeight="bold">
+                              {Math.round(item.kcal)}
+                            </VuiTypography>
+                          </VuiBox>
+                        ))}
+                      </VuiBox>
                     </VuiBox>
 
                     <VuiBox mt="auto">
