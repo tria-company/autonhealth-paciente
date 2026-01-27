@@ -78,3 +78,4 @@ export async function buscarExerciciosAgrupados(pacienteId) {
   return agruparExerciciosPorTipo(exercicios);
 }
 
+

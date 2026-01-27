@@ -148,3 +148,8 @@ SELECT
 FROM patient_metrics
 WHERE paciente_id = '750c9511-d75c-49dd-badf-3125f44a2d64';
 
+
+
+
+
+

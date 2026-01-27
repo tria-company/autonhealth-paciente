@@ -56,7 +56,7 @@ import { GiSelfLove } from "react-icons/gi";
 const routes = [
   {
     type: "collapse",
-    name: "Início",
+    name: "Inícioo",
     key: "dashboard",
     route: "/dashboard",
     icon: <IoHome size="15px" color="inherit" />,
