@@ -275,17 +275,27 @@ function Perfil() {
               <VuiBox p={3}>
                 <VuiBox display="flex" justifyContent="space-between" alignItems="flex-start" mb={3}>
                   <VuiBox display="flex" alignItems="center">
-                    <Icon
+                    <VuiBox
                       sx={{
-                        fontSize: "60px",
-                        color: "#0075FF",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "70px",
+                        height: "70px",
                         background: "rgba(0, 117, 255, 0.1)",
                         borderRadius: "12px",
-                        p: 1.5,
+                        flexShrink: 0,
                       }}
                     >
-                      account_circle
-                    </Icon>
+                      <Icon
+                        sx={{
+                          fontSize: "32px",
+                          color: "#0075FF",
+                        }}
+                      >
+                        account_circle
+                      </Icon>
+                    </VuiBox>
                     <VuiBox ml={2}>
                       <VuiTypography variant="h4" color="white" fontWeight="bold">
                         Meu Perfil
@@ -378,6 +388,9 @@ function Perfil() {
                       sx={{
                         background: "rgba(255, 255, 255, 0.08) !important",
                         border: "1px solid rgba(0, 117, 255, 0.3) !important",
+                        "& .MuiInputBase-input": {
+                          color: "#000000",
+                        },
                       }}
                     />
                   ) : (
@@ -490,6 +503,9 @@ function Perfil() {
                       sx={{
                         background: "rgba(255, 255, 255, 0.08) !important",
                         border: "1px solid rgba(0, 117, 255, 0.3) !important",
+                        "& .MuiInputBase-input": {
+                          color: "#000000",
+                        },
                       }}
                     />
                   ) : (
@@ -535,6 +551,9 @@ function Perfil() {
                       sx={{
                         background: "rgba(255, 255, 255, 0.08) !important",
                         border: "1px solid rgba(0, 117, 255, 0.3) !important",
+                        "& .MuiInputBase-input": {
+                          color: "#000000",
+                        },
                       }}
                     />
                   ) : (
@@ -616,17 +635,27 @@ function Perfil() {
             >
               <VuiBox p={3}>
                 <VuiBox display="flex" alignItems="center" mb={3}>
-                  <Icon
+                  <VuiBox
                     sx={{
-                      fontSize: "60px",
-                      color: "#0075FF",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      width: "70px",
+                      height: "70px",
                       background: "rgba(0, 117, 255, 0.1)",
                       borderRadius: "12px",
-                      p: 1.5,
+                      flexShrink: 0,
                     }}
                   >
-                    lock
-                  </Icon>
+                    <Icon
+                      sx={{
+                        fontSize: "32px",
+                        color: "#0075FF",
+                      }}
+                    >
+                      lock
+                    </Icon>
+                  </VuiBox>
                   <VuiBox ml={2}>
                     <VuiTypography variant="h4" color="white" fontWeight="bold">
                       Segurança
@@ -706,6 +735,9 @@ function Perfil() {
                         disabled={loadingSenha}
                         sx={{
                           background: "rgba(255, 255, 255, 0.05) !important",
+                          "& .MuiInputBase-input": {
+                            color: "#000000",
+                          },
                         }}
                       />
                       <Icon
@@ -745,6 +777,9 @@ function Perfil() {
                         disabled={loadingSenha}
                         sx={{
                           background: "rgba(255, 255, 255, 0.05) !important",
+                          "& .MuiInputBase-input": {
+                            color: "#000000",
+                          },
                         }}
                       />
                       <Icon
@@ -792,44 +827,57 @@ function Perfil() {
                   {/* Dicas de Segurança */}
                   <VuiBox
                     mt={3}
-                    p={2.5}
+                    p={3}
                     sx={{
-                      background: "linear-gradient(127.09deg, rgba(6, 11, 40, 0.94) 19.41%, rgba(10, 14, 35, 0.49) 76.65%)",
-                      borderRadius: "12px",
-                      border: "1px solid rgba(0, 117, 255, 0.2)",
-                      boxShadow: "0px 2px 10px rgba(0, 117, 255, 0.1)",
+                      background: "rgba(0, 117, 255, 0.05)",
+                      borderRadius: "16px",
+                      border: "1px solid rgba(0, 117, 255, 0.3)",
+                      backdropFilter: "blur(10px)",
                     }}
                   >
-                    <VuiBox display="flex" alignItems="center" mb={2}>
-                      <Icon sx={{ color: "#0075FF", fontSize: "20px", mr: 1 }}>info</Icon>
-                      <VuiTypography variant="button" color="white" fontWeight="bold">
+                    <VuiBox display="flex" alignItems="center" mb={2.5}>
+                      <VuiBox
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: "36px",
+                          height: "36px",
+                          borderRadius: "10px",
+                          backgroundColor: "rgba(0, 117, 255, 0.15)",
+                          mr: 1.5,
+                        }}
+                      >
+                        <Icon sx={{ color: "#0075FF", fontSize: "20px" }}>info</Icon>
+                      </VuiBox>
+                      <VuiTypography variant="h6" color="white" fontWeight="bold">
                         Dicas para uma senha segura
                       </VuiTypography>
                     </VuiBox>
                     
-                    <VuiBox display="flex" alignItems="flex-start" mb={1}>
-                      <Icon sx={{ color: "#00D9FF", fontSize: "16px", mr: 1.5, mt: 0.2 }}>
+                    <VuiBox display="flex" alignItems="center" mb={1.5}>
+                      <Icon sx={{ color: "#01b574", fontSize: "18px", mr: 1.5 }}>
                         check_circle
                       </Icon>
-                      <VuiTypography variant="caption" color="text">
+                      <VuiTypography variant="body2" color="white" fontWeight="regular">
                         Use no mínimo 6 caracteres
                       </VuiTypography>
                     </VuiBox>
                     
-                    <VuiBox display="flex" alignItems="flex-start" mb={1}>
-                      <Icon sx={{ color: "#00D9FF", fontSize: "16px", mr: 1.5, mt: 0.2 }}>
+                    <VuiBox display="flex" alignItems="center" mb={1.5}>
+                      <Icon sx={{ color: "#01b574", fontSize: "18px", mr: 1.5 }}>
                         check_circle
                       </Icon>
-                      <VuiTypography variant="caption" color="text">
+                      <VuiTypography variant="body2" color="white" fontWeight="regular">
                         Combine letras, números e símbolos
                       </VuiTypography>
                     </VuiBox>
                     
-                    <VuiBox display="flex" alignItems="flex-start">
-                      <Icon sx={{ color: "#00D9FF", fontSize: "16px", mr: 1.5, mt: 0.2 }}>
+                    <VuiBox display="flex" alignItems="center">
+                      <Icon sx={{ color: "#01b574", fontSize: "18px", mr: 1.5 }}>
                         check_circle
                       </Icon>
-                      <VuiTypography variant="caption" color="text">
+                      <VuiTypography variant="body2" color="white" fontWeight="regular">
                         Não use informações pessoais óbvias
                       </VuiTypography>
                     </VuiBox>

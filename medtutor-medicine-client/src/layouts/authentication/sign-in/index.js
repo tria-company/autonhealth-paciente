@@ -117,7 +117,7 @@ function SignIn() {
             border: "1px solid rgba(255, 56, 56, 0.3)",
             borderRadius: "12px"
           }}>
-            <VuiTypography variant="body2" color="#FF3838" fontWeight="medium">
+            <VuiTypography variant="body2" fontWeight="medium" sx={{ color: "#FF3838" }}>
               {error}
             </VuiTypography>
           </VuiBox>
@@ -150,6 +150,7 @@ function SignIn() {
                 "& .MuiInputBase-input": {
                   padding: "16px 28px",
                   fontSize: "1rem",
+                  color: "#000000",
                 },
               }}
             />
@@ -182,6 +183,7 @@ function SignIn() {
                 "& .MuiInputBase-input": {
                   padding: "16px 28px",
                   fontSize: "1rem",
+                  color: "#000000",
                 },
               }}
             />

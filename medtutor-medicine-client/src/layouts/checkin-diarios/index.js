@@ -379,9 +379,11 @@ const CheckinDiarios = () => {
             >
               <VuiTypography
                 variant="body2"
-                color={mensagem.tipo === 'success' ? '#01b574' : '#FF3838'}
                 fontWeight="medium"
                 textAlign="center"
+                sx={{
+                  color: mensagem.tipo === 'success' ? '#01b574' : '#FF3838'
+                }}
               >
                 {mensagem.texto}
               </VuiTypography>

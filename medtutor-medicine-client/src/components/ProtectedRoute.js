@@ -131,7 +131,7 @@ function ProtectedRoute({ component: Component, ...rest }) {
         }}
       >
         <CircularProgress sx={{ color: "#1B4266" }} />
-        <VuiTypography variant="body2" color="#1B4266" mt={2} sx={{ fontWeight: 500 }}>
+        <VuiTypography variant="body2" mt={2} sx={{ fontWeight: 500, color: "#1B4266" }}>
           Verificando autenticação...
         </VuiTypography>
       </Box>
@@ -153,10 +153,10 @@ function ProtectedRoute({ component: Component, ...rest }) {
           padding: 3
         }}
       >
-        <VuiTypography variant="h5" color="#1B4266" textAlign="center" fontWeight="bold">
+        <VuiTypography variant="h5" textAlign="center" fontWeight="bold" sx={{ color: "#1B4266" }}>
           Erro ao carregar
         </VuiTypography>
-        <VuiTypography variant="body2" color="#1B4266" textAlign="center">
+        <VuiTypography variant="body2" textAlign="center" sx={{ color: "#1B4266" }}>
           {error}
         </VuiTypography>
         <Button
