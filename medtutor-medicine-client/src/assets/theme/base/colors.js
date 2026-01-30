@@ -168,32 +168,32 @@ export default {
 
     cardDark: {
       deg: "126.97",
-      main: "#F5FAFD 28.26%",
-      state: "#E7F0F6 91.2%",
+      main: "#D4E4EF 28.26%",
+      state: "#C2D8E8 91.2%",
     },
 
     cardLight: {
       deg: "127.09",
-      main: "#FFFFFF 19.41%",
-      state: "#F0F5FA 76.65%",
+      main: "#DCE8F2 19.41%",
+      state: "#CEDFEB 76.65%",
     },
 
     card: {
       deg: "127.09",
-      main: "#FFFFFF 19.41%",
-      state: "#F0F5FA 76.65%",
+      main: "#D6E4EF 19.41%",
+      state: "#C8DAE8 76.65%",
     },
 
     menu: {
       deg: "126.97",
-      main: "#FFFFFF 28.26%",
-      state: "#F0F5FA 91.2%",
+      main: "#DCE8F2 28.26%",
+      state: "#CEDFEB 91.2%",
     },
 
     cardContent: {
       deg: "126.97",
-      main: "#FFFFFF 28.26%",
-      state: "#F2F6FA 91.2%",
+      main: "#D2E0EC 28.26%",
+      state: "#C4D6E6 91.2%",
     },
 
     box: {

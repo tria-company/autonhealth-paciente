@@ -48,7 +48,7 @@ import ReferralTracking from "layouts/dashboard/components/ReferralTracking";
 
 // React icons
 import { IoIosRocket } from "react-icons/io";
-import { IoGlobe, IoBuild, IoWallet, IoWater, IoMoon, IoChatbubbleEllipses, IoHappy } from "react-icons/io5";
+import { IoGlobe, IoBuild, IoWallet, IoWater, IoMoon, IoFitness } from "react-icons/io5";
 import { IoDocumentText } from "react-icons/io5";
 import { FaShoppingCart } from "react-icons/fa";
 
@@ -63,6 +63,7 @@ import { barChartOptionsDashboard } from "layouts/dashboard/data/barChartOptions
 // Hooks e funções
 import { usePaciente } from "hooks/usePaciente";
 import { buscarMetricasPaciente, buscarHistoricoCheckins, processarDadosGrafico } from "lib/checkins";
+import { buscarHabitosVidaPaciente } from "lib/alimentacao";
 
 function Dashboard() {
   const { gradients } = colors;
@@ -73,6 +74,7 @@ function Dashboard() {
   const [metricas, setMetricas] = useState(null);
   const [historico, setHistorico] = useState([]);
   const [dadosGrafico, setDadosGrafico] = useState(null);
+  const [habitosVida, setHabitosVida] = useState(null); // Meta água, exercício e sono (igual à alimentação)
   const [periodo, setPeriodo] = useState(7); // Período padrão: 7 dias
   const [loading, setLoading] = useState(true);
 
@@ -81,6 +83,7 @@ function Dashboard() {
     setMetricas(null);
     setHistorico([]);
     setDadosGrafico(null);
+    setHabitosVida(null);
     setLoading(true);
   }, [location.pathname]);
 
@@ -108,19 +111,21 @@ function Dashboard() {
         setTimeout(() => reject(new Error('Timeout ao carregar dados')), 10000);
       });
 
-      // Buscar métricas e histórico em paralelo com timeout
+      // Buscar métricas, histórico e hábitos (água, exercício, sono - mesma fonte da alimentação) em paralelo
       const dataPromise = Promise.all([
         buscarMetricasPaciente(paciente.id),
-        buscarHistoricoCheckins(paciente.id, periodo)
+        buscarHistoricoCheckins(paciente.id, periodo),
+        buscarHabitosVidaPaciente(paciente.id)
       ]);
 
-      const [metricasData, historicoData] = await Promise.race([
+      const [metricasData, historicoData, habitosData] = await Promise.race([
         dataPromise,
         timeoutPromise
       ]);
 
       setMetricas(metricasData);
       setHistorico(historicoData);
+      setHabitosVida(habitosData || null);
 
       // Processar dados para o gráfico
       if (historicoData && historicoData.length > 0) {
@@ -208,23 +213,41 @@ function Dashboard() {
 
   // Formatar valores para exibição
   const equilibrioGeral = metricas.equilibrio_geral?.toFixed(1) || "0.0";
-  const equilibrioVariacao = metricas.equilibrio_geral_variacao 
-    ? (metricas.equilibrio_geral_variacao >= 0 ? `+${metricas.equilibrio_geral_variacao.toFixed(0)}%` : `${metricas.equilibrio_geral_variacao.toFixed(0)}%`)
-    : "+0%";
-  
+
   const sonoHoras = metricas.qualidade_sono_horas || 0;
   const sonoHorasFormatado = `${Math.floor(sonoHoras)}h:${Math.round((sonoHoras % 1) * 60)}min`;
   const sonoVariacao = metricas.qualidade_sono_variacao_minutos 
     ? (metricas.qualidade_sono_variacao_minutos >= 0 ? `+${metricas.qualidade_sono_variacao_minutos}min` : `${metricas.qualidade_sono_variacao_minutos}min`)
     : "+0min";
 
-  const hidratacaoAtual = metricas.hidratacao_atual_litros?.toFixed(1) || "0.0";
-  const hidratacaoMeta = metricas.hidratacao_meta_litros?.toFixed(1) || "2.4";
+  // Hidratação: consumo atual vem do check-in; meta vem da consulta (igual à alimentação)
+  const metaAguaLitros = habitosVida?.metaAguaMl != null ? habitosVida.metaAguaMl / 1000 : null;
+  const hidratacaoAtual = metricas.hidratacao_atual_litros != null ? Number(metricas.hidratacao_atual_litros).toFixed(1) : "0.0";
+  const metaAguaNum = (metaAguaLitros != null && !Number.isNaN(metaAguaLitros)) ? metaAguaLitros : 2.4;
+  const hidratacaoMeta = metaAguaNum.toFixed(1);
+  const hidratacaoPercentual = (metaAguaNum > 0 && metricas.hidratacao_atual_litros != null)
+    ? Math.min(100, Math.round((metricas.hidratacao_atual_litros / metaAguaNum) * 100))
+    : null;
 
-  const mentalEnergia = metricas.mental_energia?.toFixed(1) || "0.0";
-  const mentalVariacao = metricas.mental_energia_variacao 
-    ? (metricas.mental_energia_variacao >= 0 ? `+${metricas.mental_energia_variacao.toFixed(0)}%` : `${metricas.mental_energia_variacao.toFixed(0)}%`)
-    : "+0%";
+  // Exercício: prescrição (pilar2, min/dia) vs realizado no check-in (média atividade_tempo_horas → min)
+  const exercicioMetaMin = habitosVida?.exercicioDuracaoMin ?? null;
+  const exercicioAtualMin = historico?.length > 0
+    ? Math.round(
+        (historico.reduce((acc, c) => acc + (Number(c.atividade_tempo_horas) || 0), 0) / historico.length) * 60
+      )
+    : 0;
+  const exercicioMetaNum = exercicioMetaMin != null && exercicioMetaMin > 0 ? exercicioMetaMin : 60;
+  const exercicioPercentual = exercicioMetaNum > 0
+    ? Math.min(100, Math.round((exercicioAtualMin / exercicioMetaNum) * 100))
+    : null;
+
+  // Sono: meta (pilar3, horas) vs realizado no check-in (qualidade_sono_horas = média sono_tempo_horas)
+  const sonoMetaHoras = habitosVida?.sonoDuracaoHoras ?? null;
+  const sonoAtualHoras = metricas.qualidade_sono_horas ?? 0;
+  const sonoMetaNum = sonoMetaHoras != null && sonoMetaHoras > 0 ? sonoMetaHoras : 8;
+  const sonoPercentual = sonoMetaNum > 0
+    ? Math.min(100, Math.round((sonoAtualHoras / sonoMetaNum) * 100))
+    : null;
 
   // Debug: Ver valores brutos das métricas
   console.log("📊 Métricas brutas do banco:", {
@@ -270,49 +293,44 @@ function Dashboard() {
 
         <VuiBox mb={3}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "Equilíbrio Geral", fontWeight: "regular" }}
-                count={`${equilibrioGeral}/10`}
-                percentage={{ 
-                  color: metricas.equilibrio_geral_variacao >= 0 ? "success" : "error", 
-                  text: equilibrioVariacao 
-                }}
-                icon={{ color: "info", component: <IoChatbubbleEllipses size="22px" color="white" /> }}
-              />
+            <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+              <VuiBox sx={{ width: "100%", minHeight: 110 }}>
+                <MiniStatisticsCard
+                  title={{ text: "Qualidade do sono" }}
+                  count={sonoMetaHoras != null ? `${sonoHorasFormatado} / ${sonoMetaHoras.toFixed(1)}h` : sonoHorasFormatado}
+                  percentage={{ 
+                    color: sonoPercentual != null ? (sonoPercentual >= 100 ? "success" : "error") : (metricas.qualidade_sono_variacao_minutos >= 0 ? "success" : "error"), 
+                    text: sonoPercentual != null ? (sonoPercentual >= 100 ? `${sonoPercentual}%` : `↓ ${sonoPercentual}%`) : sonoVariacao 
+                  }}
+                  icon={{ color: "info", component: <IoMoon size="22px" color="white" /> }}
+                />
+              </VuiBox>
             </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "Qualidade do sono" }}
-                count={sonoHorasFormatado}
-                percentage={{ 
-                  color: metricas.qualidade_sono_variacao_minutos >= 0 ? "success" : "error", 
-                  text: sonoVariacao 
-                }}
-                icon={{ color: "info", component: <IoMoon size="22px" color="white" /> }}
-              />
+            <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+              <VuiBox sx={{ width: "100%", minHeight: 110 }}>
+                <MiniStatisticsCard
+                  title={{ text: "Exercício" }}
+                  count={`${exercicioAtualMin} min / ${exercicioMetaNum} min`}
+                  percentage={{ 
+                    color: exercicioPercentual != null && exercicioPercentual >= 100 ? "success" : "error", 
+                    text: exercicioPercentual != null ? (exercicioPercentual >= 100 ? `${exercicioPercentual}%` : `↓ ${exercicioPercentual}%`) : "" 
+                  }}
+                  icon={{ color: "info", component: <IoFitness size="22px" color="white" /> }}
+                />
+              </VuiBox>
             </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "Hidratação" }}
-                count={`${hidratacaoAtual} L / ${hidratacaoMeta} L`}
-                percentage={{ 
-                  color: parseFloat(hidratacaoAtual) >= parseFloat(hidratacaoMeta) ? "success" : "error", 
-                  text: "" 
-                }}
-                icon={{ color: "info", component: <IoWater size="22px" color="white" /> }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} xl={3}>
-              <MiniStatisticsCard
-                title={{ text: "Mental & Energia" }}
-                count={`${mentalEnergia} / 10`}
-                percentage={{ 
-                  color: metricas.mental_energia_variacao >= 0 ? "success" : "error", 
-                  text: mentalVariacao 
-                }}
-                icon={{ color: "info", component: <IoHappy size="22px" color="white" /> }}
-              />
+            <Grid item xs={12} md={4} sx={{ display: "flex" }}>
+              <VuiBox sx={{ width: "100%", minHeight: 110 }}>
+                <MiniStatisticsCard
+                  title={{ text: "Hidratação" }}
+                  count={`${hidratacaoAtual} L / ${hidratacaoMeta} L`}
+                  percentage={{ 
+                    color: parseFloat(hidratacaoAtual) >= parseFloat(hidratacaoMeta) ? "success" : "error", 
+                    text: hidratacaoPercentual != null ? (parseFloat(hidratacaoAtual) >= parseFloat(hidratacaoMeta) ? `${hidratacaoPercentual}%` : `↓ ${hidratacaoPercentual}%`) : "" 
+                  }}
+                  icon={{ color: "info", component: <IoWater size="22px" color="white" /> }}
+                />
+              </VuiBox>
             </Grid>
           </Grid>
         </VuiBox>

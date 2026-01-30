@@ -7,7 +7,7 @@ import Divider from "@mui/material/Divider";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 
-import { IoFastFoodOutline, IoTimeOutline, IoWaterOutline, IoNutritionOutline } from "react-icons/io5";
+import { IoLeafOutline, IoTimeOutline, IoWaterOutline, IoNutritionOutline } from "react-icons/io5";
 
 // Vision UI components
 import VuiBox from "components/VuiBox";
@@ -24,12 +24,13 @@ import linearGradient from "assets/theme/functions/linearGradient";
 
 // Hooks e funções
 import { usePaciente } from "hooks/usePaciente";
-import { buscarAlimentacaoPaciente, processarDadosAlimentacao } from "lib/alimentacao";
+import { buscarAlimentacaoPaciente, processarDadosAlimentacao, buscarMetaAguaPaciente } from "lib/alimentacao";
 
 const Alimentacao = () => {
   const { paciente, loading: loadingPaciente } = usePaciente();
   const location = useLocation();
   const [dadosAlimentacao, setDadosAlimentacao] = useState(null);
+  const [metaAguaMl, setMetaAguaMl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
   const { gradients } = colors;
@@ -38,6 +39,7 @@ const Alimentacao = () => {
   // Resetar estado quando a rota mudar
   useEffect(() => {
     setDadosAlimentacao(null);
+    setMetaAguaMl(null);
     setLoading(true);
     setErro(null);
   }, [location.pathname]);
@@ -59,9 +61,13 @@ const Alimentacao = () => {
 
     try {
       setLoading(true);
-      const alimentos = await buscarAlimentacaoPaciente(paciente.id);
+      const [alimentos, aguaMl] = await Promise.all([
+        buscarAlimentacaoPaciente(paciente.id),
+        buscarMetaAguaPaciente(paciente.id),
+      ]);
       const dadosProcessados = processarDadosAlimentacao(alimentos);
       setDadosAlimentacao(dadosProcessados);
+      setMetaAguaMl(aguaMl);
       setErro(null);
     } catch (error) {
       console.error('❌ Erro ao carregar alimentação:', error);
@@ -185,7 +191,7 @@ const Alimentacao = () => {
             >
               <VuiBox p={3} display="flex" flexDirection="column" gap={1.5}>
                 <VuiBox display="flex" alignItems="center" gap={1.5}>
-                  <IoFastFoodOutline size={28} color="#01b574" />
+                  <IoLeafOutline size={28} color="#01b574" />
                   <VuiTypography variant="h6" color="white" fontWeight="bold">
                     Total de Refeições
                   </VuiTypography>
@@ -212,14 +218,16 @@ const Alimentacao = () => {
                 <VuiBox display="flex" alignItems="center" gap={1.5}>
                   <IoWaterOutline size={28} color="#2E72AC" />
                   <VuiTypography variant="h6" color="white" fontWeight="bold">
-                    Total de Alimentos
+                    Meta de Água
                   </VuiTypography>
                 </VuiBox>
                 <VuiTypography variant="h3" color="white" fontWeight="bold">
-                  {dadosAlimentacao.refeicoes.reduce((total, ref) => total + ref.itens.length, 0)}
+                  {metaAguaMl != null && !Number.isNaN(metaAguaMl) && metaAguaMl >= 0
+                    ? `${(metaAguaMl / 1000).toFixed(1)} L`
+                    : "—"}
                 </VuiTypography>
                 <VuiTypography variant="caption" color="text">
-                  Alimentos cadastrados no plano
+                  Quantidade de água a ingerir por dia
                 </VuiTypography>
               </VuiBox>
             </Card>

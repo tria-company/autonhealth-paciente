@@ -1,6 +1,121 @@
 import { supabase } from './supabase-client';
 
 /**
+ * Busca a meta de água diária (ml) do paciente na tabela d_agente_habitos_vida_sistemica.
+ * Sempre retorna o valor da **última consulta** (registro mais recente por created_at).
+ * @param {string} pacienteId - ID do paciente (UUID)
+ * @returns {Promise<number|null>} Meta em ml ou null se não encontrado
+ */
+function parseMetaAgua(data) {
+  if (!data || (data.pilar1_hidratacao_agua_ml_dia != null && data.pilar1_hidratacao_agua_ml_dia === '')) {
+    return null;
+  }
+  const raw = data.pilar1_hidratacao_agua_ml_dia;
+  if (raw == null) return null;
+  const valor = parseFloat(raw);
+  if (Number.isNaN(valor) || valor < 0) return null;
+  return valor;
+}
+
+export async function buscarMetaAguaPaciente(pacienteId) {
+  try {
+    const pacienteIdStr = String(pacienteId).trim();
+
+    // Buscar por paciente_id e ordenar pela última consulta (registro mais recente)
+    const { data, error } = await supabase
+      .from('d_agente_habitos_vida_sistemica')
+      .select('pilar1_hidratacao_agua_ml_dia')
+      .eq('paciente_id', pacienteIdStr)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      // Se created_at não existir, tentar por updated_at (última atualização)
+      if (error.message && (error.message.includes('created_at') || error.code === '42703')) {
+        const { data: dataFallback, error: errFallback } = await supabase
+          .from('d_agente_habitos_vida_sistemica')
+          .select('pilar1_hidratacao_agua_ml_dia')
+          .eq('paciente_id', pacienteIdStr)
+          .order('updated_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (!errFallback && dataFallback) {
+          const valor = parseMetaAgua(dataFallback);
+          if (valor != null) {
+            console.log('✅ Meta de água encontrada (última consulta):', valor, 'ml');
+            return valor;
+          }
+        }
+      }
+      console.warn('⚠️ Meta de água:', error.message);
+      return null;
+    }
+
+    const valor = parseMetaAgua(data);
+    if (valor != null) {
+      console.log('✅ Meta de água encontrada (última consulta):', valor, 'ml');
+      return valor;
+    }
+
+    return null;
+  } catch (err) {
+    console.error('❌ Erro ao buscar meta de água:', err);
+    return null;
+  }
+}
+
+/**
+ * Busca hábitos de vida (última consulta) para comparar com check-in.
+ * Retorna: meta de água (ml), prescrição exercício (min/dia), padrão sono (horas ou valor).
+ * @param {string} pacienteId - ID do paciente (UUID)
+ * @returns {Promise<{ metaAguaMl: number|null, exercicioDuracaoMin: number|null, sonoDuracaoHoras: number|null }>}
+ */
+export async function buscarHabitosVidaPaciente(pacienteId) {
+  try {
+    const pacienteIdStr = String(pacienteId).trim();
+    const { data, error } = await supabase
+      .from('d_agente_habitos_vida_sistemica')
+      .select('pilar1_hidratacao_agua_ml_dia, pilar2_prescricao_fase1_duracao, pilar3_padrao_duracao_total')
+      .eq('paciente_id', pacienteIdStr)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      if (error.message && (error.message.includes('created_at') || error.code === '42703')) {
+        const { data: fallback } = await supabase
+          .from('d_agente_habitos_vida_sistemica')
+          .select('pilar1_hidratacao_agua_ml_dia, pilar2_prescricao_fase1_duracao, pilar3_padrao_duracao_total')
+          .eq('paciente_id', pacienteIdStr)
+          .limit(1)
+          .maybeSingle();
+        if (fallback) return parseHabitosVida(fallback);
+      }
+      console.warn('⚠️ Hábitos vida:', error.message);
+      return { metaAguaMl: null, exercicioDuracaoMin: null, sonoDuracaoHoras: null };
+    }
+
+    return parseHabitosVida(data);
+  } catch (err) {
+    console.error('❌ Erro ao buscar hábitos vida:', err);
+    return { metaAguaMl: null, exercicioDuracaoMin: null, sonoDuracaoHoras: null };
+  }
+}
+
+function parseHabitosVida(row) {
+  if (!row) return { metaAguaMl: null, exercicioDuracaoMin: null, sonoDuracaoHoras: null };
+  const metaAguaMl = parseFloat(row.pilar1_hidratacao_agua_ml_dia);
+  const exercicioDuracaoMin = parseFloat(row.pilar2_prescricao_fase1_duracao);
+  const sonoDuracaoHoras = parseFloat(row.pilar3_padrao_duracao_total);
+  return {
+    metaAguaMl: Number.isNaN(metaAguaMl) || metaAguaMl < 0 ? null : metaAguaMl,
+    exercicioDuracaoMin: Number.isNaN(exercicioDuracaoMin) || exercicioDuracaoMin < 0 ? null : exercicioDuracaoMin,
+    sonoDuracaoHoras: Number.isNaN(sonoDuracaoHoras) || sonoDuracaoHoras < 0 ? null : sonoDuracaoHoras,
+  };
+}
+
+/**
  * Busca os dados de alimentação do paciente com timeout
  * @param {string} pacienteId - ID do paciente (UUID)
  * @param {number} tentativas - Número de tentativas (padrão: 1)
