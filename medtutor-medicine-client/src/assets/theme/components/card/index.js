@@ -42,7 +42,7 @@ export default {
       padding: "22px",
       wordWrap: "break-word",
       backgroundClip: "border-box",
-      border: `${borderWidth[0]} solid ${rgba(black.main, 0.08)}`,
+      border: `1px solid ${rgba(black.main, 0.12)}`,
       borderRadius: borderRadius.xl,
       boxShadow: xxl,
     },

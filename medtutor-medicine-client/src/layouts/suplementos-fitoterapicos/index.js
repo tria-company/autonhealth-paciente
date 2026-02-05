@@ -27,7 +27,7 @@ import { usePaciente } from "hooks/usePaciente";
 // Função para obter ícone e cor baseado na categoria
 const getCategoriaInfo = (categoria) => {
   const categorias = {
-    suplementos: { Icon: FaCapsules, color: "#2E72AC", label: "Suplemento" },
+    suplementos: { Icon: FaCapsules, color: "#2c3e50", label: "Suplemento" },
     fitoterapicos: { Icon: IoLeaf, color: "#01b574", label: "Fitoterápico" },
     homeopatia: { Icon: GiHerbsBundle, color: "#9f7aea", label: "Homeopatia" },
     florais_bach: { Icon: IoFlower, color: "#f6ad55", label: "Floral de Bach" },
@@ -93,7 +93,7 @@ const SuplementosFitoterapicos = () => {
       termino: "15/04/2026",
       criticidade: null,
       observacaoCritica: null,
-      iconColor: "#2E72AC",
+      iconColor: "#2c3e50",
       Icon: IoFlask,
     },
     {
@@ -296,7 +296,7 @@ const SuplementosFitoterapicos = () => {
         <DashboardNavbar />
         <VuiBox pt={3} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
           <VuiBox textAlign="center">
-            <CircularProgress sx={{ color: "#2E72AC", mb: 2 }} />
+            <CircularProgress sx={{ color: "#2c3e50", mb: 2 }} />
             <VuiTypography variant="h6" color="white" fontWeight="medium">
               {loadingPaciente ? "Carregando informações do paciente..." : "Carregando Suplementação..."}
             </VuiTypography>

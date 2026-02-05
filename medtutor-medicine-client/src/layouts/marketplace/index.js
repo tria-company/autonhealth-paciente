@@ -354,7 +354,7 @@ const Marketplace = () => {
                             sx={{
                               color: "rgba(255, 255, 255, 0.5)",
                               "&.Mui-checked": {
-                                color: "#2E72AC",
+                                color: "#2c3e50",
                               },
                             }}
                           />
@@ -417,7 +417,7 @@ const Marketplace = () => {
                             sx={{
                               color: "rgba(255, 255, 255, 0.5)",
                               "&.Mui-checked": {
-                                color: "#2E72AC",
+                                color: "#2c3e50",
                               },
                             }}
                           />
@@ -484,7 +484,7 @@ const Marketplace = () => {
                             borderColor: "rgba(255, 255, 255, 0.5)",
                           },
                           "&.Mui-focused fieldset": {
-                            borderColor: "#2E72AC",
+                            borderColor: "#2c3e50",
                           },
                         },
                         "& .MuiInputLabel-root": {
@@ -492,7 +492,7 @@ const Marketplace = () => {
                           transform: "translate(14px, 0px) scale(0.75) !important",
                           top: "0px",
                           "&.Mui-focused": {
-                            color: "#2E72AC !important",
+                            color: "#2c3e50 !important",
                           },
                         },
                         "& .MuiInputBase-input": {
@@ -522,7 +522,7 @@ const Marketplace = () => {
                             borderColor: "rgba(255, 255, 255, 0.5)",
                           },
                           "&.Mui-focused fieldset": {
-                            borderColor: "#2E72AC",
+                            borderColor: "#2c3e50",
                           },
                         },
                         "& .MuiInputLabel-root": {
@@ -530,7 +530,7 @@ const Marketplace = () => {
                           transform: "translate(14px, 0px) scale(0.75) !important",
                           top: "0px",
                           "&.Mui-focused": {
-                            color: "#2E72AC !important",
+                            color: "#2c3e50 !important",
                           },
                         },
                         "& .MuiInputBase-input": {
@@ -709,7 +709,7 @@ const Marketplace = () => {
                   "& .MuiPaginationItem-root": {
                     color: "white",
                     "&.Mui-selected": {
-                      background: "#2E72AC",
+                      background: "#2c3e50",
                       color: "white",
                     },
                   },

@@ -46,7 +46,7 @@ const HigieneDoSono = () => {
       <VuiBox pt={3} pb={6}>
         {/* Título Principal */}
         <VuiBox mb={4} display="flex" alignItems="center">
-          <IoMoon size={40} color="#2E72AC" style={{ marginRight: 16 }} />
+          <IoMoon size={40} color="#2c3e50" style={{ marginRight: 16 }} />
           <VuiTypography variant="h3" color="white" fontWeight="bold">
             Higiene do Sono
           </VuiTypography>
@@ -62,7 +62,7 @@ const HigieneDoSono = () => {
         >
           <VuiBox p={3}>
             <VuiBox display="flex" alignItems="center" mb={3}>
-              <IoTime size={28} color="#2E72AC" style={{ marginRight: 12 }} />
+              <IoTime size={28} color="#2c3e50" style={{ marginRight: 12 }} />
               <VuiTypography variant="h5" color="white" fontWeight="bold">
                 Horários Recomendados
               </VuiTypography>
@@ -140,7 +140,7 @@ const HigieneDoSono = () => {
             >
               <VuiBox p={3}>
                 <VuiBox display="flex" alignItems="center" mb={2}>
-                  <IoCalendar size={24} color="#2E72AC" style={{ marginRight: 12 }} />
+                  <IoCalendar size={24} color="#2c3e50" style={{ marginRight: 12 }} />
                   <VuiTypography variant="h6" color="white" fontWeight="bold">
                     Janela de Sono - Semana
                   </VuiTypography>
@@ -170,7 +170,7 @@ const HigieneDoSono = () => {
             >
               <VuiBox p={3}>
                 <VuiBox display="flex" alignItems="center" mb={2}>
-                  <IoCalendar size={24} color="#2E72AC" style={{ marginRight: 12 }} />
+                  <IoCalendar size={24} color="#2c3e50" style={{ marginRight: 12 }} />
                   <VuiTypography variant="h6" color="white" fontWeight="bold">
                     Janela de Sono - Fins de Semana
                   </VuiTypography>
@@ -202,7 +202,7 @@ const HigieneDoSono = () => {
         >
           <VuiBox p={3}>
             <VuiBox display="flex" alignItems="center" mb={3}>
-              <IoCheckmarkCircle size={28} color="#2E72AC" style={{ marginRight: 12 }} />
+              <IoCheckmarkCircle size={28} color="#2c3e50" style={{ marginRight: 12 }} />
               <VuiTypography variant="h5" color="white" fontWeight="bold">
                 Rotina Pré-Sono
               </VuiTypography>

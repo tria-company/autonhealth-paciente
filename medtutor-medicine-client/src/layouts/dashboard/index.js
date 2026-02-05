@@ -174,7 +174,7 @@ function Dashboard() {
       <DashboardLayout>
         <DashboardNavbar />
         <VuiBox pt={3} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="70vh">
-          <CircularProgress sx={{ color: "#2E72AC" }} />
+          <CircularProgress sx={{ color: "#2c3e50" }} />
         </VuiBox>
         <Footer />
       </DashboardLayout>
@@ -280,7 +280,7 @@ function Dashboard() {
                 color: "white",
                 "& .MuiSelect-icon": { color: "white" },
                 "&:before": { borderColor: "rgba(255, 255, 255, 0.3)" },
-                "&:after": { borderColor: "#2E72AC" },
+                "&:after": { borderColor: "#2c3e50" },
               }}
             >
               <MenuItem value={7}>Últimos 7 dias</MenuItem>

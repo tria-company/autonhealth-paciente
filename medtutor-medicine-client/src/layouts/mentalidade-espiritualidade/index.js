@@ -625,7 +625,7 @@ const MentalidadeEspiritualidade = () => {
   const getPrioridadeColor = (prioridade) => {
     if (prioridade <= 2) return "#FF3838";
     if (prioridade <= 4) return "#F9CF05";
-    return "#2E72AC";
+    return "#2c3e50";
   };
 
   // Loading state - aguardar paciente ou dados
@@ -635,7 +635,7 @@ const MentalidadeEspiritualidade = () => {
         <DashboardNavbar />
         <VuiBox pt={3} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
           <VuiBox textAlign="center">
-            <CircularProgress sx={{ color: "#2E72AC", mb: 2 }} />
+            <CircularProgress sx={{ color: "#2c3e50", mb: 2 }} />
             <VuiTypography variant="h6" color="white" fontWeight="medium">
               {loadingPaciente ? "Carregando informações do paciente..." : "Carregando Livro da Vida..."}
             </VuiTypography>
@@ -707,20 +707,35 @@ const MentalidadeEspiritualidade = () => {
         >
           <VuiBox p={3}>
             <VuiBox display="flex" alignItems="center" mb={2}>
-              <GiSelfLove size={32} color="#2E72AC" style={{ marginRight: 12 }} />
+              <GiSelfLove size={32} color="#2c3e50" style={{ marginRight: 12 }} />
               <VuiTypography variant="h4" color="white" fontWeight="bold">
                 {resumoParaExibir.titulo}
               </VuiTypography>
             </VuiBox>
-            <VuiBox>
+            <VuiBox
+              sx={{
+                maxWidth: "75ch",
+                "& p": {
+                  marginBottom: 0,
+                },
+              }}
+            >
               {resumoParaExibir.conteudo.map((paragrafo, index) => (
                 <VuiTypography
                   key={index}
-                  variant="body2"
+                  variant="body1"
                   color="text"
                   fontWeight="regular"
-                  mb={index < resumoParaExibir.conteudo.length - 1 ? 2 : 0}
-                  sx={{ lineHeight: 1.8 }}
+                  component="p"
+                  mt={index > 0 ? 3 : 0}
+                  mb={index < resumoParaExibir.conteudo.length - 1 ? 3 : 0}
+                  sx={{
+                    lineHeight: 1.85,
+                    textAlign: "justify",
+                    fontSize: "1rem",
+                    letterSpacing: "0.01em",
+                    color: "#2c3e50",
+                  }}
                 >
                   {paragrafo}
                 </VuiTypography>
@@ -732,7 +747,7 @@ const MentalidadeEspiritualidade = () => {
         {/* Seção Higiene do Sono */}
         <VuiBox mt={6} mb={4}>
           <VuiBox display="flex" alignItems="center" mb={3}>
-            <IoMoon size={40} color="#2E72AC" style={{ marginRight: 16 }} />
+            <IoMoon size={40} color="#2c3e50" style={{ marginRight: 16 }} />
             <VuiTypography variant="h3" color="white" fontWeight="bold">
               Higiene do Sono
             </VuiTypography>
@@ -753,7 +768,7 @@ const MentalidadeEspiritualidade = () => {
               >
                 <VuiBox p={3}>
                   <VuiBox display="flex" alignItems="center" mb={3}>
-                    <IoTime size={28} color="#2E72AC" style={{ marginRight: 12 }} />
+                    <IoTime size={28} color="#2c3e50" style={{ marginRight: 12 }} />
                     <VuiTypography variant="h5" color="white" fontWeight="bold">
                       Horários Recomendados
                     </VuiTypography>
@@ -833,7 +848,7 @@ const MentalidadeEspiritualidade = () => {
                   >
                     <VuiBox p={3}>
                       <VuiBox display="flex" alignItems="center" mb={2}>
-                        <IoCalendar size={24} color="#2E72AC" style={{ marginRight: 12 }} />
+                        <IoCalendar size={24} color="#2c3e50" style={{ marginRight: 12 }} />
                         <VuiTypography variant="h6" color="white" fontWeight="bold">
                           Janela de Sono - Semana
                         </VuiTypography>
@@ -863,7 +878,7 @@ const MentalidadeEspiritualidade = () => {
                   >
                     <VuiBox p={3}>
                       <VuiBox display="flex" alignItems="center" mb={2}>
-                        <IoCalendar size={24} color="#2E72AC" style={{ marginRight: 12 }} />
+                        <IoCalendar size={24} color="#2c3e50" style={{ marginRight: 12 }} />
                         <VuiTypography variant="h6" color="white" fontWeight="bold">
                           Janela de Sono - Fins de Semana
                         </VuiTypography>
@@ -896,7 +911,7 @@ const MentalidadeEspiritualidade = () => {
                 >
                   <VuiBox p={3}>
                     <VuiBox display="flex" alignItems="center" mb={3}>
-                      <IoCheckmarkCircle size={28} color="#2E72AC" style={{ marginRight: 12 }} />
+                      <IoCheckmarkCircle size={28} color="#2c3e50" style={{ marginRight: 12 }} />
                       <VuiTypography variant="h5" color="white" fontWeight="bold">
                         Rotina Pré-Sono
                       </VuiTypography>
@@ -1190,7 +1205,7 @@ const MentalidadeEspiritualidade = () => {
                           mr: 2,
                         }}
                       >
-                        <VuiTypography variant="h6" color="white" fontWeight="bold">
+                        <VuiTypography variant="h6" color="white" fontWeight="bold" sx={{ color: "#FFFFFF !important" }}>
                           {padrao.prioridade}
                         </VuiTypography>
                       </VuiBox>
@@ -1217,8 +1232,8 @@ const MentalidadeEspiritualidade = () => {
                             label={cat.replace(/_/g, " ")}
                             size="small"
                             sx={{
-                              backgroundColor: "rgba(46, 114, 172, 0.2)",
-                              color: "#CBD5E0",
+                              backgroundColor: "#2c3e50",
+                              color: "#FFFFFF",
                               fontWeight: "medium",
                             }}
                           />
@@ -1231,11 +1246,11 @@ const MentalidadeEspiritualidade = () => {
                         {padrao.areasImpacto.map((area, idx) => (
                           <Chip
                             key={idx}
-                            label={area}
+                            label={area.replace(/_/g, " ")}
                             size="small"
                             sx={{
-                              backgroundColor: "rgba(255, 255, 255, 0.05)",
-                              color: "#CBD5E0",
+                              backgroundColor: "#2c3e50",
+                              color: "#FFFFFF",
                               fontWeight: "regular",
                             }}
                           />
@@ -1426,7 +1441,7 @@ const MentalidadeEspiritualidade = () => {
                                     mr: 2,
                                   }}
                                 >
-                                  <VuiTypography variant="button" color="white" fontWeight="bold">
+                                  <VuiTypography variant="button" color="white" fontWeight="bold" sx={{ color: "#FFFFFF !important" }}>
                                     {orientacao.numero}
                                   </VuiTypography>
                                 </VuiBox>

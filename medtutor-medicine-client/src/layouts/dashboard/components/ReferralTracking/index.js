@@ -76,7 +76,7 @@ function ReferralTracking() {
                             const pathD = `M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`;
                             return (
                                 <svg width={size} height={size} style={{ position: 'absolute', top: -20, left: 0 }}>
-                                    <path d={pathD} stroke="#2F3765" strokeWidth={22} fill="none" strokeLinecap="round" />
+                                    <path d={pathD} stroke="#9ca3af" strokeWidth={22} fill="none" strokeLinecap="round" />
                                     <path d={pathD} stroke={info.main} strokeWidth={22} fill="none" strokeLinecap="round" strokeDasharray={dashArray} strokeDashoffset={dashOffset} />
                                 </svg>
                             );

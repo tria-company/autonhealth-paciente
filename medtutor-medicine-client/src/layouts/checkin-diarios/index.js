@@ -100,7 +100,7 @@ const CheckinDiarios = () => {
       nome: "Atividade Física",
       descricao: "Movimento e Exercício",
       icone: IoFitness,
-      corIcone: "#2E72AC",
+      corIcone: "#2c3e50",
     },
     {
       id: 3,
@@ -169,7 +169,7 @@ const CheckinDiarios = () => {
       <DashboardLayout>
         <DashboardNavbar />
         <VuiBox pt={3} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="70vh">
-          <CircularProgress sx={{ color: "#2E72AC" }} />
+          <CircularProgress sx={{ color: "#2c3e50" }} />
         </VuiBox>
         <Footer />
       </DashboardLayout>
@@ -399,11 +399,11 @@ const CheckinDiarios = () => {
             onClick={handleAnterior}
             disabled={stepAtual === 0 || salvando}
             sx={{
-              borderColor: "#2E72AC",
-              color: "#2E72AC",
+              borderColor: "#2c3e50",
+              color: "#2c3e50",
               px: 4,
               "&:hover": {
-                borderColor: "#2E72AC",
+                borderColor: "#2c3e50",
                 backgroundColor: "rgba(46, 114, 172, 0.1)",
               },
               "&.Mui-disabled": {
@@ -520,15 +520,15 @@ function renderStepContent(categoria, valores, setValores) {
               max={10}
               step={1}
               sx={{
-                color: "#2E72AC",
+                color: "#2c3e50",
                 "& .MuiSlider-thumb": {
                   width: 20,
                   height: 20,
-                  backgroundColor: "#2E72AC",
+                  backgroundColor: "#2c3e50",
                   border: "2px solid #FFFFFF",
                 },
                 "& .MuiSlider-track": {
-                  backgroundColor: "#2E72AC",
+                  backgroundColor: "#2c3e50",
                 },
                 "& .MuiSlider-rail": {
                   backgroundColor: "rgba(255, 255, 255, 0.1)",
@@ -599,15 +599,15 @@ function renderStepContent(categoria, valores, setValores) {
               max={3}
               step={0.5}
               sx={{
-                color: "#2E72AC",
+                color: "#2c3e50",
                 "& .MuiSlider-thumb": {
                   width: 20,
                   height: 20,
-                  backgroundColor: "#2E72AC",
+                  backgroundColor: "#2c3e50",
                   border: "2px solid #FFFFFF",
                 },
                 "& .MuiSlider-track": {
-                  backgroundColor: "#2E72AC",
+                  backgroundColor: "#2c3e50",
                 },
                 "& .MuiSlider-rail": {
                   backgroundColor: "rgba(255, 255, 255, 0.1)",

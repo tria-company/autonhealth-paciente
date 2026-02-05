@@ -147,10 +147,16 @@ function SignIn() {
               disabled={loading}
               fontWeight="500"
               sx={{
+                width: "100%",
+                backgroundColor: "#FFFFFF !important",
                 "& .MuiInputBase-input": {
                   padding: "16px 28px",
                   fontSize: "1rem",
                   color: "#000000",
+                  "&:-webkit-autofill": {
+                    WebkitBoxShadow: "0 0 0 1000px #FFFFFF inset !important",
+                    boxShadow: "0 0 0 1000px #FFFFFF inset !important",
+                  },
                 },
               }}
             />
@@ -180,10 +186,16 @@ function SignIn() {
               required
               disabled={loading}
               sx={{
+                width: "100%",
+                backgroundColor: "#FFFFFF !important",
                 "& .MuiInputBase-input": {
                   padding: "16px 28px",
                   fontSize: "1rem",
                   color: "#000000",
+                  "&:-webkit-autofill": {
+                    WebkitBoxShadow: "0 0 0 1000px #FFFFFF inset !important",
+                    boxShadow: "0 0 0 1000px #FFFFFF inset !important",
+                  },
                 },
               }}
             />
@@ -202,7 +214,7 @@ function SignIn() {
           </VuiTypography>
         </VuiBox>
         <VuiBox mt={4} mb={1}>
-          <VuiButton color="info" fullWidth onClick={handleSignIn} disabled={loading}>
+          <VuiButton type="submit" color="info" fullWidth disabled={loading}>
             {loading ? "ENTRANDO..." : "ENTRAR"}
           </VuiButton>
         </VuiBox>

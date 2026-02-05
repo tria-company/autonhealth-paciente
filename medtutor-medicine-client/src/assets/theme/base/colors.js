@@ -28,12 +28,12 @@ export default {
   },
 
   sidenav: {
-    button: "#1B4266",
+    button: "#2c3e50",
   },
 
   text: {
-    main: "#1B4266",
-    focus: "#0B1A26",
+    main: "#2c3e50",
+    focus: "#1a252f",
   },
 
   transparent: {
@@ -46,8 +46,8 @@ export default {
   },
 
   brand: {
-    main: "#1B4266",
-    focus: "#2D6293",
+    main: "#2c3e50",
+    focus: "#34495e",
   },
 
   black: {
@@ -57,18 +57,18 @@ export default {
   },
 
   primary: {
-    main: "#1B4266",
-    focus: "#2D6293",
+    main: "#2c3e50",
+    focus: "#34495e",
   },
 
   secondary: {
-    main: "#2D6293",
-    focus: "#3A74A8",
+    main: "#34495e",
+    focus: "#3d566e",
   },
 
   lightblue: {
-    main: "#2D6293",
-    focus: "#3A74A8",
+    main: "#2c3e50",
+    focus: "#34495e",
   },
 
   orange: {
@@ -91,20 +91,20 @@ export default {
   borderCol: {
     main: "#D9E5EF",
     red: "#e31a1a",
-    navbar: "rgba(27, 66, 102, 0.2)",
+    navbar: "rgba(44, 62, 80, 0.2)",
   },
 
   // Other colors
   info: {
-    main: "#2D6293",
-    focus: "#3A74A8",
+    main: "#2c3e50",
+    focus: "#34495e",
     charts: {
-      100: "#2D6293",
-      200: "#245A8A",
-      300: "#1F4F7A",
-      400: "#1B4266",
-      500: "#163654",
-      600: "#102840",
+      100: "#2c3e50",
+      200: "#2c3e50",
+      300: "#2c3e50",
+      400: "#2c3e50",
+      500: "#2c3e50",
+      600: "#1a252f",
     },
   },
 
@@ -129,8 +129,8 @@ export default {
   },
 
   dark: {
-    main: "#1B4266",
-    focus: "#163654",
+    main: "#2c3e50",
+    focus: "#1a252f",
     body: "#EBF3F6",
   },
 
@@ -138,7 +138,7 @@ export default {
     navbar: {
       deg: "123.64deg",
       main: "rgba(255, 255, 255, 0) -22.38%",
-      state: "rgba(27, 66, 102, 0.06) 70.38%",
+      state: "rgba(44, 62, 80, 0.06) 70.38%",
     },
 
     sidenav: {
@@ -168,32 +168,32 @@ export default {
 
     cardDark: {
       deg: "126.97",
-      main: "#D4E4EF 28.26%",
-      state: "#C2D8E8 91.2%",
+      main: "#FFFFFF 28.26%",
+      state: "#F0F6FA 91.2%",
     },
 
     cardLight: {
       deg: "127.09",
-      main: "#DCE8F2 19.41%",
-      state: "#CEDFEB 76.65%",
+      main: "#FFFFFF 19.41%",
+      state: "#F2F7FB 76.65%",
     },
 
     card: {
       deg: "127.09",
-      main: "#D6E4EF 19.41%",
-      state: "#C8DAE8 76.65%",
+      main: "#FFFFFF 19.41%",
+      state: "#F2F7FB 76.65%",
     },
 
     menu: {
       deg: "126.97",
-      main: "#DCE8F2 28.26%",
-      state: "#CEDFEB 91.2%",
+      main: "#FFFFFF 28.26%",
+      state: "#F2F7FB 91.2%",
     },
 
     cardContent: {
       deg: "126.97",
-      main: "#D2E0EC 28.26%",
-      state: "#C4D6E6 91.2%",
+      main: "#FFFFFF 28.26%",
+      state: "#F0F6FA 91.2%",
     },
 
     box: {
@@ -210,8 +210,8 @@ export default {
 
     primary: {
       deg: "97.89",
-      main: "#1B4266",
-      state: "#2D6293",
+      main: "#2c3e50",
+      state: "#34495e",
     },
 
     secondary: {
@@ -227,8 +227,8 @@ export default {
 
     info: {
       deg: "97.89",
-      main: "#2D6293",
-      state: "#3A74A8",
+      main: "#2c3e50",
+      state: "#34495e",
     },
 
     success: {
@@ -252,8 +252,8 @@ export default {
     },
 
     dark: {
-      main: "#1B4266",
-      state: "#2D6293",
+      main: "#2c3e50",
+      state: "#34495e",
     },
   },
 
@@ -321,8 +321,8 @@ export default {
 
   alertColors: {
     primary: {
-      main: "#1B4266",
-      state: "#2D6293",
+      main: "#2c3e50",
+      state: "#34495e",
       border: "#efb6e2",
     },
 
@@ -333,8 +333,8 @@ export default {
     },
 
     info: {
-      main: "#2D6293",
-      state: "#3A74A8",
+      main: "#2c3e50",
+      state: "#34495e",
       border: "#b9ecf8",
     },
 
@@ -363,16 +363,16 @@ export default {
     },
 
     dark: {
-      main: "#1B4266",
-      state: "#2D6293",
+      main: "#2c3e50",
+      state: "#34495e",
       border: "#c2c8d1",
     },
   },
 
   badgeColors: {
     primary: {
-      basic: "#1B4266",
-      background: "#2D6293",
+      basic: "#2c3e50",
+      background: "#34495e",
       text: "#a3017e",
     },
 
@@ -383,7 +383,7 @@ export default {
     },
 
     info: {
-      basic: "#2D6293",
+      basic: "#2c3e50",
       background: "#abe9f7",
       text: "#08a1c4",
     },
@@ -413,22 +413,22 @@ export default {
     },
 
     dark: {
-      basic: "#1B4266",
-      background: "#2D6293",
+      basic: "#2c3e50",
+      background: "#34495e",
       text: "#fff",
     },
   },
 
   inputColors: {
     backgroundColor: "#FFFFFF",
-    borderColor: { main: "rgba(27, 66, 102, 0.2)", focus: "rgba(27, 66, 102, 0.4)" },
-    boxShadow: "#2D6293",
+    borderColor: { main: "rgba(44, 62, 80, 0.2)", focus: "rgba(44, 62, 80, 0.4)" },
+    boxShadow: "#2c3e50",
     error: "#fd5c70",
     success: "#66d432",
   },
 
   sliderColors: {
-    thumb: { borderColor: "#1B4266" },
+    thumb: { borderColor: "#2c3e50" },
   },
 
   circleSliderColors: {

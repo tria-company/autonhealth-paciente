@@ -143,7 +143,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
         <VuiBox px={2.5} py={2.5}>
           {/* Header do Perfil */}
           <VuiBox display="flex" alignItems="center" mb={2.5}>
-            <Icon sx={{ fontSize: "48px", color: "#2D6293" }}>account_circle</Icon>
+            <Icon sx={{ fontSize: "48px", color: "#2c3e50" }}>account_circle</Icon>
             <VuiBox ml={2}>
               <VuiTypography variant="h6" color="dark" fontWeight="bold" sx={{ mb: 0.3 }}>
                 {paciente?.name || "Paciente"}
@@ -182,7 +182,7 @@ function DashboardNavbar({ absolute, light, isMini }) {
               onClick={handleCloseMenu}
             >
               <>
-                <Icon sx={{ color: "#2D6293", mr: 1.5, fontSize: "20px" }}>person</Icon>
+                <Icon sx={{ color: "#2c3e50", mr: 1.5, fontSize: "20px" }}>person</Icon>
                 <VuiTypography variant="button" color="dark" fontWeight="medium">
                   Acessar Perfil
                 </VuiTypography>

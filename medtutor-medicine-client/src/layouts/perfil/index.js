@@ -290,7 +290,7 @@ function Perfil() {
                       <Icon
                         sx={{
                           fontSize: "32px",
-                          color: "#0075FF",
+                          color: "#2c3e50",
                         }}
                       >
                         account_circle
@@ -369,7 +369,7 @@ function Perfil() {
                 {/* Nome Completo */}
                 <VuiBox mb={3}>
                   <VuiBox display="flex" alignItems="center" mb={1}>
-                    <Icon sx={{ fontSize: "16px", color: "#0075FF", mr: 1 }}>person</Icon>
+                    <Icon sx={{ fontSize: "16px", color: "#2c3e50", mr: 1 }}>person</Icon>
                     <VuiTypography
                       variant="caption"
                       color="text"
@@ -417,7 +417,7 @@ function Perfil() {
                 {/* Email */}
                 <VuiBox mb={3}>
                   <VuiBox display="flex" alignItems="center" mb={1}>
-                    <Icon sx={{ fontSize: "16px", color: "#0075FF", mr: 1 }}>email</Icon>
+                    <Icon sx={{ fontSize: "16px", color: "#2c3e50", mr: 1 }}>email</Icon>
                     <VuiTypography
                       variant="caption"
                       color="text"
@@ -451,7 +451,7 @@ function Perfil() {
                 {/* CPF */}
                 <VuiBox mb={3}>
                   <VuiBox display="flex" alignItems="center" mb={1}>
-                    <Icon sx={{ fontSize: "16px", color: "#0075FF", mr: 1 }}>badge</Icon>
+                    <Icon sx={{ fontSize: "16px", color: "#2c3e50", mr: 1 }}>badge</Icon>
                     <VuiTypography
                       variant="caption"
                       color="text"
@@ -484,7 +484,7 @@ function Perfil() {
                 {/* Telefone */}
                 <VuiBox mb={3}>
                   <VuiBox display="flex" alignItems="center" mb={1}>
-                    <Icon sx={{ fontSize: "16px", color: "#0075FF", mr: 1 }}>phone</Icon>
+                    <Icon sx={{ fontSize: "16px", color: "#2c3e50", mr: 1 }}>phone</Icon>
                     <VuiTypography
                       variant="caption"
                       color="text"
@@ -532,7 +532,7 @@ function Perfil() {
                 {/* Data de Nascimento */}
                 <VuiBox mb={modoEdicao ? 3 : 0}>
                   <VuiBox display="flex" alignItems="center" mb={1}>
-                    <Icon sx={{ fontSize: "16px", color: "#0075FF", mr: 1 }}>cake</Icon>
+                    <Icon sx={{ fontSize: "16px", color: "#2c3e50", mr: 1 }}>cake</Icon>
                     <VuiTypography
                       variant="caption"
                       color="text"
@@ -587,11 +587,15 @@ function Perfil() {
                       disabled={loadingPerfil}
                       sx={{
                         flex: 1,
-                        color: 'white',
-                        border: '1px solid rgba(255, 255, 255, 0.3)',
+                        color: '#2c3e50 !important',
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        border: '1px solid rgba(44, 62, 80, 0.3)',
                         '&:hover': {
-                          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                        }
+                          backgroundColor: 'rgba(255, 255, 255, 1)',
+                        },
+                        '& .MuiIcon-root': {
+                          color: '#2c3e50',
+                        },
                       }}
                     >
                       <Icon sx={{ mr: 0.5 }}>close</Icon>
@@ -650,7 +654,7 @@ function Perfil() {
                     <Icon
                       sx={{
                         fontSize: "32px",
-                        color: "#0075FF",
+                        color: "#2c3e50",
                       }}
                     >
                       lock
@@ -848,7 +852,7 @@ function Perfil() {
                           mr: 1.5,
                         }}
                       >
-                        <Icon sx={{ color: "#0075FF", fontSize: "20px" }}>info</Icon>
+                        <Icon sx={{ color: "#2c3e50", fontSize: "20px" }}>info</Icon>
                       </VuiBox>
                       <VuiTypography variant="h6" color="white" fontWeight="bold">
                         Dicas para uma senha segura

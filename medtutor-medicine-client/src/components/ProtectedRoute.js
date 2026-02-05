@@ -130,8 +130,8 @@ function ProtectedRoute({ component: Component, ...rest }) {
           backgroundColor: '#EBF3F6'
         }}
       >
-        <CircularProgress sx={{ color: "#1B4266" }} />
-        <VuiTypography variant="body2" mt={2} sx={{ fontWeight: 500, color: "#1B4266" }}>
+        <CircularProgress sx={{ color: "#2c3e50" }} />
+        <VuiTypography variant="body2" mt={2} sx={{ fontWeight: 500, color: "#2c3e50" }}>
           Verificando autenticação...
         </VuiTypography>
       </Box>
@@ -153,10 +153,10 @@ function ProtectedRoute({ component: Component, ...rest }) {
           padding: 3
         }}
       >
-        <VuiTypography variant="h5" textAlign="center" fontWeight="bold" sx={{ color: "#1B4266" }}>
+        <VuiTypography variant="h5" textAlign="center" fontWeight="bold" sx={{ color: "#2c3e50" }}>
           Erro ao carregar
         </VuiTypography>
-        <VuiTypography variant="body2" textAlign="center" sx={{ color: "#1B4266" }}>
+        <VuiTypography variant="body2" textAlign="center" sx={{ color: "#2c3e50" }}>
           {error}
         </VuiTypography>
         <Button
@@ -164,9 +164,9 @@ function ProtectedRoute({ component: Component, ...rest }) {
           onClick={() => window.location.reload()}
           sx={{
             mt: 2,
-            backgroundColor: '#1B4266',
+            backgroundColor: '#2c3e50',
             color: '#FFFFFF',
-            '&:hover': { backgroundColor: '#2D6293' }
+            '&:hover': { backgroundColor: '#34495e' }
           }}
         >
           Recarregar Página

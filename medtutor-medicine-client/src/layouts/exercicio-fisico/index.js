@@ -114,7 +114,7 @@ const ExercicioFisico = () => {
         <DashboardNavbar />
         <VuiBox pt={6} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
           <VuiBox textAlign="center">
-            <CircularProgress size={60} sx={{ color: '#0075FF' }} />
+            <CircularProgress size={60} sx={{ color: '#2c3e50' }} />
             <VuiTypography variant="h6" color="white" mt={3}>
               Carregando exercícios...
             </VuiTypography>

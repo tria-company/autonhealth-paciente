@@ -93,7 +93,7 @@ const Alimentacao = () => {
         <DashboardNavbar />
         <VuiBox pt={6} pb={6} display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
           <VuiBox textAlign="center">
-            <CircularProgress size={60} sx={{ color: '#0075FF' }} />
+            <CircularProgress size={60} sx={{ color: '#2c3e50' }} />
             <VuiTypography variant="h6" color="white" mt={3}>
               Carregando plano alimentar...
             </VuiTypography>
@@ -216,7 +216,7 @@ const Alimentacao = () => {
             >
               <VuiBox p={3} display="flex" flexDirection="column" gap={1.5}>
                 <VuiBox display="flex" alignItems="center" gap={1.5}>
-                  <IoWaterOutline size={28} color="#2E72AC" />
+                  <IoWaterOutline size={28} color="#2c3e50" />
                   <VuiTypography variant="h6" color="white" fontWeight="bold">
                     Meta de Água
                   </VuiTypography>

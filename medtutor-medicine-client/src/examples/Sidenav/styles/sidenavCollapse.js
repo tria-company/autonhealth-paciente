@@ -138,7 +138,7 @@ function collapseText(theme, ownerState) {
       fontWeight: active ? fontWeightMedium : fontWeightRegular,
       fontSize: size.sm,
       lineHeight: 1.4,
-      color: active ? "#1B4266" : "#1B4266",
+      color: active ? "#2c3e50" : "#2c3e50",
     },
   };
 }
