@@ -31,6 +31,7 @@ const Alimentacao = () => {
   const [metaAguaMl, setMetaAguaMl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState(null);
+  const [viewRefeicao, setViewRefeicao] = useState({});
   const { gradients } = colors;
   const { cardContent, info, success } = gradients;
 
@@ -40,6 +41,7 @@ const Alimentacao = () => {
     setMetaAguaMl(null);
     setLoading(true);
     setErro(null);
+    setViewRefeicao({});
   }, [location.pathname]);
 
   // Função para carregar dados
@@ -281,14 +283,56 @@ const Alimentacao = () => {
                           {refeicao.nome}
                         </VuiTypography>
                       </VuiBox>
-                      <VuiTypography variant="h6" color="white" fontWeight="bold" sx={{ fontSize: { xs: "0.95rem", md: "1rem" } }}>
-                        Substituições
-                      </VuiTypography>
+                      <VuiBox
+                        sx={{
+                          display: "flex",
+                          backgroundColor: "rgba(44, 62, 80, 0.5)",
+                          borderRadius: "10px",
+                          p: 0.25,
+                        }}
+                      >
+                        <VuiBox
+                          component="button"
+                          onClick={() => setViewRefeicao((prev) => ({ ...prev, [refeicao.id]: "principal" }))}
+                          sx={{
+                            px: 2,
+                            py: 0.75,
+                            borderRadius: "8px",
+                            border: "none",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                            fontSize: { xs: "0.8rem", md: "0.85rem" },
+                            transition: "all 0.2s",
+                            backgroundColor: (viewRefeicao[refeicao.id] || "principal") === "principal" ? "#1e3a5f" : "rgba(44, 62, 80, 0.4)",
+                            color: (viewRefeicao[refeicao.id] || "principal") === "principal" ? "#fff" : "rgba(255,255,255,0.6)",
+                          }}
+                        >
+                          Principal
+                        </VuiBox>
+                        <VuiBox
+                          component="button"
+                          onClick={() => setViewRefeicao((prev) => ({ ...prev, [refeicao.id]: "substituicoes" }))}
+                          sx={{
+                            px: 2,
+                            py: 0.75,
+                            borderRadius: "8px",
+                            border: "none",
+                            cursor: "pointer",
+                            fontWeight: "bold",
+                            fontSize: { xs: "0.8rem", md: "0.85rem" },
+                            transition: "all 0.2s",
+                            backgroundColor: (viewRefeicao[refeicao.id] || "principal") === "substituicoes" ? "#1e3a5f" : "rgba(44, 62, 80, 0.4)",
+                            color: (viewRefeicao[refeicao.id] || "principal") === "substituicoes" ? "#fff" : "rgba(255,255,255,0.6)",
+                          }}
+                        >
+                          Substituições
+                        </VuiBox>
+                      </VuiBox>
                     </VuiBox>
 
+                    {(viewRefeicao[refeicao.id] || "principal") === "principal" ? (
                     <Grid container spacing={3}>
-                      {/* Refeição Principal */}
-                      <Grid item xs={12} md={8} sx={{ minWidth: { md: 420 } }}>
+                      <Grid item xs={12}>
                         <VuiBox
                           sx={{
                             background: "rgba(46, 114, 172, 0.15)",
@@ -299,9 +343,6 @@ const Alimentacao = () => {
                             height: "100%",
                           }}
                         >
-                          <VuiTypography variant="button" color="white" fontWeight="bold" mb={1.5} sx={{ fontSize: { xs: "0.95rem", md: "0.8rem" } }}>
-                            Refeição Principal
-                          </VuiTypography>
                           <VuiBox display="grid" gridTemplateColumns={{ xs: "1fr 1.4fr 0.9fr 0.6fr", md: "1fr 1.2fr 0.8fr 0.5fr" }} px={{ xs: 1.5, md: 1 }} py={{ xs: 1, md: 0.5 }} gap={{ xs: 0.5, md: 0 }}>
                             <VuiTypography variant="caption" color="text" fontWeight="medium" sx={{ fontSize: { xs: "0.85rem", md: "0.75rem" } }}>Categoria</VuiTypography>
                             <VuiTypography variant="caption" color="text" fontWeight="medium" sx={{ fontSize: { xs: "0.85rem", md: "0.75rem" } }}>Alimento</VuiTypography>
@@ -315,15 +356,21 @@ const Alimentacao = () => {
                                 key={`principal-${index}`}
                                 display="grid"
                                 gridTemplateColumns={{ xs: "1fr 1.4fr 0.9fr 0.6fr", md: "1fr 1.2fr 0.8fr 0.5fr" }}
-                                px={{ xs: 1.5, md: 1 }}
-                                py={{ xs: 1, md: 0.75 }}
+                                px={{ xs: 1.5, md: 1.5 }}
+                                py={{ xs: 1, md: 1 }}
                                 gap={{ xs: 0.5, md: 0 }}
-                                sx={{ backgroundColor: index % 2 === 0 ? "rgba(255,255,255,0.03)" : "transparent" }}
+                                sx={{
+                                  backgroundColor: "#FFFFFF",
+                                  borderRadius: "10px",
+                                  borderLeft: "4px solid #1e3a5f",
+                                  mb: 1,
+                                  "&:last-of-type": { mb: 0 },
+                                }}
                               >
-                                <VuiTypography variant="caption" color="text" textTransform="capitalize" sx={{ fontSize: { xs: "0.85rem", md: "0.75rem" } }}>{(item.categoria || "").replace(/_/g, " ")}</VuiTypography>
-                                <VuiTypography variant="body2" color="white" fontWeight="medium" sx={{ fontSize: { xs: "0.9rem", md: "0.875rem" } }}>{item.alimento}</VuiTypography>
-                                <VuiTypography variant="body2" color="text" sx={{ fontSize: { xs: "0.9rem", md: "0.875rem" } }}>{item.quantidade}</VuiTypography>
-                                <VuiTypography variant="body2" color="white" textAlign="right" fontWeight="bold" sx={{ fontSize: { xs: "0.9rem", md: "0.875rem" } }}>{Math.round(item.kcal || 0)}</VuiTypography>
+                                <VuiTypography variant="caption" textTransform="capitalize" sx={{ fontSize: { xs: "0.85rem", md: "0.75rem" }, color: "#2c3e50" }}>{(item.categoria || "").replace(/_/g, " ")}</VuiTypography>
+                                <VuiTypography variant="body2" fontWeight="medium" sx={{ fontSize: { xs: "0.9rem", md: "0.875rem" }, color: "#2c3e50" }}>{item.alimento}</VuiTypography>
+                                <VuiTypography variant="body2" sx={{ fontSize: { xs: "0.9rem", md: "0.875rem" }, color: "#2c3e50" }}>{item.quantidade}</VuiTypography>
+                                <VuiTypography variant="body2" textAlign="right" fontWeight="bold" sx={{ fontSize: { xs: "0.9rem", md: "0.875rem" }, color: "#2c3e50" }}>{Math.round(item.kcal || 0)}</VuiTypography>
                               </VuiBox>
                             ))
                           ) : (
@@ -338,55 +385,54 @@ const Alimentacao = () => {
                           )}
                         </VuiBox>
                       </Grid>
-
-                      {/* Substituições por categoria */}
-                      <Grid item xs={12} md={4}>
-                        <VuiBox
-                          sx={{
-                            background: "rgba(255, 255, 255, 0.05)",
-                            borderRadius: "14px",
-                            p: { xs: 1.5, md: 2 },
-                            height: "100%",
-                          }}
-                        >
-                          {(() => {
-                            const porCategoria = refeicao.substituicoesPorCategoria || {};
-                            const labels = { proteinas: "Proteínas", carboidratos: "Carboidratos", gorduras: "Gorduras", leguminosas: "Leguminosas" };
-                            const categorias = ["proteinas", "carboidratos", "gorduras", "leguminosas"];
-                            return categorias.map((cat) => {
-                              const itens = porCategoria[cat] || [];
-                              if (itens.length === 0) return null;
-                              return (
-                                <VuiBox key={cat} mb={{ xs: 1.5, md: 2 }}>
-                                  <VuiTypography variant="caption" color="white" fontWeight="bold" sx={{ display: "block", mb: 0.75, fontSize: { xs: "0.7rem", md: "0.75rem" } }}>
-                                    {labels[cat]}
-                                  </VuiTypography>
-                                  <VuiBox sx={{ pl: 1.5, borderLeft: "3px solid rgba(46, 114, 172, 0.5)" }}>
-                                    {itens.map((item, idx) => (
-                                      <VuiBox
-                                        key={`${cat}-${idx}`}
-                                        display="grid"
-                                        gridTemplateColumns={{ xs: "1fr 0.7fr 0.5fr", md: "1.2fr 0.8fr 0.5fr" }}
-                                        px={1}
-                                        py={{ xs: 0.4, md: 0.5 }}
-                                        sx={{ backgroundColor: idx % 2 === 0 ? "rgba(255,255,255,0.03)" : "transparent", borderRadius: 1 }}
-                                      >
-                                        <VuiTypography variant="body2" color="white" fontWeight="medium" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>{item.alimento}</VuiTypography>
-                                        <VuiTypography variant="body2" color="text" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>{item.quantidade}</VuiTypography>
-                                        <VuiTypography variant="body2" color="white" textAlign="right" fontWeight="bold" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>{Math.round(item.kcal || 0)}</VuiTypography>
-                                      </VuiBox>
-                                    ))}
-                                  </VuiBox>
-                                </VuiBox>
-                              );
-                            });
-                          })()}
-                          {!refeicao.substituicoesPorCategoria || Object.values(refeicao.substituicoesPorCategoria).every((arr) => !arr || arr.length === 0) ? (
-                            <VuiTypography variant="body2" color="text" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>Nenhuma substituição</VuiTypography>
-                          ) : null}
-                        </VuiBox>
-                      </Grid>
                     </Grid>
+                    ) : (
+                    <VuiBox
+                      sx={{
+                        background: "rgba(255, 255, 255, 0.05)",
+                        borderRadius: "14px",
+                        p: { xs: 1.5, md: 2 },
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
+                      {(() => {
+                        const porCategoria = refeicao.substituicoesPorCategoria || {};
+                        const labels = { proteinas: "Proteínas", carboidratos: "Carboidratos", gorduras: "Gorduras", leguminosas: "Leguminosas" };
+                        const categorias = ["proteinas", "carboidratos", "gorduras", "leguminosas"];
+                        return categorias.map((cat) => {
+                          const itens = porCategoria[cat] || [];
+                          if (itens.length === 0) return null;
+                          return (
+                            <VuiBox key={cat} mb={{ xs: 1.5, md: 2 }}>
+                              <VuiTypography variant="caption" color="white" fontWeight="bold" sx={{ display: "block", mb: 0.75, fontSize: { xs: "0.7rem", md: "0.75rem" } }}>
+                                {labels[cat]}
+                              </VuiTypography>
+                              <VuiBox sx={{ pl: 1.5, borderLeft: "3px solid rgba(46, 114, 172, 0.5)" }}>
+                                {itens.map((item, idx) => (
+                                  <VuiBox
+                                    key={`${cat}-${idx}`}
+                                    display="grid"
+                                    gridTemplateColumns={{ xs: "1fr 0.7fr 0.5fr", md: "1.2fr 0.8fr 0.5fr" }}
+                                    px={1}
+                                    py={{ xs: 0.4, md: 0.5 }}
+                                    sx={{ backgroundColor: idx % 2 === 0 ? "rgba(255,255,255,0.03)" : "transparent", borderRadius: 1 }}
+                                  >
+                                    <VuiTypography variant="body2" color="white" fontWeight="medium" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>{item.alimento}</VuiTypography>
+                                    <VuiTypography variant="body2" color="text" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>{item.quantidade}</VuiTypography>
+                                    <VuiTypography variant="body2" color="white" textAlign="right" fontWeight="bold" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>{Math.round(item.kcal || 0)}</VuiTypography>
+                                  </VuiBox>
+                                ))}
+                              </VuiBox>
+                            </VuiBox>
+                          );
+                        });
+                      })()}
+                      {!refeicao.substituicoesPorCategoria || Object.values(refeicao.substituicoesPorCategoria).every((arr) => !arr || arr.length === 0) ? (
+                        <VuiTypography variant="body2" color="text" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>Nenhuma substituição</VuiTypography>
+                      ) : null}
+                    </VuiBox>
+                    )}
 
                     <VuiBox mt={3}>
                       <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.08)" }} />

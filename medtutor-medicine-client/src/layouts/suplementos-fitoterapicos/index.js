@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 import Grid from "@mui/material/Grid";
-import { Card, CircularProgress, Chip } from "@mui/material";
+import { Card, CircularProgress, Chip, Divider } from "@mui/material";
 
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
@@ -349,7 +349,7 @@ const SuplementosFitoterapicos = () => {
             const IconComponent = suplemento.Icon;
             const categoriaInfo = suplemento.categoria ? getCategoriaInfo(suplemento.categoria) : null;
             return (
-              <Grid item xs={12} md={4} key={suplemento.id}>
+              <Grid item xs={12} md={6} lg={4} key={suplemento.id}>
                 <Card
                   sx={{
                     borderRadius: "20px",
@@ -359,7 +359,7 @@ const SuplementosFitoterapicos = () => {
                     height: "100%",
                   }}
                 >
-                  <VuiBox p={4} position="relative">
+                  <VuiBox p={{ xs: 2.5, md: 3 }} position="relative">
                     {/* Ícone do suplemento */}
                     <VuiBox
                       display="flex"
@@ -381,7 +381,18 @@ const SuplementosFitoterapicos = () => {
 
                   {/* Nome do suplemento */}
                   <VuiBox textAlign="center" mb={2}>
-                    <VuiTypography variant="h5" color="white" fontWeight="bold" mb={1}>
+                    <VuiTypography
+                      variant="h5"
+                      color="white"
+                      fontWeight="bold"
+                      mb={1}
+                      sx={{
+                        wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                        lineHeight: 1.4,
+                        fontSize: { xs: "1rem", md: "1.25rem" },
+                      }}
+                    >
                       {suplemento.nome}
                     </VuiTypography>
                     {categoriaInfo && (
@@ -398,131 +409,104 @@ const SuplementosFitoterapicos = () => {
                     )}
                   </VuiBox>
 
-                  {/* Grid de informações */}
-                  <Grid container spacing={3}>
-                    <Grid item xs={12}>
-                      <VuiBox>
-                        <VuiTypography variant="caption" color="text" fontWeight="medium" mb={1}>
-                          Objetivo
-                        </VuiTypography>
+                  {/* Objetivo */}
+                  <VuiBox mb={3}>
+                    <VuiTypography variant="caption" color="text" fontWeight="bold" mb={1} sx={{ display: "block", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                      Objetivo
+                    </VuiTypography>
+                    <VuiBox
+                      p={2}
+                      sx={{
+                        borderRadius: "12px",
+                        background: "rgba(255, 255, 255, 0.06)",
+                        border: "1px solid rgba(255, 255, 255, 0.12)",
+                        borderLeft: "4px solid rgba(255, 255, 255, 0.3)",
+                      }}
+                    >
+                      <VuiTypography
+                        variant="body2"
+                        color="white"
+                        fontWeight="regular"
+                        sx={{
+                          wordBreak: "break-word",
+                          overflowWrap: "break-word",
+                          lineHeight: 1.6,
+                          textAlign: "left",
+                          display: "block",
+                          whiteSpace: "normal",
+                          fontSize: { xs: "0.875rem", md: "0.9rem" },
+                        }}
+                      >
+                        {suplemento.objetivo}
+                      </VuiTypography>
+                      {suplemento.criticidade && (
                         <VuiBox
+                          mt={2}
+                          display="flex"
+                          alignItems="flex-start"
                           p={2}
                           sx={{
-                            borderRadius: "15px",
-                            background: "rgba(255, 255, 255, 0.05)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
+                            borderRadius: "10px",
+                            background: "rgba(249, 207, 5, 0.12)",
+                            border: "1px solid rgba(249, 207, 5, 0.25)",
                           }}
                         >
-                          <VuiTypography variant="body2" color="white" fontWeight="regular">
-                            {suplemento.objetivo}
-                          </VuiTypography>
-                          {suplemento.criticidade && (
-                            <VuiBox
-                              mt={2}
-                              display="flex"
-                              alignItems="center"
-                              p={2}
-                              sx={{
-                                borderRadius: "12px",
-                                background: "rgba(249, 207, 5, 0.15)",
-                                border: "1px solid rgba(249, 207, 5, 0.3)",
-                              }}
-                            >
-                              <IoWarning size={24} color="#F9CF05" />
-                              <VuiBox ml={2}>
-                                <VuiTypography variant="button" color="#F9CF05" fontWeight="bold">
-                                  {suplemento.criticidade}:
-                                </VuiTypography>
-                                <VuiTypography variant="body2" color="#F9CF05" fontWeight="regular">
-                                  {suplemento.observacaoCritica}
-                                </VuiTypography>
-                              </VuiBox>
-                            </VuiBox>
-                          )}
+                          <IoWarning size={22} color="#F9CF05" style={{ flexShrink: 0, marginTop: 2 }} />
+                          <VuiBox ml={1.5}>
+                            <VuiTypography variant="button" color="#F9CF05" fontWeight="bold" sx={{ wordBreak: "break-word", lineHeight: 1.4, fontSize: "0.8rem" }}>
+                              {suplemento.criticidade}:
+                            </VuiTypography>
+                            <VuiTypography variant="body2" color="#F9CF05" fontWeight="regular" sx={{ wordBreak: "break-word", lineHeight: 1.5, whiteSpace: "normal", fontSize: "0.8rem" }}>
+                              {suplemento.observacaoCritica}
+                            </VuiTypography>
+                          </VuiBox>
                         </VuiBox>
-                      </VuiBox>
-                    </Grid>
+                      )}
+                    </VuiBox>
+                  </VuiBox>
 
-                    <Grid item xs={12} sm={6}>
-                      <VuiBox>
-                        <VuiTypography variant="caption" color="text" fontWeight="medium" mb={1}>
-                          Dosagem
-                        </VuiTypography>
-                        <VuiBox
-                          p={2}
-                          sx={{
-                            borderRadius: "15px",
-                            background: "rgba(255, 255, 255, 0.05)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                          }}
-                        >
-                          <VuiTypography variant="body2" color="white" fontWeight="medium">
-                            {suplemento.dosagem}
-                          </VuiTypography>
-                        </VuiBox>
-                      </VuiBox>
-                    </Grid>
+                  <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.15)", mb: 2 }} />
 
-                    <Grid item xs={12} sm={6}>
-                      <VuiBox>
-                        <VuiTypography variant="caption" color="text" fontWeight="medium" mb={1}>
-                          Horário
-                        </VuiTypography>
-                        <VuiBox
-                          p={2}
-                          sx={{
-                            borderRadius: "15px",
-                            background: "rgba(255, 255, 255, 0.05)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                          }}
-                        >
-                          <VuiTypography variant="body2" color="white" fontWeight="medium">
-                            {suplemento.horario}
+                  {/* Detalhes: Dosagem, Horário, Início, Término */}
+                  <VuiBox
+                    sx={{
+                      borderRadius: "12px",
+                      background: "rgba(255, 255, 255, 0.04)",
+                      border: "1px solid rgba(255, 255, 255, 0.1)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {[
+                      { label: "Dosagem", value: suplemento.dosagem },
+                      { label: "Horário", value: suplemento.horario },
+                      { label: "Início", value: suplemento.inicio },
+                      { label: "Término", value: suplemento.termino },
+                    ].map((item, idx) => (
+                      <VuiBox key={item.label}>
+                        {idx > 0 && <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)" }} />}
+                        <VuiBox px={2} py={1.5} display="flex" flexDirection="column" gap={0.25}>
+                          <VuiTypography variant="caption" color="text" fontWeight="bold" sx={{ fontSize: "0.7rem", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                            {item.label}
+                          </VuiTypography>
+                          <VuiTypography
+                            variant="body2"
+                            color="white"
+                            fontWeight="medium"
+                            sx={{
+                              wordBreak: "break-word",
+                              overflowWrap: "break-word",
+                              lineHeight: 1.5,
+                              whiteSpace: "normal",
+                              fontSize: { xs: "0.875rem", md: "0.9rem" },
+                              textAlign: "left",
+                            }}
+                          >
+                            {item.value}
                           </VuiTypography>
                         </VuiBox>
                       </VuiBox>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <VuiBox>
-                        <VuiTypography variant="caption" color="text" fontWeight="medium" mb={1}>
-                          Início
-                        </VuiTypography>
-                        <VuiBox
-                          p={2}
-                          sx={{
-                            borderRadius: "15px",
-                            background: "rgba(255, 255, 255, 0.05)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                          }}
-                        >
-                          <VuiTypography variant="body2" color="white" fontWeight="medium">
-                            {suplemento.inicio}
-                          </VuiTypography>
-                        </VuiBox>
-                      </VuiBox>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <VuiBox>
-                        <VuiTypography variant="caption" color="text" fontWeight="medium" mb={1}>
-                          Término
-                        </VuiTypography>
-                        <VuiBox
-                          p={2}
-                          sx={{
-                            borderRadius: "15px",
-                            background: "rgba(255, 255, 255, 0.05)",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                          }}
-                        >
-                          <VuiTypography variant="body2" color="white" fontWeight="medium">
-                            {suplemento.termino}
-                          </VuiTypography>
-                        </VuiBox>
-                      </VuiBox>
-                    </Grid>
-                  </Grid>
+                    ))}
+                  </VuiBox>
                 </VuiBox>
               </Card>
             </Grid>
