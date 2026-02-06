@@ -4,7 +4,6 @@ import { useLocation } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Divider from "@mui/material/Divider";
-import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import { IoLeafOutline, IoTimeOutline, IoWaterOutline, IoNutritionOutline } from "react-icons/io5";
@@ -24,7 +23,7 @@ import linearGradient from "assets/theme/functions/linearGradient";
 
 // Hooks e funções
 import { usePaciente } from "hooks/usePaciente";
-import { buscarAlimentacaoPaciente, processarDadosAlimentacao, buscarMetaAguaPaciente } from "lib/alimentacao";
+import { buscarRefeicaoPaciente, processarDadosRefeicao, buscarMetaAguaPaciente } from "lib/alimentacao";
 
 const Alimentacao = () => {
   const { paciente, loading: loadingPaciente } = usePaciente();
@@ -61,11 +60,11 @@ const Alimentacao = () => {
 
     try {
       setLoading(true);
-      const [alimentos, aguaMl] = await Promise.all([
-        buscarAlimentacaoPaciente(paciente.id),
+      const [registroRefeicao, aguaMl] = await Promise.all([
+        buscarRefeicaoPaciente(paciente.id),
         buscarMetaAguaPaciente(paciente.id),
       ]);
-      const dadosProcessados = processarDadosAlimentacao(alimentos);
+      const dadosProcessados = processarDadosRefeicao(registroRefeicao);
       setDadosAlimentacao(dadosProcessados);
       setMetaAguaMl(aguaMl);
       setErro(null);
@@ -144,12 +143,12 @@ const Alimentacao = () => {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <VuiBox pt={3} pb={6}>
+      <VuiBox pt={{ xs: 2, md: 3 }} pb={{ xs: 4, md: 6 }}>
         <VuiBox mb={4}>
-          <VuiTypography variant="h3" color="white" fontWeight="bold" mb={1}>
+          <VuiTypography variant="h3" color="white" fontWeight="bold" mb={1} sx={{ fontSize: { xs: "1.35rem", sm: "1.6rem", md: "1.75rem" } }}>
             Plano Alimentar Personalizado
           </VuiTypography>
-          <VuiTypography variant="body2" color="text" fontWeight="regular" sx={{ maxWidth: 720 }}>
+          <VuiTypography variant="body2" color="text" fontWeight="regular" sx={{ maxWidth: 720, fontSize: { xs: "0.8rem", md: "0.875rem" } }}>
             Plano alimentar baseado nos dados do seu profissional de saúde. 
             Siga as orientações de porções e horários para obter os melhores resultados.
           </VuiTypography>
@@ -164,17 +163,17 @@ const Alimentacao = () => {
                 height: "100%",
               }}
             >
-              <VuiBox p={3} display="flex" flexDirection="column" gap={1.5}>
+              <VuiBox p={{ xs: 2, md: 3 }} display="flex" flexDirection="column" gap={1.5}>
                 <VuiBox display="flex" alignItems="center" gap={1.5}>
-                  <IoNutritionOutline size={28} color="#00d4ff" />
-                  <VuiTypography variant="h6" color="white" fontWeight="bold">
+                  <IoNutritionOutline size={24} color="#00d4ff" style={{ flexShrink: 0 }} />
+                  <VuiTypography variant="h6" color="white" fontWeight="bold" sx={{ fontSize: { xs: "0.9rem", md: "1rem" } }}>
                     Calorias Totais
                   </VuiTypography>
                 </VuiBox>
-                <VuiTypography variant="h3" color="white" fontWeight="bold">
+                <VuiTypography variant="h3" color="white" fontWeight="bold" sx={{ fontSize: { xs: "1.4rem", md: "1.75rem" } }}>
                   {dadosAlimentacao.totalCalorias} kcal
                 </VuiTypography>
-                <VuiTypography variant="caption" color="text">
+                <VuiTypography variant="caption" color="text" sx={{ fontSize: { xs: "0.75rem", md: "0.75rem" } }}>
                   Total de calorias do plano alimentar
                 </VuiTypography>
               </VuiBox>
@@ -189,17 +188,17 @@ const Alimentacao = () => {
                 height: "100%",
               }}
             >
-              <VuiBox p={3} display="flex" flexDirection="column" gap={1.5}>
+              <VuiBox p={{ xs: 2, md: 3 }} display="flex" flexDirection="column" gap={1.5}>
                 <VuiBox display="flex" alignItems="center" gap={1.5}>
-                  <IoLeafOutline size={28} color="#01b574" />
-                  <VuiTypography variant="h6" color="white" fontWeight="bold">
+                  <IoLeafOutline size={24} color="#01b574" style={{ flexShrink: 0 }} />
+                  <VuiTypography variant="h6" color="white" fontWeight="bold" sx={{ fontSize: { xs: "0.9rem", md: "1rem" } }}>
                     Total de Refeições
                   </VuiTypography>
                 </VuiBox>
-                <VuiTypography variant="h3" color="white" fontWeight="bold">
+                <VuiTypography variant="h3" color="white" fontWeight="bold" sx={{ fontSize: { xs: "1.4rem", md: "1.75rem" } }}>
                   {dadosAlimentacao.refeicoes.length}
                 </VuiTypography>
-                <VuiTypography variant="caption" color="text">
+                <VuiTypography variant="caption" color="text" sx={{ fontSize: { xs: "0.75rem", md: "0.75rem" } }}>
                   Refeições distribuídas ao longo do dia
                 </VuiTypography>
               </VuiBox>
@@ -214,19 +213,19 @@ const Alimentacao = () => {
                 height: "100%",
               }}
             >
-              <VuiBox p={3} display="flex" flexDirection="column" gap={1.5}>
+              <VuiBox p={{ xs: 2, md: 3 }} display="flex" flexDirection="column" gap={1.5}>
                 <VuiBox display="flex" alignItems="center" gap={1.5}>
-                  <IoWaterOutline size={28} color="#2c3e50" />
-                  <VuiTypography variant="h6" color="white" fontWeight="bold">
+                  <IoWaterOutline size={24} color="#2c3e50" style={{ flexShrink: 0 }} />
+                  <VuiTypography variant="h6" color="white" fontWeight="bold" sx={{ fontSize: { xs: "0.9rem", md: "1rem" } }}>
                     Meta de Água
                   </VuiTypography>
                 </VuiBox>
-                <VuiTypography variant="h3" color="white" fontWeight="bold">
+                <VuiTypography variant="h3" color="white" fontWeight="bold" sx={{ fontSize: { xs: "1.4rem", md: "1.75rem" } }}>
                   {metaAguaMl != null && !Number.isNaN(metaAguaMl) && metaAguaMl >= 0
                     ? `${(metaAguaMl / 1000).toFixed(1)} L`
                     : "—"}
                 </VuiTypography>
-                <VuiTypography variant="caption" color="text">
+                <VuiTypography variant="caption" color="text" sx={{ fontSize: { xs: "0.75rem", md: "0.75rem" } }}>
                   Quantidade de água a ingerir por dia
                 </VuiTypography>
               </VuiBox>
@@ -241,17 +240,17 @@ const Alimentacao = () => {
                 height: "100%",
               }}
             >
-              <VuiBox p={3} display="flex" flexDirection="column" gap={1.5}>
+              <VuiBox p={{ xs: 2, md: 3 }} display="flex" flexDirection="column" gap={1.5}>
                 <VuiBox display="flex" alignItems="center" gap={1.5}>
-                  <IoTimeOutline size={28} color="#f9cf05" />
-                  <VuiTypography variant="h6" color="white" fontWeight="bold">
+                  <IoTimeOutline size={24} color="#f9cf05" style={{ flexShrink: 0 }} />
+                  <VuiTypography variant="h6" color="white" fontWeight="bold" sx={{ fontSize: { xs: "0.9rem", md: "1rem" } }}>
                     Acompanhamento
                   </VuiTypography>
                 </VuiBox>
-                <VuiTypography variant="body2" color="text">
+                <VuiTypography variant="body2" color="text" sx={{ fontSize: { xs: "0.8rem", md: "0.875rem" } }}>
                   Siga as orientações do seu profissional de saúde
                 </VuiTypography>
-                <VuiTypography variant="caption" color="text">
+                <VuiTypography variant="caption" color="text" sx={{ fontSize: { xs: "0.75rem", md: "0.75rem" } }}>
                   Ajuste conforme necessário
                 </VuiTypography>
               </VuiBox>
@@ -260,110 +259,140 @@ const Alimentacao = () => {
         </Grid>
 
         <VuiBox mt={6}>
-          <VuiTypography variant="h4" color="white" fontWeight="bold" mb={3}>
+          <VuiTypography variant="h4" color="white" fontWeight="bold" mb={3} sx={{ fontSize: { xs: "1.15rem", sm: "1.25rem", md: "1.5rem" } }}>
             Distribuição das Refeições
           </VuiTypography>
           <Grid container spacing={3}>
             {dadosAlimentacao.refeicoes.map((refeicao) => (
-              <Grid item xs={12} md={6} key={refeicao.id}>
+              <Grid item xs={12} key={refeicao.id}>
                 <Card
                   sx={{
                     borderRadius: "20px",
                     background: linearGradient(cardContent.main, cardContent.state, cardContent.deg),
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
+                    overflow: "hidden",
                   }}
                 >
-                  <VuiBox p={3} sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-                    <VuiBox display="flex" alignItems="center" justifyContent="space-between" mb={1.5}>
+                  <VuiBox p={{ xs: 2, md: 3 }}>
+                    <VuiBox display="flex" alignItems="center" justifyContent="space-between" mb={2} flexWrap="wrap" gap={1}>
                       <VuiBox>
-                        <VuiTypography variant="caption" color="text" fontWeight="medium">
-                          {refeicao.kcal} kcal
+                        <VuiTypography variant="caption" color="text" fontWeight="medium" sx={{ fontSize: { xs: "0.75rem", md: "0.75rem" } }}>
+                          {refeicao.totalKcal || 0} kcal
                         </VuiTypography>
-                        <VuiTypography variant="h5" color="white" fontWeight="bold">
+                        <VuiTypography variant="h5" color="white" fontWeight="bold" sx={{ fontSize: { xs: "1.1rem", md: "1.25rem" } }}>
                           {refeicao.nome}
                         </VuiTypography>
                       </VuiBox>
-                      <Chip
-                        label={`${refeicao.itens.length} ${refeicao.itens.length === 1 ? 'alimento' : 'alimentos'}`}
-                        sx={{
-                          backgroundColor: "rgba(255, 255, 255, 0.08)",
-                          color: "#FFFFFF",
-                          fontWeight: "bold",
-                        }}
-                      />
+                      <VuiTypography variant="h6" color="white" fontWeight="bold" sx={{ fontSize: { xs: "0.95rem", md: "1rem" } }}>
+                        Substituições
+                      </VuiTypography>
                     </VuiBox>
 
-                    <VuiBox
-                      sx={{
-                        background: "rgba(255, 255, 255, 0.03)",
-                        borderRadius: "14px",
-                        overflow: "hidden",
-                      }}
-                    >
-                      <VuiBox display="grid" gridTemplateColumns="1.2fr 0.8fr 0.5fr" px={3} py={1.5}>
-                        <VuiTypography variant="caption" color="text" fontWeight="medium">
-                          Alimento
-                        </VuiTypography>
-                        <VuiTypography variant="caption" color="text" fontWeight="medium">
-                          Quantidade
-                        </VuiTypography>
-                        <VuiTypography variant="caption" color="text" fontWeight="medium" textAlign="right">
-                          kcal
-                        </VuiTypography>
-                      </VuiBox>
-                      <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.08)" }} />
-                      <VuiBox
-                        sx={{
-                          maxHeight: "320px",
-                          overflowY: "auto",
-                          "&::-webkit-scrollbar": {
-                            width: "6px",
-                          },
-                          "&::-webkit-scrollbar-track": {
-                            background: "rgba(255, 255, 255, 0.05)",
-                            borderRadius: "10px",
-                          },
-                          "&::-webkit-scrollbar-thumb": {
-                            background: "rgba(255, 255, 255, 0.2)",
-                            borderRadius: "10px",
-                            "&:hover": {
-                              background: "rgba(255, 255, 255, 0.3)",
-                            },
-                          },
-                        }}
-                      >
-                        {refeicao.itens.map((item, index) => (
-                          <VuiBox
-                            key={`${item.alimento}-${index}`}
-                            display="grid"
-                            gridTemplateColumns="1.2fr 0.8fr 0.5fr"
-                            px={3}
-                            py={1.25}
-                            sx={{
-                              backgroundColor:
-                                index % 2 === 0 ? "rgba(255, 255, 255, 0.02)" : "rgba(255, 255, 255, 0.06)",
-                            }}
-                          >
-                            <VuiTypography variant="body2" color="white" fontWeight="medium">
-                              {item.alimento}
-                            </VuiTypography>
-                            <VuiTypography variant="body2" color="text">
-                              {item.quantidade}
-                            </VuiTypography>
-                            <VuiTypography variant="body2" color="white" textAlign="right" fontWeight="bold">
-                              {Math.round(item.kcal)}
-                            </VuiTypography>
+                    <Grid container spacing={3}>
+                      {/* Refeição Principal */}
+                      <Grid item xs={12} md={8} sx={{ minWidth: { md: 420 } }}>
+                        <VuiBox
+                          sx={{
+                            background: "rgba(46, 114, 172, 0.15)",
+                            borderRadius: "14px",
+                            p: { xs: 2.5, md: 2 },
+                            width: "100%",
+                            minWidth: { xs: "100%", md: 400 },
+                            height: "100%",
+                          }}
+                        >
+                          <VuiTypography variant="button" color="white" fontWeight="bold" mb={1.5} sx={{ fontSize: { xs: "0.95rem", md: "0.8rem" } }}>
+                            Refeição Principal
+                          </VuiTypography>
+                          <VuiBox display="grid" gridTemplateColumns={{ xs: "1fr 1.4fr 0.9fr 0.6fr", md: "1fr 1.2fr 0.8fr 0.5fr" }} px={{ xs: 1.5, md: 1 }} py={{ xs: 1, md: 0.5 }} gap={{ xs: 0.5, md: 0 }}>
+                            <VuiTypography variant="caption" color="text" fontWeight="medium" sx={{ fontSize: { xs: "0.85rem", md: "0.75rem" } }}>Categoria</VuiTypography>
+                            <VuiTypography variant="caption" color="text" fontWeight="medium" sx={{ fontSize: { xs: "0.85rem", md: "0.75rem" } }}>Alimento</VuiTypography>
+                            <VuiTypography variant="caption" color="text" fontWeight="medium" sx={{ fontSize: { xs: "0.85rem", md: "0.75rem" } }}>Qtd</VuiTypography>
+                            <VuiTypography variant="caption" color="text" fontWeight="medium" textAlign="right" sx={{ fontSize: { xs: "0.85rem", md: "0.75rem" } }}>kcal</VuiTypography>
                           </VuiBox>
-                        ))}
-                      </VuiBox>
-                    </VuiBox>
+                          <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.1)", my: 1 }} />
+                          {(refeicao.refeicaoPrincipal?.itens || []).length > 0 ? (
+                            (refeicao.refeicaoPrincipal.itens || []).map((item, index) => (
+                              <VuiBox
+                                key={`principal-${index}`}
+                                display="grid"
+                                gridTemplateColumns={{ xs: "1fr 1.4fr 0.9fr 0.6fr", md: "1fr 1.2fr 0.8fr 0.5fr" }}
+                                px={{ xs: 1.5, md: 1 }}
+                                py={{ xs: 1, md: 0.75 }}
+                                gap={{ xs: 0.5, md: 0 }}
+                                sx={{ backgroundColor: index % 2 === 0 ? "rgba(255,255,255,0.03)" : "transparent" }}
+                              >
+                                <VuiTypography variant="caption" color="text" textTransform="capitalize" sx={{ fontSize: { xs: "0.85rem", md: "0.75rem" } }}>{(item.categoria || "").replace(/_/g, " ")}</VuiTypography>
+                                <VuiTypography variant="body2" color="white" fontWeight="medium" sx={{ fontSize: { xs: "0.9rem", md: "0.875rem" } }}>{item.alimento}</VuiTypography>
+                                <VuiTypography variant="body2" color="text" sx={{ fontSize: { xs: "0.9rem", md: "0.875rem" } }}>{item.quantidade}</VuiTypography>
+                                <VuiTypography variant="body2" color="white" textAlign="right" fontWeight="bold" sx={{ fontSize: { xs: "0.9rem", md: "0.875rem" } }}>{Math.round(item.kcal || 0)}</VuiTypography>
+                              </VuiBox>
+                            ))
+                          ) : (
+                            <VuiTypography variant="body2" color="text" sx={{ fontSize: { xs: "0.9rem", md: "0.875rem" } }}>Nenhum item</VuiTypography>
+                          )}
+                          {(refeicao.refeicaoPrincipal?.totalKcal || 0) > 0 && (
+                            <VuiBox mt={1.5} pt={1.5} sx={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+                              <VuiTypography variant="caption" color="text" fontWeight="bold" sx={{ fontSize: { xs: "0.85rem", md: "0.75rem" } }}>
+                                Total: {refeicao.refeicaoPrincipal.totalKcal} kcal
+                              </VuiTypography>
+                            </VuiBox>
+                          )}
+                        </VuiBox>
+                      </Grid>
 
-                    <VuiBox mt="auto">
-                      <Divider sx={{ my: 3, backgroundColor: "rgba(255, 255, 255, 0.08)" }} />
-                      <VuiTypography variant="caption" color="text">
-                        Siga as orientações do seu profissional de saúde. 
+                      {/* Substituições por categoria */}
+                      <Grid item xs={12} md={4}>
+                        <VuiBox
+                          sx={{
+                            background: "rgba(255, 255, 255, 0.05)",
+                            borderRadius: "14px",
+                            p: { xs: 1.5, md: 2 },
+                            height: "100%",
+                          }}
+                        >
+                          {(() => {
+                            const porCategoria = refeicao.substituicoesPorCategoria || {};
+                            const labels = { proteinas: "Proteínas", carboidratos: "Carboidratos", gorduras: "Gorduras", leguminosas: "Leguminosas" };
+                            const categorias = ["proteinas", "carboidratos", "gorduras", "leguminosas"];
+                            return categorias.map((cat) => {
+                              const itens = porCategoria[cat] || [];
+                              if (itens.length === 0) return null;
+                              return (
+                                <VuiBox key={cat} mb={{ xs: 1.5, md: 2 }}>
+                                  <VuiTypography variant="caption" color="white" fontWeight="bold" sx={{ display: "block", mb: 0.75, fontSize: { xs: "0.7rem", md: "0.75rem" } }}>
+                                    {labels[cat]}
+                                  </VuiTypography>
+                                  <VuiBox sx={{ pl: 1.5, borderLeft: "3px solid rgba(46, 114, 172, 0.5)" }}>
+                                    {itens.map((item, idx) => (
+                                      <VuiBox
+                                        key={`${cat}-${idx}`}
+                                        display="grid"
+                                        gridTemplateColumns={{ xs: "1fr 0.7fr 0.5fr", md: "1.2fr 0.8fr 0.5fr" }}
+                                        px={1}
+                                        py={{ xs: 0.4, md: 0.5 }}
+                                        sx={{ backgroundColor: idx % 2 === 0 ? "rgba(255,255,255,0.03)" : "transparent", borderRadius: 1 }}
+                                      >
+                                        <VuiTypography variant="body2" color="white" fontWeight="medium" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>{item.alimento}</VuiTypography>
+                                        <VuiTypography variant="body2" color="text" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>{item.quantidade}</VuiTypography>
+                                        <VuiTypography variant="body2" color="white" textAlign="right" fontWeight="bold" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>{Math.round(item.kcal || 0)}</VuiTypography>
+                                      </VuiBox>
+                                    ))}
+                                  </VuiBox>
+                                </VuiBox>
+                              );
+                            });
+                          })()}
+                          {!refeicao.substituicoesPorCategoria || Object.values(refeicao.substituicoesPorCategoria).every((arr) => !arr || arr.length === 0) ? (
+                            <VuiTypography variant="body2" color="text" sx={{ fontSize: { xs: "0.75rem", md: "0.875rem" } }}>Nenhuma substituição</VuiTypography>
+                          ) : null}
+                        </VuiBox>
+                      </Grid>
+                    </Grid>
+
+                    <VuiBox mt={3}>
+                      <Divider sx={{ backgroundColor: "rgba(255, 255, 255, 0.08)" }} />
+                      <VuiTypography variant="caption" color="text" mt={2} sx={{ display: "block", fontSize: { xs: "0.7rem", md: "0.75rem" } }}>
+                        Siga as orientações do seu profissional de saúde.
                         Qualquer alteração no plano deve ser discutida previamente.
                       </VuiTypography>
                     </VuiBox>

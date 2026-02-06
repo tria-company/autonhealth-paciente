@@ -116,16 +116,71 @@ function parseHabitosVida(row) {
 }
 
 /**
- * Busca os dados de alimentação do paciente com timeout
+ * Busca os dados de refeições do paciente na tabela s_refeicao.
+ * Retorna o registro mais recente (por created_at) com ref_1, ref_2, ref_3, ref_4 (JSONB).
+ * @param {string} pacienteId - ID do paciente (UUID)
+ * @returns {Promise<Object|null>} Registro s_refeicao ou null
+ */
+export async function buscarRefeicaoPaciente(pacienteId) {
+  try {
+    // 1. Tentar RPC (bypassa RLS) - requer função get_refeicao_paciente() no Supabase
+    const { data: dataRpc, error: errRpc } = await supabase.rpc('get_refeicao_paciente');
+
+    if (!errRpc && dataRpc) {
+      const row = Array.isArray(dataRpc) ? dataRpc[0] : dataRpc;
+      if (row && (row.ref_1 || row.ref_2 || row.ref_3 || row.ref_4)) {
+        console.log('✅ Refeição encontrada via RPC');
+        return row;
+      }
+    }
+
+    // 2. Fallback: query direta (coluna paciente)
+    const { data: dataPaciente, error: errPaciente } = await supabase
+      .from('s_refeicao')
+      .select('id, created_at, ref_1, ref_2, ref_3, ref_4')
+      .eq('paciente', pacienteId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!errPaciente && dataPaciente) {
+      console.log('✅ Refeição encontrada (coluna paciente)');
+      return dataPaciente;
+    }
+
+    // 3. Fallback: query direta (coluna paciente_id)
+    const { data: dataPacienteId, error: errPacienteId } = await supabase
+      .from('s_refeicao')
+      .select('id, created_at, ref_1, ref_2, ref_3, ref_4')
+      .eq('paciente_id', pacienteId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!errPacienteId && dataPacienteId) {
+      console.log('✅ Refeição encontrada (coluna paciente_id)');
+      return dataPacienteId;
+    }
+
+    console.log('🍽️ Nenhum registro de refeição encontrado para paciente:', pacienteId);
+    return null;
+  } catch (err) {
+    console.error('❌ Erro ao buscar refeição:', err);
+    return null;
+  }
+}
+
+/**
+ * Busca os dados de alimentação do paciente (legado - s_gramaturas_alimentares).
+ * Mantido para compatibilidade.
  * @param {string} pacienteId - ID do paciente (UUID)
  * @param {number} tentativas - Número de tentativas (padrão: 1)
  * @returns {Promise<Array>} Array com os alimentos do plano
  */
 export async function buscarAlimentacaoPaciente(pacienteId, tentativas = 1) {
-  console.log('🍽️ Buscando alimentação para paciente:', pacienteId);
+  console.log('🍽️ Buscando alimentação (legado) para paciente:', pacienteId);
 
   try {
-    // Criar uma promise com timeout de 8 segundos
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error('Timeout ao buscar alimentação')), 8000);
     });
@@ -140,31 +195,136 @@ export async function buscarAlimentacaoPaciente(pacienteId, tentativas = 1) {
 
     if (error) {
       console.error('❌ Erro ao buscar alimentação:', error);
-      
-      // Tentar novamente se for erro de rede e ainda tiver tentativas
       if (tentativas > 0 && (error.message?.includes('network') || error.message?.includes('timeout'))) {
-        console.log('🔄 Tentando novamente buscar alimentação...');
         await new Promise(resolve => setTimeout(resolve, 1000));
         return buscarAlimentacaoPaciente(pacienteId, tentativas - 1);
       }
-      
       throw error;
     }
 
-    console.log('✅ Alimentação encontrada:', data?.length || 0, 'alimentos');
     return data || [];
   } catch (error) {
     console.error('❌ Erro na busca de alimentação:', error);
-    
-    // Tentar novamente se for timeout e ainda tiver tentativas
-    if (tentativas > 0 && error.message?.includes('Timeout')) {
-      console.log('🔄 Timeout - tentando novamente buscar alimentação...');
+    if (tentativas > 0 && error?.message?.includes('Timeout')) {
       await new Promise(resolve => setTimeout(resolve, 1000));
       return buscarAlimentacaoPaciente(pacienteId, tentativas - 1);
     }
-    
     return [];
   }
+}
+
+/**
+ * Converte um item do banco em formato de exibição.
+ * Suporta: { alimento, gramas, quantidade, kcal, porcao }
+ */
+function parseItem(item) {
+  if (!item || typeof item !== 'object') return null;
+  if (typeof item === 'string') return { alimento: item, quantidade: '', kcal: 0, categoria: '' };
+  const gramas = item.gramas != null ? Number(item.gramas) : null;
+  const quantidade = item.quantidade || item.porcao || (gramas != null && !Number.isNaN(gramas) ? `${Math.round(gramas)}g` : '');
+  return {
+    alimento: item.alimento || item.nome || item.descricao || '—',
+    quantidade,
+    kcal: Number(item.kcal) || Number(item.calorias) || 0,
+    categoria: item.categoria || '',
+  };
+}
+
+/**
+ * Parseia um objeto JSONB de refeição (ref_1, ref_2, etc).
+ * Estrutura real: { principal: [...], substituicoes: { gorduras: [...], proteinas: [...], leguminosas: [...], carboidratos: [...] } }
+ */
+function parseRefeicaoJsonb(jsonb, nomeRefeicao) {
+  if (!jsonb) return null;
+
+  // Se vier como string (JSON do banco), fazer parse
+  if (typeof jsonb === 'string') {
+    try {
+      jsonb = JSON.parse(jsonb);
+    } catch (e) {
+      console.warn('Erro ao parsear refeição JSON:', e);
+      return null;
+    }
+  }
+
+  if (typeof jsonb !== 'object') return null;
+
+  const parseItens = (src) => {
+    if (!src) return [];
+    if (Array.isArray(src)) {
+      return src.map((item) => parseItem(item)).filter(Boolean);
+    }
+    if (src.itens && Array.isArray(src.itens)) return parseItens(src.itens);
+    if (src.alimento) return [parseItem(src)].filter(Boolean);
+    return [];
+  };
+
+  const principal = jsonb.principal || jsonb.refeicao_principal || jsonb.refeicaoPrincipal;
+  const substituicoesRaw = jsonb.substituicoes || jsonb.substituições || jsonb.substituicoes_lista || [];
+
+  const itensPrincipal = principal ? parseItens(principal) : [];
+
+  // Manter substituições agrupadas por categoria: { proteinas: [...], carboidratos: [...], gorduras: [...], leguminosas: [...] }
+  const ordemCategorias = ['proteinas', 'carboidratos', 'gorduras', 'leguminosas'];
+  const substituicoesPorCategoria = {};
+
+  if (substituicoesRaw && typeof substituicoesRaw === 'object' && !Array.isArray(substituicoesRaw)) {
+    ordemCategorias.forEach((cat) => {
+      const arr = substituicoesRaw[cat];
+      substituicoesPorCategoria[cat] = Array.isArray(arr) ? arr.map(parseItem).filter(Boolean) : [];
+    });
+  }
+
+  const totalKcalPrincipal = itensPrincipal.reduce((acc, i) => acc + (i.kcal || 0), 0);
+  const itensSubstFlat = ordemCategorias.flatMap((cat) => substituicoesPorCategoria[cat] || []);
+  const totalKcalSubst = itensSubstFlat.reduce((acc, i) => acc + (i.kcal || 0), 0);
+
+  if (itensPrincipal.length === 0 && itensSubstFlat.length === 0) {
+    return null;
+  }
+
+  return {
+    nome: nomeRefeicao,
+    refeicaoPrincipal: { itens: itensPrincipal, totalKcal: Math.round(totalKcalPrincipal) },
+    substituicoesPorCategoria,
+    substituicoes: itensSubstFlat,
+    totalKcalSubstituicoes: Math.round(totalKcalSubst),
+    totalKcal: Math.round(totalKcalPrincipal || totalKcalSubst),
+  };
+}
+
+/**
+ * Processa os dados da tabela s_refeicao (ref_1..ref_4) para o formato da UI.
+ * @param {Object|Array|null} registro - Registro de s_refeicao ou array com um registro
+ * @returns {Object} Dados para exibição
+ */
+export function processarDadosRefeicao(registro) {
+  const nomes = ['Refeição 1', 'Refeição 2', 'Refeição 3', 'Refeição 4'];
+  const refeicoes = [];
+
+  if (!registro) {
+    return { refeicoes: [], totalCalorias: 0 };
+  }
+
+  // Se vier array (ex: resposta bruta), pegar o primeiro registro
+  const row = Array.isArray(registro) ? registro[0] : registro;
+  if (!row || typeof row !== 'object') {
+    return { refeicoes: [], totalCalorias: 0 };
+  }
+
+  ['ref_1', 'ref_2', 'ref_3', 'ref_4'].forEach((key, idx) => {
+    const parsed = parseRefeicaoJsonb(row[key], nomes[idx]);
+    if (parsed) {
+      refeicoes.push({ id: idx + 1, ...parsed });
+    }
+  });
+
+  const totalCalorias = refeicoes.reduce((acc, r) => acc + (r.totalKcal || 0), 0);
+
+  return {
+    refeicoes,
+    totalCalorias: Math.round(totalCalorias),
+  };
 }
 
 /**
