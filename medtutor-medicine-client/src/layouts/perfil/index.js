@@ -1,5 +1,15 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+
+/** Formata telefone brasileiro: (11) 99800-2960 ou (11) 3980-2960 */
+function formatPhone(value) {
+  if (!value) return "";
+  const digits = String(value).replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 2) return digits ? `(${digits}` : "";
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+}
 import { Card, Grid, Icon, CircularProgress } from "@mui/material";
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
@@ -14,7 +24,7 @@ import colors from "assets/theme/base/colors";
 import linearGradient from "assets/theme/functions/linearGradient";
 
 function Perfil() {
-  const { paciente, loading: loadingPaciente } = usePaciente();
+  const { paciente, loading: loadingPaciente, refetchPaciente } = usePaciente();
   const location = useLocation();
   const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
@@ -93,7 +103,7 @@ function Perfil() {
         .from('patients')
         .update({
           name: dadosEditaveis.name,
-          phone: dadosEditaveis.phone,
+          phone: (dadosEditaveis.phone || "").replace(/\D/g, ""),
           birth_date: dadosEditaveis.birth_date,
         })
         .eq('user_auth', userAuthId)
@@ -110,16 +120,10 @@ function Perfil() {
         console.log("Dados atualizados:", data);
         setMensagemPerfil({ tipo: "sucesso", texto: "Perfil atualizado com sucesso!" });
         setModoEdicao(false);
-        
-        // Atualizar localStorage com os novos dados
         if (data && data[0]) {
           localStorage.setItem('paciente', JSON.stringify(data[0]));
         }
-        
-        // Recarregar página para atualizar dados em todos os componentes
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        await refetchPaciente();
       }
     } catch (err) {
       console.error("❌ Erro ao salvar perfil:", err);
@@ -497,8 +501,8 @@ function Perfil() {
                   </VuiBox>
                   {modoEdicao ? (
                     <VuiInput
-                      value={dadosEditaveis.phone}
-                      onChange={(e) => setDadosEditaveis({ ...dadosEditaveis, phone: e.target.value })}
+                      value={formatPhone(dadosEditaveis.phone)}
+                      onChange={(e) => setDadosEditaveis({ ...dadosEditaveis, phone: formatPhone(e.target.value) })}
                       placeholder="(00) 00000-0000"
                       sx={{
                         background: "rgba(255, 255, 255, 0.08) !important",
@@ -523,7 +527,7 @@ function Perfil() {
                       }}
                     >
                       <VuiTypography variant="body2" color="white" fontWeight="medium">
-                        {paciente?.phone || "Não informado"}
+                        {formatPhone(paciente?.phone) || "Não informado"}
                       </VuiTypography>
                     </VuiBox>
                   )}

@@ -1,41 +1,21 @@
-/*!
-
-=========================================================
-* Vision UI Free React - v1.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/vision-ui-free-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com/)
-* Licensed under MIT (https://github.com/creativetimofficial/vision-ui-free-react/blob/master LICENSE.md)
-
-* Design and Coded by Simmmple & Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Icon from "@mui/material/Icon";
 import { Card, LinearProgress, Stack, MenuItem, Select, FormControl, CircularProgress } from "@mui/material";
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
-// Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
 import VuiProgress from "components/VuiProgress";
+import VuiButton from "components/VuiButton";
 
-// Vision UI Dashboard React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import MiniStatisticsCard from "examples/Cards/StatisticsCards/MiniStatisticsCard";
 import linearGradient from "assets/theme/functions/linearGradient";
 
-// Vision UI Dashboard React base styles
 import typography from "assets/theme/base/typography";
 import colors from "assets/theme/base/colors";
 
@@ -200,9 +180,19 @@ function Dashboard() {
               <VuiTypography variant="h5" color="white" fontWeight="bold" mb={2}>
                 Nenhum Check-in Realizado
               </VuiTypography>
-              <VuiTypography variant="body2" color="text" fontWeight="regular">
+              <VuiTypography variant="body2" color="text" fontWeight="regular" mb={3}>
                 Complete seu primeiro check-in diário para visualizar suas métricas e acompanhar seu progresso.
               </VuiTypography>
+              <VuiButton
+                component={Link}
+                to="/checkin-diarios"
+                color="info"
+                size="medium"
+                sx={{ mt: 1 }}
+              >
+                <Icon sx={{ mr: 0.5 }}>add_circle</Icon>
+                Fazer Check-in
+              </VuiButton>
             </Card>
           </VuiBox>
         </VuiBox>

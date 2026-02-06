@@ -8,7 +8,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 import { IoLeafOutline, IoTimeOutline, IoWaterOutline, IoNutritionOutline } from "react-icons/io5";
 
-// Vision UI components
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
 

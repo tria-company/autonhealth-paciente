@@ -1,21 +1,3 @@
-/*!
-
-=========================================================
-* Vision UI Free React - v1.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/vision-ui-free-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com/)
-* Licensed under MIT (https://github.com/creativetimofficial/vision-ui-free-react/blob/master LICENSE.md)
-
-* Design and Coded by Simmmple & Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 // react-router-dom components
 import { Link } from "react-router-dom";
 
@@ -26,12 +8,27 @@ import PropTypes from "prop-types";
 import { Breadcrumbs as MuiBreadcrumbs } from "@mui/material";
 import Icon from "@mui/material/Icon";
 
-// Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
 
+const ROUTE_LABELS = {
+  lifestyle: "Estilo de Vida",
+  "livro-da-vida": "Livro da Vida",
+  alimentacao: "Alimentação",
+  "exercicio-fisico": "Exercício Físico",
+  "suplementos-fitoterapicos": "Suplementos e Fitoterápicos",
+  "checkin-diarios": "Check-in Diários",
+  perfil: "Perfil",
+  dashboard: "Início",
+};
+
+function getRouteLabel(segment) {
+  return ROUTE_LABELS[segment] || segment.replace(/-/g, " ");
+}
+
 function Breadcrumbs({ icon, title, route, light }) {
-  const routes = route.slice(0, -1);
+  const routeArray = Array.isArray(route) ? route : [route];
+  const routes = routeArray.slice(0, -1);
 
   return (
     <VuiBox mr={{ xs: 0, xl: 8 }}>
@@ -54,19 +51,17 @@ function Breadcrumbs({ icon, title, route, light }) {
           </VuiTypography>
         </Link>
         {routes.map((el) => (
-          <Link to={`/${el}`} key={el}>
-            <VuiTypography
-              component="span"
-              variant="button"
-              fontWeight="regular"
-              textTransform="capitalize"
-              color={light ? "white" : "dark"}
-              opacity={light ? 0.8 : 0.5}
-              sx={{ lineHeight: 0 }}
-            >
-              {el}
-            </VuiTypography>
-          </Link>
+          <VuiTypography
+            key={el}
+            component="span"
+            variant="button"
+            fontWeight="regular"
+            color={light ? "white" : "dark"}
+            opacity={light ? 0.8 : 0.5}
+            sx={{ lineHeight: 0, textTransform: "capitalize" }}
+          >
+            {getRouteLabel(el)}
+          </VuiTypography>
         ))}
         <VuiTypography
           variant="button"
@@ -75,7 +70,7 @@ function Breadcrumbs({ icon, title, route, light }) {
           color={light ? "white" : "dark"}
           sx={{ lineHeight: 0 }}
         >
-          {title.replace("-", " ")}
+          {getRouteLabel(title || routeArray[routeArray.length - 1])}
         </VuiTypography>
       </MuiBreadcrumbs>
       <VuiTypography
@@ -85,7 +80,7 @@ function Breadcrumbs({ icon, title, route, light }) {
         color={light ? "white" : "dark"}
         noWrap
       >
-        {title.replace("-", " ")}
+        {getRouteLabel(title || routeArray[routeArray.length - 1])}
       </VuiTypography>
     </VuiBox>
   );

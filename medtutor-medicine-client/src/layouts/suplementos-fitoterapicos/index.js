@@ -4,16 +4,13 @@ import { useLocation } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import { Card, CircularProgress, Chip } from "@mui/material";
 
-// Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
 
-// Vision UI Dashboard React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 
-// Vision UI Dashboard React base styles
 import colors from "assets/theme/base/colors";
 import linearGradient from "assets/theme/functions/linearGradient";
 import { IoWarning, IoFlask, IoLeaf, IoFlower } from "react-icons/io5";

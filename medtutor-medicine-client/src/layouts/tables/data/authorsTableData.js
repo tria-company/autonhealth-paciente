@@ -1,23 +1,4 @@
-/*!
-
-=========================================================
-* Vision UI Free React - v1.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/vision-ui-free-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com/)
-* Licensed under MIT (https://github.com/creativetimofficial/vision-ui-free-react/blob/master LICENSE.md)
-
-* Design and Coded by Simmmple & Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 /* eslint-disable react/prop-types */
-// Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
 import VuiTypography from "components/VuiTypography";
 import VuiAvatar from "components/VuiAvatar";
@@ -73,7 +54,7 @@ export default {
 
   rows: [
     {
-      author: <Author image={avatar4} name="Esthera Jackson" email="esthera@simmmple.com" />,
+      author: <Author image={avatar4} name="Esthera Jackson" email="esthera@exemplo.com" />,
       function: <Function job="Manager" org="Organization" />,
       status: (
         <VuiBadge
@@ -102,7 +83,7 @@ export default {
       ),
     },
     {
-      author: <Author image={avatar2} name="Alexa Liras" email="alexa@simmmple.com" />,
+      author: <Author image={avatar2} name="Alexa Liras" email="alexa@exemplo.com" />,
       function: <Function job="Programator" org="Developer" />,
       status: (
         <VuiBadge
@@ -130,7 +111,7 @@ export default {
       ),
     },
     {
-      author: <Author image={avatar3} name="Laurent Michael" email="laurent@simmmple.com" />,
+      author: <Author image={avatar3} name="Laurent Michael" email="laurent@exemplo.com" />,
       function: <Function job="Executive" org="Projects" />,
       status: (
         <VuiBadge
@@ -159,7 +140,7 @@ export default {
       ),
     },
     {
-      author: <Author image={avatar1} name="Freduardo Hill" email="freduardo@simmmple.com" />,
+      author: <Author image={avatar1} name="Freduardo Hill" email="freduardo@exemplo.com" />,
       function: <Function job="Programator" org="Developer" />,
       status: (
         <VuiBadge
@@ -188,7 +169,7 @@ export default {
       ),
     },
     {
-      author: <Author image={avatar5} name="Daniel Thomas" email="daniel@simmmple.com" />,
+      author: <Author image={avatar5} name="Daniel Thomas" email="daniel@exemplo.com" />,
       function: <Function job="Manager" org="Executive" />,
       status: (
         <VuiBadge
@@ -216,7 +197,7 @@ export default {
       ),
     },
     {
-      author: <Author image={avatar6} name="Mark Wilson" email="mark@simmmple.com" />,
+      author: <Author image={avatar6} name="Mark Wilson" email="mark@exemplo.com" />,
       function: <Function job="Programtor" org="Developer" />,
       status: (
         <VuiBadge

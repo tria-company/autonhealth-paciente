@@ -1,23 +1,5 @@
-/*!
-
-=========================================================
-* Vision UI Free React - v1.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/vision-ui-free-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com/)
-* Licensed under MIT (https://github.com/creativetimofficial/vision-ui-free-react/blob/master LICENSE.md)
-
-* Design and Coded by Simmmple & Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
-/** 
-  All of the routes for the Vision UI Dashboard React are added here,
+/**
+  Application routes are defined here.
   You can add a new route, customize the routes and delete the routes here.
 
   Once you add a new route on this file it will be visible automatically on
@@ -38,7 +20,6 @@
   10. The `component` key is used to store the component of its route.
 */
 
-// Vision UI Dashboard React layouts
 import Dashboard from "layouts/dashboard";
 import Alimentacao from "layouts/alimentacao";
 import ExercicioFisico from "layouts/exercicio-fisico";
@@ -49,7 +30,6 @@ import MentalidadeEspiritualidade from "layouts/mentalidade-espiritualidade";
 import Marketplace from "layouts/marketplace";
 import Perfil from "layouts/perfil";
 
-// Vision UI Dashboard React icons
 import { IoHome, IoBook, IoCart, IoHeart, IoRestaurant, IoFitness, IoLeaf, IoMoon, IoPerson } from "react-icons/io5";
 import { GiSelfLove } from "react-icons/gi";
 

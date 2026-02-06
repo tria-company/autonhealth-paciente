@@ -1,35 +1,14 @@
-/*!
-
-=========================================================
-* Vision UI Free React - v1.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/vision-ui-free-react
-* Copyright 2021 Creative Tim (https://www.creative-tim.com/)
-* Licensed under MIT (https://github.com/creativetimofficial/vision-ui-free-react/blob/master LICENSE.md)
-
-* Design and Coded by Simmmple & Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 import { Card, Stack } from "@mui/material";
 // @mui material components
 import Grid from "@mui/material/Grid";
 import colors from "assets/theme/base/colors";
 
-// Vision UI Dashboard React base styles
 import linearGradient from "assets/theme/functions/linearGradient";
 
-// Vision UI Dashboard React components
 import VuiBox from "components/VuiBox";
 import VuiProgress from "components/VuiProgress";
 import VuiTypography from "components/VuiTypography";
 
-// Vision UI Dashboard React contexts
 import { setDirection, useVisionUIController } from "context";
 import MiniStatisticsCard from "examples/Cards/StatisticsCards/MiniStatisticsCard";
 import BarChart from "examples/Charts/BarCharts/BarChart";
@@ -38,7 +17,6 @@ import BarChart from "examples/Charts/BarCharts/BarChart";
 import LineChart from "examples/Charts/LineCharts/LineChart";
 import Footer from "examples/Footer";
 
-// Vision UI Dashboard React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import OrderOverview from "layouts/rtl/components/OrderOverview";
