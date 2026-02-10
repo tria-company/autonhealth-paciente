@@ -167,63 +167,88 @@ function Sidenav({ color, brandName, routes, ...rest }) {
   return (
     <SidenavRoot {...rest} variant="permanent" ownerState={{ transparentSidenav, miniSidenav }}>
       <VuiBox
-        pt={3.5}
-        pb={0.5}
-        px={4}
-        textAlign="center"
         sx={{
-          overflow: "unset !important",
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          minHeight: 0,
+          overflow: "hidden",
         }}
       >
         <VuiBox
-          display={{ xs: "block", xl: "none" }}
-          position="absolute"
-          top={0}
-          right={0}
-          p={1.625}
-          onClick={closeSidenav}
-          sx={{ cursor: "pointer" }}
+          pt={3.5}
+          pb={0.5}
+          px={4}
+          textAlign="center"
+          sx={{ flexShrink: 0, overflow: "unset !important" }}
         >
-          <VuiTypography variant="h6" color="text">
-            <Icon sx={{ fontWeight: "bold" }}>close</Icon>
-          </VuiTypography>
-        </VuiBox>
-        <VuiBox component={NavLink} to="/dashboard" display="flex" alignItems="center">
           <VuiBox
-            sx={
-              ((theme) => sidenavLogoLabel(theme, { miniSidenav }),
-              {
-                display: "flex",
-                alignItems: "center",
-                margin: "0 auto",
-              })
-            }
+            display={{ xs: "block", xl: "none" }}
+            position="absolute"
+            top={0}
+            right={0}
+            p={1.625}
+            onClick={closeSidenav}
+            sx={{ cursor: "pointer" }}
           >
-            <VuiTypography
-              variant="button"
-              textGradient={false}
-              color="dark"
-              fontSize={14}
-              letterSpacing={2}
-              fontWeight="medium"
+            <VuiTypography variant="h6" color="text">
+              <Icon sx={{ fontWeight: "bold" }}>close</Icon>
+            </VuiTypography>
+          </VuiBox>
+          <VuiBox component={NavLink} to="/dashboard" display="flex" alignItems="center">
+            <VuiBox
               sx={
-                ((theme) => sidenavLogoLabel(theme, { miniSidenav, transparentSidenav }),
+                ((theme) => sidenavLogoLabel(theme, { miniSidenav }),
                 {
-                  opacity: miniSidenav || (miniSidenav && transparentSidenav) ? 0 : 1,
-                  maxWidth: miniSidenav || (miniSidenav && transparentSidenav) ? 0 : "100%",
+                  display: "flex",
+                  alignItems: "center",
                   margin: "0 auto",
                 })
               }
             >
-              {brandName}
-            </VuiTypography>
+              <VuiTypography
+                variant="button"
+                textGradient={false}
+                color="dark"
+                fontSize={14}
+                letterSpacing={2}
+                fontWeight="medium"
+                sx={
+                  ((theme) => sidenavLogoLabel(theme, { miniSidenav, transparentSidenav }),
+                  {
+                    opacity: miniSidenav || (miniSidenav && transparentSidenav) ? 0 : 1,
+                    maxWidth: miniSidenav || (miniSidenav && transparentSidenav) ? 0 : "100%",
+                    margin: "0 auto",
+                  })
+                }
+              >
+                {brandName}
+              </VuiTypography>
+            </VuiBox>
           </VuiBox>
         </VuiBox>
-      </VuiBox>
-      <Divider light />
-      <List>{renderRoutes}</List>
-      <VuiBox my={2} mx={2} mt="auto" mb={8}>
-        <SidenavCard color={color} />
+        <Divider light sx={{ flexShrink: 0 }} />
+        <List
+          sx={{
+            flex: 1,
+            minHeight: 0,
+            overflowY: "auto",
+            overflowX: "hidden",
+          }}
+        >
+          {renderRoutes}
+        </List>
+        <VuiBox
+          my={2}
+          mx={2}
+          mt="auto"
+          sx={{
+            flexShrink: 0,
+            paddingBottom: { xs: "max(16px, env(safe-area-inset-bottom))", xl: 4 },
+          }}
+        >
+          <SidenavCard color={color} />
+        </VuiBox>
       </VuiBox>
     </SidenavRoot>
   );

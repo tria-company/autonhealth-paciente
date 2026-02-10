@@ -207,20 +207,32 @@ function DashboardNavbar({ absolute, light, isMini }) {
       color="inherit"
       sx={(theme) => navbar(theme, { transparentNavbar, absolute, light })}
     >
-      <Toolbar sx={(theme) => navbarContainer(theme)}>
-        <VuiBox 
-          color="inherit" 
-          mb={{ xs: 1, md: 0 }} 
-          sx={{ 
+      <Toolbar
+        sx={(theme) => ({
+          ...navbarContainer(theme),
+          flexDirection: "column",
+          alignItems: "stretch",
+          width: "100%",
+          "& > *": { width: "100%", minWidth: 0 },
+        })}
+      >
+        {/* Linha 1: Menu (esquerda) | Perfil (direita) */}
+        <VuiBox
+          color="inherit"
+          sx={{
             display: "flex",
+            flexDirection: "row",
             alignItems: "center",
-            width: "100%",
-            gap: 2
+            justifyContent: "flex-start",
+            width: "100% !important",
+            minWidth: 0,
+            boxSizing: "border-box",
+            flex: "0 0 auto",
           }}
         >
-          {/* Botão de Menu Mobile - Lado Esquerdo */}
-          <VuiBox 
-            sx={{ 
+          {/* Botão de Menu - Lado Esquerdo */}
+          <VuiBox
+            sx={{
               display: { xs: "flex", xl: "none" },
               flexDirection: "column",
               alignItems: "center",
@@ -228,7 +240,6 @@ function DashboardNavbar({ absolute, light, isMini }) {
               cursor: "pointer",
               flexShrink: 0,
               width: "70px",
-              position: "relative"
             }}
             onClick={handleMiniSidenav}
           >
@@ -241,17 +252,17 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 padding: "12px",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "center"
+                justifyContent: "center",
               }}
               aria-label="Abrir menu"
             >
               <Icon sx={{ fontSize: "32px" }}>{miniSidenav ? "menu_open" : "menu"}</Icon>
             </IconButton>
-            <VuiTypography 
-              variant="caption" 
-              color="dark" 
+            <VuiTypography
+              variant="caption"
+              color="dark"
               fontWeight="medium"
-              sx={{ 
+              sx={{
                 fontSize: "9px",
                 textTransform: "uppercase",
                 letterSpacing: "0.5px",
@@ -259,49 +270,67 @@ function DashboardNavbar({ absolute, light, isMini }) {
                 display: { xs: "block", xl: "none" },
                 width: "100%",
                 marginTop: "4px",
-                lineHeight: 1.2
+                lineHeight: 1.2,
               }}
             >
               Menu
             </VuiTypography>
           </VuiBox>
-          
-          <Breadcrumbs icon="home" title={(route && route.length ? route[route.length - 1] : "")} route={route || []} light={false} />
-        </VuiBox>
-        {isMini ? null : (
-          <VuiBox sx={(theme) => navbarRow(theme, { isMini })}>
+          <VuiBox sx={{ display: { xs: "none", xl: "block" }, width: "70px", flexShrink: 0 }} />
+          <VuiBox sx={{ flex: 1, minWidth: 0, alignSelf: "stretch" }} />
+          {/* Perfil - Canto direito (mobile: só ícone maior; desktop: ícone + texto) */}
+          <VuiBox
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexShrink: 0,
+              marginLeft: "auto !important",
+            }}
+          >
             <VuiBox color={light ? "white" : "inherit"} display="flex" alignItems="center" gap={2}>
-              {/* Perfil do Paciente */}
               {paciente && (
-                <IconButton 
-                  sx={navbarIconButton} 
-                  size="small" 
+                <IconButton
+                  sx={(theme) => ({
+                    ...navbarIconButton(theme, {}),
+                    "& .material-icons, .material-icons-round": {
+                      color: theme.palette?.text?.main,
+                      fontSize: {
+                        xs: "28px !important",
+                        xl: `${theme.typography?.size?.lg || theme.typography?.size?.regular || "1.25rem"} !important`,
+                      },
+                    },
+                  })}
+                  size="small"
                   onClick={handleOpenMenu}
                   aria-controls="profile-menu"
                   aria-haspopup="true"
                 >
-                  <Icon
-                    sx={({ palette: { dark } }) => ({
-                      color: dark.main,
-                    })}
-                  >
-                    account_circle
-                  </Icon>
+                  <Icon sx={({ palette: { dark } }) => ({ color: dark.main })}>account_circle</Icon>
                   <VuiTypography
                     variant="button"
                     fontWeight="medium"
                     color="dark"
                     ml={1}
+                    sx={{ display: { xs: "none", sm: "inline-block" } }}
                   >
                     Perfil
                   </VuiTypography>
                 </IconButton>
               )}
-              
               {renderMenu()}
             </VuiBox>
           </VuiBox>
-        )}
+        </VuiBox>
+        {/* Linha 2: Breadcrumbs e título inline (oculto no mobile) */}
+        <VuiBox sx={{ width: "100%", display: { xs: "none", md: "block" } }}>
+          <Breadcrumbs
+            icon="home"
+            title={route && route.length ? route[route.length - 1] : ""}
+            route={route || []}
+            light={false}
+            inline
+          />
+        </VuiBox>
       </Toolbar>
     </AppBar>
   );

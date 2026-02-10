@@ -233,6 +233,24 @@ export function calcularEquilibrioGeral(checkin) {
 }
 
 /**
+ * Calcula a aderência ao protocolo com base na meta: quanto mais próximo do estipulado, maior a %.
+ * Meta = dias do período (objetivo: 1 check-in por dia). Aderência = (realizado / meta) * 100, máx 100%.
+ * @param {Array} checkins - Array de check-ins (cada um com data_checkin)
+ * @param {number} metaDias - Meta de dias com check-in no período (ex.: 7 = esperado 7 dias)
+ * @returns {{ percentual: number, realizado: number, meta: number }}
+ */
+export function calcularAderenciaProtocolo(checkins, metaDias = 7) {
+  const meta = Math.max(0, Number(metaDias) || 0);
+  if (!checkins || checkins.length === 0 || meta <= 0) {
+    return { percentual: 0, realizado: 0, meta };
+  }
+  const datasUnicas = new Set(checkins.map((c) => c.data_checkin));
+  const realizado = datasUnicas.size;
+  const percentual = Math.min(100, Math.round((realizado / meta) * 100));
+  return { percentual, realizado, meta };
+}
+
+/**
  * Processa histórico de check-ins para gráfico
  * @param {Array} checkins - Array de check-ins
  * @returns {Object} Dados formatados para gráfico

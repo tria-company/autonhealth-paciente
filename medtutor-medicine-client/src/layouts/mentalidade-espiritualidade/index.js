@@ -693,10 +693,26 @@ const MentalidadeEspiritualidade = () => {
     observacoes_clinicas: "",
   };
 
+  // Tipografia e espaçamento responsivos para mobile (leitura mais fácil e estética)
+  const containerMobileSx = {
+    "& .MuiTypography-h3": { fontSize: { xs: "1.35rem", md: undefined }, lineHeight: { xs: 1.35, md: undefined } },
+    "& .MuiTypography-h4": { fontSize: { xs: "1.15rem", md: undefined }, lineHeight: { xs: 1.3, md: undefined } },
+    "& .MuiTypography-h5": { fontSize: { xs: "1.05rem", md: undefined }, lineHeight: { xs: 1.3, md: undefined } },
+    "& .MuiTypography-h6": { fontSize: { xs: "0.95rem", md: undefined }, lineHeight: { xs: 1.35, md: undefined } },
+    "& .MuiTypography-body1": { fontSize: { xs: "0.9rem", md: undefined }, lineHeight: { xs: 1.7, md: undefined } },
+    "& .MuiTypography-body2": { fontSize: { xs: "0.85rem", md: undefined }, lineHeight: { xs: 1.65, md: undefined } },
+    "& .MuiTypography-button": { fontSize: { xs: "0.8rem", md: undefined } },
+    "& .MuiTypography-caption": { fontSize: { xs: "0.75rem", md: undefined } },
+    // Numerações dos padrões (1–8): tamanho fixo em qualquer viewport
+    "& [data-numero-padrao]": { fontSize: "1.25rem !important", lineHeight: "1 !important", minWidth: "1.25rem", textAlign: "center" },
+    // Numerações das orientações (1, 2, 3...): tamanho fixo e alinhamento
+    "& [data-numero-orientacao]": { fontSize: "0.95rem !important", lineHeight: "1 !important", minWidth: "1ch", textAlign: "center" },
+  };
+
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <VuiBox pt={3} pb={6}>
+      <VuiBox pt={3} pb={6} sx={containerMobileSx}>
         {/* Resumo Executivo */}
         <Card
           sx={{
@@ -705,19 +721,17 @@ const MentalidadeEspiritualidade = () => {
             mb: 3,
           }}
         >
-          <VuiBox p={3}>
+          <VuiBox p={{ xs: 2, md: 3 }}>
             <VuiBox display="flex" alignItems="center" mb={2}>
-              <GiSelfLove size={32} color="#2c3e50" style={{ marginRight: 12 }} />
-              <VuiTypography variant="h4" color="white" fontWeight="bold">
+              <GiSelfLove size={28} color="#2c3e50" style={{ marginRight: 10, flexShrink: 0 }} />
+              <VuiTypography variant="h4" color="white" fontWeight="bold" sx={{ fontSize: { xs: "1.15rem", md: undefined } }}>
                 {resumoParaExibir.titulo}
               </VuiTypography>
             </VuiBox>
             <VuiBox
               sx={{
                 maxWidth: "75ch",
-                "& p": {
-                  marginBottom: 0,
-                },
+                "& p": { marginBottom: 0 },
               }}
             >
               {resumoParaExibir.conteudo.map((paragrafo, index) => (
@@ -727,12 +741,12 @@ const MentalidadeEspiritualidade = () => {
                   color="text"
                   fontWeight="regular"
                   component="p"
-                  mt={index > 0 ? 3 : 0}
-                  mb={index < resumoParaExibir.conteudo.length - 1 ? 3 : 0}
+                  mt={index > 0 ? 2 : 0}
+                  mb={index < resumoParaExibir.conteudo.length - 1 ? 2 : 0}
                   sx={{
-                    lineHeight: 1.85,
+                    lineHeight: { xs: 1.7, md: 1.85 },
                     textAlign: "justify",
-                    fontSize: "1rem",
+                    fontSize: { xs: "0.9rem", md: "1rem" },
                     letterSpacing: "0.01em",
                     color: "#2c3e50",
                   }}
@@ -745,10 +759,10 @@ const MentalidadeEspiritualidade = () => {
         </Card>
 
         {/* Seção Higiene do Sono */}
-        <VuiBox mt={6} mb={4}>
+        <VuiBox mt={{ xs: 4, md: 6 }} mb={4}>
           <VuiBox display="flex" alignItems="center" mb={3}>
-            <IoMoon size={40} color="#2c3e50" style={{ marginRight: 16 }} />
-            <VuiTypography variant="h3" color="white" fontWeight="bold">
+            <IoMoon size={32} color="#2c3e50" style={{ marginRight: 12, flexShrink: 0 }} />
+            <VuiTypography variant="h3" color="white" fontWeight="bold" sx={{ fontSize: { xs: "1.35rem", md: undefined } }}>
               Higiene do Sono
             </VuiTypography>
           </VuiBox>
@@ -766,7 +780,7 @@ const MentalidadeEspiritualidade = () => {
                   mb: 3,
                 }}
               >
-                <VuiBox p={3}>
+                <VuiBox p={{ xs: 2, md: 3 }}>
                   <VuiBox display="flex" alignItems="center" mb={3}>
                     <IoTime size={28} color="#2c3e50" style={{ marginRight: 12 }} />
                     <VuiTypography variant="h5" color="white" fontWeight="bold">
@@ -951,7 +965,12 @@ const MentalidadeEspiritualidade = () => {
                                   zIndex: 2,
                                 }}
                               >
-                                <VuiTypography variant="button" color="white" fontWeight="bold">
+                                <VuiTypography
+                                  component="span"
+                                  color="white"
+                                  fontWeight="bold"
+                                  sx={{ fontSize: "0.95rem !important", lineHeight: 1 }}
+                                >
                                   {index + 1}
                                 </VuiTypography>
                               </VuiBox>
@@ -1136,8 +1155,8 @@ const MentalidadeEspiritualidade = () => {
         })()}
 
         {/* Título da Seção de Padrões */}
-        <VuiBox mb={3} mt={6}>
-          <VuiTypography variant="h4" color="white" fontWeight="bold" mb={1}>
+        <VuiBox mb={3} mt={{ xs: 4, md: 6 }}>
+          <VuiTypography variant="h4" color="white" fontWeight="bold" mb={1} sx={{ fontSize: { xs: "1.15rem", md: undefined } }}>
             Padrões Identificados
           </VuiTypography>
           <VuiTypography variant="button" color="text" fontWeight="regular">
@@ -1195,6 +1214,8 @@ const MentalidadeEspiritualidade = () => {
                         sx={{
                           width: 48,
                           height: 48,
+                          minWidth: 48,
+                          minHeight: 48,
                           borderRadius: "12px",
                           background: `linear-gradient(135deg, ${getPrioridadeColor(
                             padrao.prioridade
@@ -1203,9 +1224,16 @@ const MentalidadeEspiritualidade = () => {
                           alignItems: "center",
                           justifyContent: "center",
                           mr: 2,
+                          flexShrink: 0,
                         }}
                       >
-                        <VuiTypography variant="h6" color="white" fontWeight="bold" sx={{ color: "#FFFFFF !important" }}>
+                        <VuiTypography
+                          component="span"
+                          data-numero-padrao
+                          color="white"
+                          fontWeight="bold"
+                          sx={{ color: "#FFFFFF !important", fontSize: "1.25rem !important", lineHeight: "1 !important" }}
+                        >
                           {padrao.prioridade}
                         </VuiTypography>
                       </VuiBox>
@@ -1221,7 +1249,7 @@ const MentalidadeEspiritualidade = () => {
                   </VuiBox>
                 </AccordionSummary>
 
-                <AccordionDetails sx={{ pt: 3, pb: 3 }}>
+                <AccordionDetails sx={{ pt: { xs: 2, md: 3 }, pb: { xs: 2, md: 3 }, px: { xs: 2, md: 3 } }}>
                   <VuiBox>
                     {/* Categorias e Áreas de Impacto */}
                     <VuiBox mb={3}>
@@ -1383,7 +1411,7 @@ const MentalidadeEspiritualidade = () => {
                         background: "rgba(46, 114, 172, 0.1)",
                       }}
                     >
-                      <VuiBox p={2.5}>
+                      <VuiBox py={{ xs: 1.5, md: 2 }} px={{ xs: 1, md: 1.5 }}>
                         <VuiTypography variant="h6" color="white" fontWeight="bold" mb={2}>
                           Orientações para Transformação
                         </VuiTypography>
@@ -1422,13 +1450,48 @@ const MentalidadeEspiritualidade = () => {
                               }
                               sx={{
                                 borderRadius: "12px",
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                minHeight: 48,
+                                paddingLeft: { xs: 0.1, md: 2 },
+                                paddingRight: { xs: 0.1, md: 2 },
+                                paddingTop: 1.5,
+                                paddingBottom: 1.5,
+                                gap: 2,
+                                "& .MuiAccordionSummary-content": {
+                                  flex: 1,
+                                  minWidth: 0,
+                                  margin: 0,
+                                  paddingRight: 0,
+                                  alignItems: "center",
+                                  display: "flex",
+                                },
+                                "& .MuiAccordionSummary-expandIconWrapper": {
+                                  flexShrink: 0,
+                                  marginLeft: 0,
+                                  padding: 0,
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  minWidth: 40,
+                                },
                               }}
                             >
-                              <VuiBox display="flex" alignItems="center">
+                              <VuiBox
+                                display="flex"
+                                alignItems="center"
+                                flex={1}
+                                minWidth={0}
+                                sx={{ gap: 1.5 }}
+                              >
                                 <VuiBox
                                   sx={{
                                     width: 32,
                                     height: 32,
+                                    minWidth: 32,
+                                    minHeight: 32,
+                                    flexShrink: 0,
                                     borderRadius: "8px",
                                     background: linearGradient(
                                       gradients.info.main,
@@ -1438,19 +1501,29 @@ const MentalidadeEspiritualidade = () => {
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    mr: 2,
                                   }}
                                 >
-                                  <VuiTypography variant="button" color="white" fontWeight="bold" sx={{ color: "#FFFFFF !important" }}>
+                                  <VuiTypography
+                                    component="span"
+                                    data-numero-orientacao
+                                    color="white"
+                                    fontWeight="bold"
+                                    sx={{ color: "#FFFFFF !important", fontSize: "0.95rem !important", lineHeight: "1 !important" }}
+                                  >
                                     {orientacao.numero}
                                   </VuiTypography>
                                 </VuiBox>
-                                <VuiTypography variant="h6" color="white" fontWeight="bold">
+                                <VuiTypography
+                                  variant="h6"
+                                  color="white"
+                                  fontWeight="bold"
+                                  sx={{ flex: 1, minWidth: 0, pr: 1 }}
+                                >
                                   {orientacao.titulo}
                                 </VuiTypography>
                               </VuiBox>
                             </AccordionSummary>
-                            <AccordionDetails sx={{ pt: 2, pb: 2 }}>
+                            <AccordionDetails sx={{ pt: { xs: 1.5, md: 2 }, pb: { xs: 1.5, md: 2 }, px: { xs: 1.5, md: 2 } }}>
                               <VuiBox>
                                 <VuiBox mb={2}>
                                   <VuiTypography

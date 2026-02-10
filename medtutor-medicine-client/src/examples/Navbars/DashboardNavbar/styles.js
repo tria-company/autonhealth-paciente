@@ -8,6 +8,7 @@ function navbar(theme, ownerState) {
   const { borderRadius } = borders;
 
   return {
+    width: "100%",
     boxShadow: transparentNavbar || absolute ? "none" : navbarBoxShadow,
     backdropFilter: transparentNavbar || absolute ? "none" : `blur(${pxToRem(42)})`,
     backgroundColor: `${transparent.main} !important`,
@@ -56,8 +57,9 @@ function navbar(theme, ownerState) {
 
     "& .MuiToolbar-root": {
       display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
+      justifyContent: "flex-start",
+      alignItems: "stretch",
+      width: "100%",
 
       [breakpoints.up("sm")]: {
         minHeight: "auto",

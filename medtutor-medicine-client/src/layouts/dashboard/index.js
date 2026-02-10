@@ -204,22 +204,20 @@ function Dashboard() {
   // Formatar valores para exibição
   const equilibrioGeral = metricas.equilibrio_geral?.toFixed(1) || "0.0";
 
-  const sonoHoras = metricas.qualidade_sono_horas || 0;
-  const sonoHorasFormatado = `${Math.floor(sonoHoras)}h:${Math.round((sonoHoras % 1) * 60)}min`;
-  const sonoVariacao = metricas.qualidade_sono_variacao_minutos 
-    ? (metricas.qualidade_sono_variacao_minutos >= 0 ? `+${metricas.qualidade_sono_variacao_minutos}min` : `${metricas.qualidade_sono_variacao_minutos}min`)
-    : "+0min";
-
-  // Hidratação: consumo atual vem do check-in; meta vem da consulta (igual à alimentação)
+  // Hidratação: média do período a partir do histórico de check-ins (respeita filtro de período)
   const metaAguaLitros = habitosVida?.metaAguaMl != null ? habitosVida.metaAguaMl / 1000 : null;
-  const hidratacaoAtual = metricas.hidratacao_atual_litros != null ? Number(metricas.hidratacao_atual_litros).toFixed(1) : "0.0";
   const metaAguaNum = (metaAguaLitros != null && !Number.isNaN(metaAguaLitros)) ? metaAguaLitros : 2.4;
+  const hidratacaoMediaPeriodo = historico?.length > 0
+    ? historico.reduce((acc, c) => acc + (Number(c.alimentacao_agua_litros) || 0), 0) / historico.length
+    : null;
+  const hidratacaoAtualNum = hidratacaoMediaPeriodo != null ? hidratacaoMediaPeriodo : (metricas.hidratacao_atual_litros ?? 0);
+  const hidratacaoAtual = hidratacaoAtualNum != null ? Number(hidratacaoAtualNum).toFixed(1) : "0.0";
   const hidratacaoMeta = metaAguaNum.toFixed(1);
-  const hidratacaoPercentual = (metaAguaNum > 0 && metricas.hidratacao_atual_litros != null)
-    ? Math.min(100, Math.round((metricas.hidratacao_atual_litros / metaAguaNum) * 100))
+  const hidratacaoPercentual = (metaAguaNum > 0 && hidratacaoAtualNum != null)
+    ? Math.min(100, Math.round((hidratacaoAtualNum / metaAguaNum) * 100))
     : null;
 
-  // Exercício: prescrição (pilar2, min/dia) vs realizado no check-in (média atividade_tempo_horas → min)
+  // Exercício: prescrição (pilar2, min/dia) vs realizado no check-in (média do período)
   const exercicioMetaMin = habitosVida?.exercicioDuracaoMin ?? null;
   const exercicioAtualMin = historico?.length > 0
     ? Math.round(
@@ -231,13 +229,22 @@ function Dashboard() {
     ? Math.min(100, Math.round((exercicioAtualMin / exercicioMetaNum) * 100))
     : null;
 
-  // Sono: meta (pilar3, horas) vs realizado no check-in (qualidade_sono_horas = média sono_tempo_horas)
+  // Qualidade do sono: média do período a partir do histórico de check-ins (respeita filtro de período)
   const sonoMetaHoras = habitosVida?.sonoDuracaoHoras ?? null;
-  const sonoAtualHoras = metricas.qualidade_sono_horas ?? 0;
+  const sonoMediaPeriodo = historico?.length > 0
+    ? historico.reduce((acc, c) => acc + (Number(c.sono_tempo_horas) || 0), 0) / historico.length
+    : null;
+  const sonoAtualHoras = sonoMediaPeriodo != null ? sonoMediaPeriodo : (metricas.qualidade_sono_horas ?? 0);
   const sonoMetaNum = sonoMetaHoras != null && sonoMetaHoras > 0 ? sonoMetaHoras : 8;
   const sonoPercentual = sonoMetaNum > 0
     ? Math.min(100, Math.round((sonoAtualHoras / sonoMetaNum) * 100))
     : null;
+
+  const sonoHoras = sonoAtualHoras || 0;
+  const sonoHorasFormatado = `${Math.floor(sonoHoras)}h:${Math.round((sonoHoras % 1) * 60)}min`;
+  const sonoVariacao = metricas.qualidade_sono_variacao_minutos != null
+    ? (metricas.qualidade_sono_variacao_minutos >= 0 ? `+${metricas.qualidade_sono_variacao_minutos}min` : `${metricas.qualidade_sono_variacao_minutos}min`)
+    : "+0min";
 
   // Debug: Ver valores brutos das métricas
   console.log("📊 Métricas brutas do banco:", {
@@ -273,6 +280,7 @@ function Dashboard() {
                 "&:after": { borderColor: "#2c3e50" },
               }}
             >
+              <MenuItem value={1}>Hoje</MenuItem>
               <MenuItem value={7}>Últimos 7 dias</MenuItem>
               <MenuItem value={15}>Últimos 15 dias</MenuItem>
               <MenuItem value={30}>Últimos 30 dias</MenuItem>
@@ -333,7 +341,7 @@ function Dashboard() {
               <IdadeBiologica />
             </Grid>
             <Grid item xs={12} lg={6} xl={4}>
-              <ReferralTracking />
+              <ReferralTracking periodo={periodo} />
             </Grid>
           </Grid>
         </VuiBox>

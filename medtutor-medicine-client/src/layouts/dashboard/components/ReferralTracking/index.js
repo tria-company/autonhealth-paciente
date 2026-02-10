@@ -7,33 +7,36 @@ import VuiTypography from 'components/VuiTypography';
 import colors from 'assets/theme/base/colors';
 import linearGradient from 'assets/theme/functions/linearGradient';
 import { usePaciente } from 'hooks/usePaciente';
-import { buscarMetricasPaciente } from 'lib/checkins';
+import { buscarHistoricoCheckins, calcularAderenciaProtocolo } from 'lib/checkins';
 
-function ReferralTracking() {
+/**
+ * Exibe a Aderência ao Protocolo com base na meta: % em relação ao estipulado (dias com check-in).
+ * Meta = período selecionado (ex.: 7 dias = meta 7). Quanto mais próximo da meta, maior a aderência.
+ */
+function ReferralTracking({ periodo = 7 }) {
 	const { info, gradients } = colors;
 	const { cardContent } = gradients;
 	const { paciente } = usePaciente();
 	const location = useLocation();
-	const [aderencia, setAderencia] = useState(0);
+	const [resultado, setResultado] = useState({ percentual: 0, realizado: 0, meta: periodo });
 
 	// Resetar estado quando a rota mudar
 	useEffect(() => {
-		setAderencia(0);
-	}, [location.pathname]);
+		setResultado({ percentual: 0, realizado: 0, meta: periodo });
+	}, [location.pathname, periodo]);
 
 	useEffect(() => {
 		async function carregarAderencia() {
 			if (paciente?.id) {
-				const metricas = await buscarMetricasPaciente(paciente.id);
-				if (metricas && metricas.aderencia_protocolo !== null) {
-					setAderencia(metricas.aderencia_protocolo);
-				}
+				const historico = await buscarHistoricoCheckins(paciente.id, periodo);
+				const res = calcularAderenciaProtocolo(historico, periodo);
+				setResultado(res);
 			}
 		}
 		carregarAderencia();
-	}, [paciente, location.pathname]);
+	}, [paciente?.id, periodo, location.pathname]);
 
-	// Normalizar aderência para 0-1
+	const aderencia = resultado.percentual;
 	const progress = (aderencia / 100) || 0;
 	const aderenciaFormatada = Math.round(aderencia);
 
@@ -120,7 +123,7 @@ function ReferralTracking() {
                                 {aderenciaFormatada}%
                             </VuiTypography>
                             <VuiTypography color='text' variant='caption' fontWeight='regular'>
-                                de check-ins realizados
+                                {resultado.realizado} de {resultado.meta} dias (meta)
                             </VuiTypography>
                         </VuiBox>
                         <VuiTypography color='text' variant='caption'>100%</VuiTypography>

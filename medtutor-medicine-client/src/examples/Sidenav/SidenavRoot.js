@@ -60,7 +60,10 @@ export default styled(Drawer)(({ theme, ownerState }) => {
       boxShadow: xxl,
       border: "none",
       height: "100vh",
+      maxHeight: "100dvh",
       overflow: "hidden",
+      display: "flex",
+      flexDirection: "column",
       background: transparentSidenav
       ? transparent.main
       : linearGradient(

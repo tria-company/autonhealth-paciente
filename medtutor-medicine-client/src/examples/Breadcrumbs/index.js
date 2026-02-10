@@ -26,62 +26,83 @@ function getRouteLabel(segment) {
   return ROUTE_LABELS[segment] || segment.replace(/-/g, " ");
 }
 
-function Breadcrumbs({ icon, title, route, light }) {
-  const routeArray = Array.isArray(route) ? route : [route];
+function Breadcrumbs({ icon, title, route, light, inline }) {
+  const routeArray = Array.isArray (route) ? route : [route];
   const routes = routeArray.slice(0, -1);
+  const currentLabel = getRouteLabel(title || routeArray[routeArray.length - 1]);
 
-  return (
-    <VuiBox mr={{ xs: 0, xl: 8 }}>
-      <MuiBreadcrumbs
-        sx={{
-          "& .MuiBreadcrumbs-separator": {
-            color: ({ palette: { white, grey } }) => (light ? white.main : grey[600]),
-          },
-        }}
-      >
-        <Link to="/dashboard">
-          <VuiTypography
-            component="span"
-            variant="body2"
-            color={light ? "white" : "dark"}
-            opacity={light ? 0.8 : 0.5}
-            sx={{ lineHeight: 0 }}
-          >
-            <Icon>{icon}</Icon>
-          </VuiTypography>
-        </Link>
-        {routes.map((el) => (
-          <VuiTypography
-            key={el}
-            component="span"
-            variant="button"
-            fontWeight="regular"
-            color={light ? "white" : "dark"}
-            opacity={light ? 0.8 : 0.5}
-            sx={{ lineHeight: 0, textTransform: "capitalize" }}
-          >
-            {getRouteLabel(el)}
-          </VuiTypography>
-        ))}
+  const breadcrumbContent = (
+    <MuiBreadcrumbs
+      sx={{
+        "& .MuiBreadcrumbs-separator": {
+          color: ({ palette: { white, grey } }) => (light ? white.main : grey[600]),
+        },
+      }}
+    >
+      <Link to="/dashboard">
         <VuiTypography
-          variant="button"
-          fontWeight="regular"
-          textTransform="capitalize"
+          component="span"
+          variant="body2"
           color={light ? "white" : "dark"}
+          opacity={light ? 0.8 : 0.5}
           sx={{ lineHeight: 0 }}
         >
-          {getRouteLabel(title || routeArray[routeArray.length - 1])}
+          <Icon>{icon}</Icon>
         </VuiTypography>
-      </MuiBreadcrumbs>
+      </Link>
+      {routes.map((el) => (
+        <VuiTypography
+          key={el}
+          component="span"
+          variant="button"
+          fontWeight="regular"
+          color={light ? "white" : "dark"}
+          opacity={light ? 0.8 : 0.5}
+          sx={{ lineHeight: 0, textTransform: "capitalize" }}
+        >
+          {getRouteLabel(el)}
+        </VuiTypography>
+      ))}
       <VuiTypography
-        fontWeight="bold"
+        variant="button"
+        fontWeight="regular"
         textTransform="capitalize"
-        variant="h6"
         color={light ? "white" : "dark"}
-        noWrap
+        sx={{ lineHeight: 0 }}
       >
-        {getRouteLabel(title || routeArray[routeArray.length - 1])}
+        {currentLabel}
       </VuiTypography>
+    </MuiBreadcrumbs>
+  );
+
+  const titleContent = (
+    <VuiTypography
+      fontWeight="bold"
+      textTransform="capitalize"
+      variant="h6"
+      color={light ? "white" : "dark"}
+      noWrap
+    >
+      {currentLabel}
+    </VuiTypography>
+  );
+
+  return (
+    <VuiBox
+      mr={{ xs: 0, xl: 8 }}
+      sx={
+        inline
+          ? {
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 1,
+            }
+          : {}
+      }
+    >
+      
+      {titleContent}
     </VuiBox>
   );
 }
@@ -89,6 +110,7 @@ function Breadcrumbs({ icon, title, route, light }) {
 // Setting default values for the props of Breadcrumbs
 Breadcrumbs.defaultProps = {
   light: false,
+  inline: false,
 };
 
 // Typechecking props for the Breadcrumbs
@@ -97,6 +119,7 @@ Breadcrumbs.propTypes = {
   title: PropTypes.string.isRequired,
   route: PropTypes.oneOfType([PropTypes.string, PropTypes.array]).isRequired,
   light: PropTypes.bool,
+  inline: PropTypes.bool,
 };
 
 export default Breadcrumbs;
