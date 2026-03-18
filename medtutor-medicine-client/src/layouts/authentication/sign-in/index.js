@@ -181,16 +181,28 @@ function SignIn() {
             />
           </GradientBorder>
         </VuiBox>
-        <VuiBox display="flex" alignItems="center">
-          <VuiSwitch color="info" checked={rememberMe} onChange={handleSetRememberMe} disabled={loading} />
+        <VuiBox display="flex" alignItems="center" justifyContent="space-between">
+          <VuiBox display="flex" alignItems="center">
+            <VuiSwitch color="info" checked={rememberMe} onChange={handleSetRememberMe} disabled={loading} />
+            <VuiTypography
+              variant="caption"
+              color="white"
+              fontWeight="medium"
+              onClick={handleSetRememberMe}
+              sx={{ cursor: "pointer", userSelect: "none" }}
+            >
+              &nbsp;&nbsp;&nbsp;&nbsp;Lembrar-me
+            </VuiTypography>
+          </VuiBox>
           <VuiTypography
+            component={Link}
+            to="/authentication/forgot-password"
             variant="caption"
             color="white"
             fontWeight="medium"
-            onClick={handleSetRememberMe}
-            sx={{ cursor: "pointer", userSelect: "none" }}
+            sx={{ cursor: "pointer", "&:hover": { opacity: 0.8 } }}
           >
-            &nbsp;&nbsp;&nbsp;&nbsp;Lembrar-me
+            Esqueci minha senha
           </VuiTypography>
         </VuiBox>
         <VuiBox mt={4} mb={1}>

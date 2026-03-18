@@ -20,6 +20,7 @@ import createCache from "@emotion/cache";
 import routes from "routes";
 import EducacionalModulo from "layouts/educacional/modulo";
 import SignIn from "layouts/authentication/sign-in";
+import ForgotPassword from "layouts/authentication/forgot-password";
 import ProtectedRoute from "components/ProtectedRoute";
 
 import { useVisionUIController, setMiniSidenav } from "context";
@@ -112,6 +113,7 @@ export default function App() {
         )}
         <Switch>
           <Route exact path="/authentication/sign-in" component={SignIn} />
+          <Route exact path="/authentication/forgot-password" component={ForgotPassword} />
           <ProtectedRoute exact path="/educacional/modulo/:moduloId" component={EducacionalModulo} />
           {getRoutes(routes)}
           <Redirect from="/" to="/authentication/sign-in" />
@@ -136,6 +138,7 @@ export default function App() {
       )}
       <Switch>
         <Route exact path="/authentication/sign-in" component={SignIn} />
+        <Route exact path="/authentication/forgot-password" component={ForgotPassword} />
         <ProtectedRoute exact path="/educacional/modulo/:moduloId" component={EducacionalModulo} />
         {getRoutes(routes)}
         <Redirect from="/" to="/authentication/sign-in" />
