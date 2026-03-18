@@ -36,7 +36,7 @@ function ForgotPassword() {
 
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/authentication/reset-password`,
+        redirectTo: "https://autonhealth.com.br/auth/reset-password",
       });
 
       if (resetError) {
