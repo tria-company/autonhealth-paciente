@@ -37,6 +37,7 @@ import LineChart from "examples/Charts/LineCharts/LineChart";
 import BarChart from "examples/Charts/BarCharts/BarChart";
 import { lineChartOptionsDashboard } from "layouts/dashboard/data/lineChartOptions";
 import EquilibrioGeralWidget from "layouts/dashboard/components/EquilibrioGeralWidget";
+import EvolucaoPaciente from "layouts/dashboard/components/EvolucaoPaciente";
 import { barChartDataDashboard } from "layouts/dashboard/data/barChartData";
 import { barChartOptionsDashboard } from "layouts/dashboard/data/barChartOptions";
 
@@ -408,7 +409,10 @@ function Dashboard() {
             </VuiBox>
           </Card>
         </VuiBox>
-        {/* Removed Projects and Orders overview section as requested */}
+        {/* Evolução do Paciente */}
+        <VuiBox mb={3}>
+          <EvolucaoPaciente />
+        </VuiBox>
       </VuiBox>
       <Footer />
     </DashboardLayout>
